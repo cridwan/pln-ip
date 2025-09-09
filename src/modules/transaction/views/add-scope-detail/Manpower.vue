@@ -18,11 +18,12 @@ import type {
   ManpowerStdCreateModelInterface,
   ManpowerStdInterface,
 } from "@/modules/master/types/ManpowerStdType";
-
 import { ColumnsManpower } from "@/modules/transaction/constants/ManpowerConstant";
 import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
 import FilterManpowerStd from "@/modules/transaction/components/add-scope/FilterManpowerStd.vue";
 import FormManpowerStd from "@/modules/transaction/components/FormManpowerStd.vue";
+
+import type { ProjectInterface } from "../../types/ProjectType";
 
 const transactionStore = useTransactionStore();
 const route = useRoute();
@@ -54,6 +55,22 @@ const selected_item = ref<ManpowerStdInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
+
+//--- GET STATUS APPROVAL
+const { data: dataApproval } = useQuery({
+  queryKey: ["getApprovalAtManpowerAddScope"],
+  queryFn: async () => {
+    const { data } = await transactionStore.getProject(
+      route.params.id_project as string
+    );
+    const response = data.data.data as ProjectInterface;
+
+    return response;
+  },
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
 
 //--- GET MANPOWER
 const {
@@ -204,7 +221,6 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: ManpowerStdCreateModelInterface) => {
-  console.log("HAHA", data);
   dataForm.value = data;
   setFilter();
   refetchManPower();
@@ -232,33 +248,66 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate"
-      v-if="dataForm?.activity_uuid" />
+    <Button
+      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterManpowerStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingManPower" />
+        <FilterManpowerStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="isLoadingManPower"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Manpower" :columns="ColumnsManpower" :entities="dataManPower?.data || []"
-            :loading="isLoadingManPower" :pagination="pagination" :is-create="false" class="mt-6"
-            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
+          <Table
+            label-create="Manpower"
+            :columns="ColumnsManpower"
+            :entities="dataManPower?.data || []"
+            :loading="isLoadingManPower"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="dataApproval?.status !== 'approve'"
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+                <Icon
+                  name="pencil"
+                  class="icon-action-table"
+                  @click="handleUpdate(entity)"
+                />
+                <Icon
+                  name="trash"
+                  class="icon-action-table"
+                  @click="handleDelete(entity)"
+                />
               </div>
             </template>
             <template #column_manpower="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.manpower?.name ?? "-" }}
               </p>
             </template>
             <template #column_qty="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.qty ?? "-" }}
               </p>
             </template>
@@ -269,8 +318,18 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormManpowerStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-    @error="handleError" @removeSucess="handleRemoveSuccess" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.manpower?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <FormManpowerStd
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.manpower?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

@@ -3,7 +3,14 @@ import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 
-import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type {
@@ -11,12 +18,13 @@ import type {
   ConsumableMaterialStdInterface,
 } from "@/modules/master/types/ConsumableMaterialStdType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
-
 import { ColumnsConsumableMaterial } from "@/modules/transaction/constants/ConsumableMaterialConstant";
 import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
 import FormConsumableMaterialStd from "@/modules/transaction/components/FormConsumableMaterialStd.vue";
 import FilterConsumableMaterialStd from "@/modules/transaction/components/add-scope/FilterConsumableMaterialStd.vue";
 import { numberFormat } from "@/helpers/global";
+
+import type { ProjectInterface } from "../../types/ProjectType";
 
 const transactionStore = useTransactionStore();
 const route = useRoute();
@@ -48,6 +56,22 @@ const selected_item = ref<ConsumableMaterialStdInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
+
+//--- GET STATUS APPROVAL
+const { data: dataApproval } = useQuery({
+  queryKey: ["getApprovalAtConsMatAddScope"],
+  queryFn: async () => {
+    const { data } = await transactionStore.getProject(
+      route.params.id_project as string
+    );
+    const response = data.data.data as ProjectInterface;
+
+    return response;
+  },
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
 
 //--- GET CONSMAT STD
 const {
@@ -225,44 +249,80 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate"
-      v-if="dataForm?.activity_uuid" />
+    <Button
+      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
-          :loading="isLoadingConsMat" />
+        <FilterConsumableMaterialStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="isLoadingConsMat"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Material" :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []"
-            :loading="isLoadingConsMat" :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
-            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
-            <template #column_action="{ entity }">
+          <Table
+            label-create="Material"
+            :columns="ColumnsConsumableMaterial"
+            :entities="dataConsMat?.data || []"
+            :loading="isLoadingConsMat"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="false"
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
+            <!-- <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+                <Icon
+                  name="pencil"
+                  class="icon-action-table"
+                  @click="handleUpdate(entity)"
+                />
+                <Icon
+                  name="trash"
+                  class="icon-action-table"
+                  @click="handleDelete(entity)"
+                />
               </div>
-            </template>
+            </template> -->
             <template #column_material="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.name ?? "-" }}
               </p>
             </template>
             <template #column_merk="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.merk ?? "-" }}
               </p>
             </template>
             <template #column_price="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
             <template #column_unit="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.global_unit?.name ?? "-" }}
               </p>
             </template>
@@ -273,8 +333,18 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormConsumableMaterialStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
-    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <FormConsumableMaterialStd
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.consmat?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

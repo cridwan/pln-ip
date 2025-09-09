@@ -3,7 +3,14 @@ import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 
-import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type {
@@ -294,22 +301,30 @@ onMounted(() => {
               </div>
             </template> -->
             <template #column_material="{ entity }">
-              <p class="text-base text-neutral-50 text-left">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.name ?? "-" }}
               </p>
             </template>
             <template #column_merk="{ entity }">
-              <p class="text-base text-neutral-50 text-left">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.merk ?? "-" }}
               </p>
             </template>
             <template #column_price="{ entity }">
-              <p class="text-base text-neutral-50 text-left">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
             <template #column_unit="{ entity }">
-              <p class="text-base text-neutral-50 text-left">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.global_unit?.name ?? "-" }}
               </p>
             </template>
