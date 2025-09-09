@@ -17,14 +17,14 @@ export const ColumnsPart: TableColumnType[] = [
   {
     key: "unit",
     label: "Unit",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },
   {
     key: "number_drawing",
     label: "No. Drawing",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },

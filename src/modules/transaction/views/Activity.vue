@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
 
 import {
@@ -11,18 +12,18 @@ import {
   Toast,
 } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
-import type { IPagination } from "@/types/GlobalType";
-import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
-
 import { ColumnsActivity } from "@/modules/master/constants/ActivityConstant";
+import FilterActivity from "@/modules/transaction/components/FilterActivity.vue";
 import type {
   ActivityInterface,
   ActivityModelCreateInterface,
 } from "@/modules/master/types/AcitivityType";
+import type { IPagination } from "@/types/GlobalType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
+
 import FormActivity from "../components/FormActivity.vue";
-import FilterActivity from "@/modules/transaction/components/FilterActivity.vue";
-import { useRoute } from "vue-router";
 import { useTransactionStore } from "../stores/TransactionStore";
+import type { ProjectInterface } from "../types/ProjectType";
 
 const route = useRoute();
 const dataForm = ref<ActivityModelCreateInterface | null>(null);
@@ -55,6 +56,22 @@ const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 
+//--- GET STATUS APPROVAL
+const { data: dataApproval } = useQuery({
+  queryKey: ["getApprovalAtActivity"],
+  queryFn: async () => {
+    const { data } = await transactionStore.getProject(
+      route.params.id_project as string
+    );
+    const response = data.data.data as ProjectInterface;
+
+    return response;
+  },
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
+
 //--- GET ACTIVITY
 const {
   data: dataActivity,
@@ -75,6 +92,7 @@ const {
       throw err.response;
     }
   },
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -101,6 +119,7 @@ const { mutate: deleteActivity, isPending: isLoadingDelete } = useMutation({
       type: "error",
     });
   },
+  retry: 0,
 });
 //--- END
 
@@ -227,21 +246,52 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate"
-      v-if="dataForm?.equipment_uuid" />
+    <Button
+      v-if="dataForm?.equipment_uuid && dataApproval?.status !== 'approve'"
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterActivity @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingActivity" />
+        <FilterActivity
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="isLoadingActivity"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
-          :loading="isLoadingActivity" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
-          class="mt-6" @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+        <Table
+          label-create="Sub Bidang"
+          :columns="ColumnsActivity"
+          :entities="dataActivity?.data || []"
+          :loading="isLoadingActivity"
+          :pagination="pagination"
+          :is-create="false"
+          :is-action="dataApproval?.status !== 'approve'"
+          v-model:model-search="params.search"
+          class="mt-6"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <!-- <Icon
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              /> -->
+              <Icon
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+              />
             </div>
           </template>
           <template #column_equipment="{ entity }">
@@ -253,12 +303,23 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormActivity v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+    <FormActivity
+      v-model="open_form"
+      :data-form="dataForm"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+    />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>
 
 <style lang="sass"></style>

@@ -34,6 +34,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["save"]);
@@ -85,12 +89,13 @@ defineExpose({
             'button-trigger-active': modelOpenInputData === true,
           },
           value && value?.file?.length > 0 ? 'button-trigger-active' : '',
+          disabled ? 'cursor-default' : 'cursor-pointer',
         ]"
       >
         {{ value && value?.file?.length > 0 ? "Active" : "Add" }}
       </button>
     </PopoverTrigger>
-    <PopoverPortal>
+    <PopoverPortal v-if="!disabled">
       <PopoverContent :side-offset="5" class="popover-content-upload">
         <p class="popover-title">{{ label }}</p>
         <div class="mt-4">

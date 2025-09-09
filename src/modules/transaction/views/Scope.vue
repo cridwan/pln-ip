@@ -22,6 +22,7 @@ import type {
 import { useTransactionStore } from "../stores/TransactionStore";
 import FilterScope from "../components/FilterScope.vue";
 import FormScope from "../components/FormScope.vue";
+import type { ProjectInterface } from "../types/ProjectType";
 
 const open_form = ref(false);
 const entitiesScope = ref<ScopeInterface[]>([]);
@@ -62,12 +63,25 @@ const file = ref<File | null>(null);
 const is_loading_create = ref(false);
 const timeout = ref(0);
 const file_deleted = ref("");
+
+//--- GET STATUS APPROVAL
+const { data: dataApproval } = useQuery({
+  queryKey: ["getApprovalAtScope"],
+  queryFn: async () => {
+    const { data } = await transactionStore.getProject(
+      route.params.id_project as string
+    );
+    const response = data.data.data as ProjectInterface;
+
+    return response;
+  },
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
+
 //--- GET SCOPE
-const {
-  data: dataScope,
-  isFetching: isLoadingScope,
-  refetch: refetchScope,
-} = useQuery({
+const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
   queryKey: ["getScopeTransaction"],
   queryFn: async () => {
     try {
@@ -81,104 +95,97 @@ const {
             asset: item.name || "",
             asset_welness: item.asset_welnes
               ? {
-                color: item.asset_welnes?.color,
-                note: item.asset_welnes?.note,
-                file: item.asset_welnes?.document
-                  ? [
-                    {
-                      id: item.asset_welnes.document.uuid,
-                      name: item.asset_welnes.document
-                        .document_original_name,
-                      size: item.asset_welnes.document.document_size,
-                      file: item.asset_welnes.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  color: item.asset_welnes?.color,
+                  note: item.asset_welnes?.note,
+                  file: item.asset_welnes?.document
+                    ? [
+                        {
+                          id: item.asset_welnes.document.uuid,
+                          name: item.asset_welnes.document
+                            .document_original_name,
+                          size: item.asset_welnes.document.document_size,
+                          file: item.asset_welnes.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             oh_recom: item.oh_recom
               ? {
-                note: item.oh_recom?.note,
-                file: item.oh_recom?.document
-                  ? [
-                    {
-                      id: item.oh_recom.document.uuid,
-                      name: item.oh_recom.document.document_original_name,
-                      size: item.oh_recom.document.document_size,
-                      file: item.oh_recom.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.oh_recom?.note,
+                  file: item.oh_recom?.document
+                    ? [
+                        {
+                          id: item.oh_recom.document.uuid,
+                          name: item.oh_recom.document.document_original_name,
+                          size: item.oh_recom.document.document_size,
+                          file: item.oh_recom.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             wo_priority: item.wo_priority
               ? {
-                note: item.wo_priority?.note,
-                file: item.wo_priority?.document
-                  ? [
-                    {
-                      id: item.wo_priority.document.uuid,
-                      name: item.wo_priority.document
-                        .document_original_name,
-                      size: item.wo_priority.document.document_size,
-                      file: item.wo_priority.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.wo_priority?.note,
+                  file: item.wo_priority?.document
+                    ? [
+                        {
+                          id: item.wo_priority.document.uuid,
+                          name: item.wo_priority.document
+                            .document_original_name,
+                          size: item.wo_priority.document.document_size,
+                          file: item.wo_priority.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             history: item.history
               ? {
-                note: item.history?.note,
-                file: item.history?.document
-                  ? [
-                    {
-                      id: item.history.document.uuid,
-                      name: item.history.document.document_original_name,
-                      size: item.history.document.document_size,
-                      file: item.history.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.history?.note,
+                  file: item.history?.document
+                    ? [
+                        {
+                          id: item.history.document.uuid,
+                          name: item.history.document.document_original_name,
+                          size: item.history.document.document_size,
+                          file: item.history.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             rla: item.rla
               ? {
-                note: item.rla?.note,
-                file: item.rla?.document
-                  ? [
-                    {
-                      id: item.rla.document.uuid,
-                      name: item.rla.document.document_original_name,
-                      size: item.rla.document.document_size,
-                      file: item.rla.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.rla?.note,
+                  file: item.rla?.document
+                    ? [
+                        {
+                          id: item.rla.document.uuid,
+                          name: item.rla.document.document_original_name,
+                          size: item.rla.document.document_size,
+                          file: item.rla.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             ncr: item.ncr
               ? {
-                note: item.ncr?.note,
-                file: item.ncr?.document
-                  ? [
-                    {
-                      id: item.ncr.document.uuid,
-                      name: item.ncr.document.document_original_name,
-                      size: item.ncr.document.document_size,
-                      file: item.ncr.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.ncr?.note,
+                  file: item.ncr?.document
+                    ? [
+                        {
+                          id: item.ncr.document.uuid,
+                          name: item.ncr.document.document_original_name,
+                          size: item.ncr.document.document_size,
+                          file: item.ncr.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
-            // children: item.details.map((el) => {
-            //     return {
-            //         id: el.uuid,
-            //         name: el.name,
-            //         document: el.document,
-            //     };
-            // }),
             document: item.document,
           };
         }) || [];
@@ -189,6 +196,7 @@ const {
       throw err.response;
     }
   },
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -214,6 +222,7 @@ const {
       throw err.response;
     }
   },
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -278,6 +287,7 @@ const { mutate: createScope } = useMutation({
     file.value = null;
     is_loading_create.value = false;
   },
+  retry: 0,
 });
 //--- END
 
@@ -312,6 +322,7 @@ const { mutate: createDocument } = useMutation({
     file.value = null;
     is_loading_create.value = false;
   },
+  retry: 0,
 });
 //--- END
 
@@ -338,6 +349,7 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       type: "error",
     });
   },
+  retry: 0,
 });
 //--- END
 
@@ -509,63 +521,158 @@ const handleError = (error: any) => {
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.asset" :loading="isLoadingDelete" @delete="onDelete" />
-  <div class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1">
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.asset"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
+  <div
+    class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1"
+  >
     <span v-if="isLoadingDuration">Loading...</span>
     <span v-else>{{ dataDuration }} Days</span>
   </div>
-  <Button v-if="dataForm?.sub_bidang_uuid" icon_only="plus" class="absolute right-[9rem] top-[6.5rem]" size="sm"
-    rounded="full" color="blue" @click="handleCreate" />
+  <Button
+    v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'"
+    icon_only="plus"
+    class="absolute right-[9rem] top-[6.5rem]"
+    size="sm"
+    rounded="full"
+    color="blue"
+    @click="handleCreate"
+  />
   <div class="flex gap-8">
     <div class="basis-1/5">
-      <FilterScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingScope" />
+      <FilterScope
+        @filter="handleOnFilter"
+        @reset-filter="handleResetFilter"
+        :loading="isLoadingScope"
+      />
     </div>
     <div class="flex-1 overflow-auto">
       <div class="max-w-full min-w-full">
-        <Table label-create="Asset" :columns="ColumnsScope" :entities="entitiesScope" :loading="isLoadingScope"
-          :pagination="pagination" :is-create="false" v-model:model-search="params.search" @delete="handleDelete"
-          @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+        <Table
+          label-create="Asset"
+          :columns="ColumnsScope"
+          :entities="entitiesScope"
+          :loading="isLoadingScope"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          @delete="handleDelete"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_asset_welness="{ entity }">
             <div class="w-full flex justify-center">
-              <FormAssetWelness ref="asset_welness" :value="entity.asset_welness" :label="entity.asset"
-                :loading="is_loading_create" @save="(e) => saveAssetWelness(e, entity)" />
+              <p
+                v-if="
+                  dataApproval?.status === 'approve' && !entity.asset_welness
+                "
+              >
+                -
+              </p>
+              <FormAssetWelness
+                v-else
+                ref="asset_welness"
+                :value="entity.asset_welness"
+                :label="entity.asset"
+                :loading="is_loading_create"
+                :disabled="dataApproval?.status === 'approve'"
+                @save="(e) => saveAssetWelness(e, entity)"
+              />
             </div>
           </template>
           <template #column_oh_recom="{ entity }">
             <div class="w-full flex justify-center">
-              <FormWithUploadFile ref="oh_recom" :value="entity.oh_recom" :label="entity.asset"
-                :loading="is_loading_create" @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')" />
+              <p v-if="dataApproval?.status === 'approve' && !entity.oh_recom">
+                -
+              </p>
+              <FormWithUploadFile
+                v-else
+                ref="oh_recom"
+                :value="entity.oh_recom"
+                :label="entity.asset"
+                :loading="is_loading_create"
+                :disabled="dataApproval?.status === 'approve'"
+                @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')"
+              />
             </div>
           </template>
           <template #column_wo_priority="{ entity }">
             <div class="w-full flex justify-center">
-              <FormWithUploadFile ref="wo_priority" :value="entity.wo_priority" :label="entity.asset"
-                :loading="is_loading_create" @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')" />
+              <p
+                v-if="dataApproval?.status === 'approve' && !entity.wo_priority"
+              >
+                -
+              </p>
+              <FormWithUploadFile
+                v-else
+                ref="wo_priority"
+                :value="entity.wo_priority"
+                :label="entity.asset"
+                :loading="is_loading_create"
+                :disabled="dataApproval?.status === 'approve'"
+                @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')"
+              />
             </div>
           </template>
           <template #column_history="{ entity }">
             <div class="w-full flex justify-center">
-              <FormWithUploadFile ref="history" :value="entity.history" :label="entity.asset"
-                :loading="is_loading_create" @save="(e) => saveFieldWithFile(e, entity, 'history')" />
+              <p v-if="dataApproval?.status === 'approve' && !entity.history">
+                -
+              </p>
+              <FormWithUploadFile
+                v-else
+                ref="history"
+                :value="entity.history"
+                :label="entity.asset"
+                :loading="is_loading_create"
+                :disabled="dataApproval?.status === 'approve'"
+                @save="(e) => saveFieldWithFile(e, entity, 'history')"
+              />
             </div>
           </template>
           <template #column_rla="{ entity }">
             <div class="w-full flex justify-center">
-              <FormWithUploadFile ref="rla" :value="entity.rla" :label="entity.asset" :loading="is_loading_create"
-                @save="(e) => saveFieldWithFile(e, entity, 'rla')" />
+              <p v-if="dataApproval?.status === 'approve' && !entity.rla">-</p>
+              <FormWithUploadFile
+                v-else
+                ref="rla"
+                :value="entity.rla"
+                :label="entity.asset"
+                :loading="is_loading_create"
+                :disabled="dataApproval?.status === 'approve'"
+                @save="(e) => saveFieldWithFile(e, entity, 'rla')"
+              />
             </div>
           </template>
           <template #column_ncr="{ entity }">
             <div class="w-full flex justify-center">
-              <FormWithUploadFile ref="ncr" :value="entity.ncr" :label="entity.asset" :loading="is_loading_create"
-                @save="(e) => saveFieldWithFile(e, entity, 'ncr')" />
+              <p v-if="dataApproval?.status === 'approve' && !entity.ncr">-</p>
+              <FormWithUploadFile
+                v-else
+                ref="ncr"
+                :value="entity.ncr"
+                :label="entity.asset"
+                :loading="is_loading_create"
+                :disabled="dataApproval?.status === 'approve'"
+                @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
+              />
             </div>
           </template>
         </Table>
       </div>
     </div>
 
-    <FormScope v-model="open_form" :dataForm="dataForm" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" />
+    <FormScope
+      v-model="open_form"
+      :dataForm="dataForm"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+    />
   </div>
 </template>

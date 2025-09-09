@@ -31,6 +31,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["save"]);
@@ -89,6 +93,7 @@ defineExpose({
           (value && value?.note !== '' && value && value?.note !== null)
             ? 'button-trigger-active'
             : '',
+          disabled ? 'cursor-default' : 'cursor-pointer',
         ]"
       >
         {{
@@ -99,7 +104,7 @@ defineExpose({
         }}
       </button>
     </PopoverTrigger>
-    <PopoverPortal>
+    <PopoverPortal v-if="!disabled">
       <PopoverContent :side-offset="5" class="popover-content-file">
         <!-- <p class="popover-title">{{ label }}</p>
         <div class="popover-input mt-4">

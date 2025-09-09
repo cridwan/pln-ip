@@ -34,6 +34,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["save"]);
@@ -109,6 +113,7 @@ defineExpose({
               ? '!bg-green-500'
               : ''
             : '',
+          disabled ? 'cursor-default' : 'cursor-pointer',
         ]"
       >
         {{
@@ -124,7 +129,7 @@ defineExpose({
         }}
       </button>
     </PopoverTrigger>
-    <PopoverPortal>
+    <PopoverPortal v-if="!disabled">
       <PopoverContent :side-offset="5" class="popover-content">
         <p class="popover-title">{{ label }}</p>
         <div class="button-colors">
@@ -222,7 +227,7 @@ defineExpose({
   .button-colors
     @apply flex items-center gap-2 mt-2
     > button
-      @apply min-w-[100px] rounded-lg bg-buttonGray py-1 px-3 cursor-pointer text-[13px] text-neutral-50
+      @apply min-w-[100px] rounded-lg bg-buttonGray py-1 px-3 text-[13px] text-neutral-50
     .button-red
       @apply hover:bg-red-500
     .button-yellow

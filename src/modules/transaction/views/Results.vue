@@ -71,6 +71,7 @@ const { refetch: refetchDownloadScope } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -94,6 +95,7 @@ const { refetch: refetchDownloadConsMat } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -117,6 +119,7 @@ const { refetch: refetchDownloadPart } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -140,6 +143,7 @@ const { refetch: refetchDownloadManpower } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -163,6 +167,7 @@ const { refetch: refetchDownloadTools } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -186,6 +191,7 @@ const { refetch: refetchDownloadHse } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -209,6 +215,7 @@ const { refetch: refetchDownloadQcPlan } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END

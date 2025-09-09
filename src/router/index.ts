@@ -10,6 +10,7 @@ import { routeInspection } from "@/modules/inspection/router/InspectionRouter";
 import { routeTransaction } from "@/modules/transaction/router/TransactionRouter";
 import { routeUser } from "@/modules/user/router/UserRouter";
 import { routeNotFound } from "@/modules/not-found/router/NotFoundRouter";
+import { UserEnum } from "@/modules/auth/types/AuthType";
 
 const routes = [
   ...routeAuth,
@@ -73,7 +74,15 @@ router.beforeEach(async (to, from, next) => {
         }
         // }
       } else {
-        next();
+        if (to.name === "transaction approval") {
+          if (users.value?.role === UserEnum.APPROVAL) {
+            next();
+          } else {
+            next({ path: "/not-found" });
+          }
+        } else {
+          next();
+        }
       }
     } else if (to.matched.some((record) => record.meta.requireAuth)) {
       if (!token) {
@@ -82,6 +91,7 @@ router.beforeEach(async (to, from, next) => {
         next();
       }
     } else {
+      console.log("III", to);
       next();
     }
   };

@@ -10,7 +10,7 @@ export const ColumnsManpower: TableColumnType[] = [
   {
     key: "qty",
     label: "Quantity",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },

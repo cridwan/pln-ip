@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
+// import type { AxiosError } from "axios";
 
-import { HeaderMain, Footer } from "@/components";
 import Sidebar from "@/components/layouts/Sidebar.vue";
-import type { TInspection } from "@/modules/inspection/types/InspectionType";
-import { useGlobalStore } from "@/stores/GlobalStore";
-import { useQuery } from "@tanstack/vue-query";
-import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
+import { HeaderMain, Footer } from "@/components";
+// import { useGlobalStore } from "@/stores/GlobalStore";
+// import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
+// import type { TInspection } from "@/modules/inspection/types/InspectionType";
+// import { useQuery } from "@tanstack/vue-query";
 
 const imgUrl = new URL("@/assets/images/bg-main-page.jpg", import.meta.url)
   .href;
@@ -16,44 +16,47 @@ const imgUrl = new URL("@/assets/images/bg-main-page.jpg", import.meta.url)
 const page = ["blok", "unit"];
 
 const route = useRoute();
-const transactionStore = useTransactionStore();
-const globalStore = useGlobalStore();
-const { InspectionType } = storeToRefs(globalStore);
+// const globalStore = useGlobalStore();
+// const transactionStore = useTransactionStore();
+// const { InspectionType } = storeToRefs(globalStore);
 
-//--- GET DETAIL INSPECTION
-const {
-  data: dataDetailInspection,
-  isFetching: isLoadingDetailInspection,
-  refetch: refetchDetailInspection,
-} = useQuery({
-  queryKey: ["getDetailInspection"],
-  queryFn: async () => {
-    try {
-      const { data } = await transactionStore.getDetailInspection(
-        route.params?.id_inspection as string
-      );
+// //--- GET DETAIL INSPECTION
+// const {
+//   data: dataDetailInspection,
+//   isFetching: isLoadingDetailInspection,
+//   refetch: refetchDetailInspection,
+// } = useQuery({
+//   queryKey: ["getDetailInspection"],
+//   queryFn: async () => {
+//     try {
+//       const { data } = await transactionStore.getDetailInspection(
+//         route.params?.id_inspection as string
+//       );
 
-      const response = data?.data as TInspection;
+//       const response = data?.data as TInspection;
 
-      InspectionType.value = response;
+//       InspectionType.value = response;
 
-      return response;
-    } catch (error: any) {
-      const err = error as AxiosError;
-      throw err.response;
-    }
-  },
-  refetchOnWindowFocus: false,
-});
-//--- END
+//       return response;
+//     } catch (error: any) {
+//       const err = error as AxiosError;
+//       throw err.response;
+//     }
+//   },
+//   refetchOnWindowFocus: false,
+// });
+// //--- END
 </script>
 
 <template>
-  <div class="layout-main" :style="{
-    backgroundImage: `url(${imgUrl})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  }">
+  <div
+    class="layout-main"
+    :style="{
+      backgroundImage: `url(${imgUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }"
+  >
     <header>
       <HeaderMain />
     </header>

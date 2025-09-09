@@ -16,6 +16,7 @@ import type {
 } from "../types/QcPlanType";
 import FormOnlyUploadFile from "../components/FormOnlyUploadFile.vue";
 import { useTransactionStore } from "../stores/TransactionStore";
+import type { ProjectInterface } from "../types/ProjectType";
 
 const entitiesQcPlan = ref<QcPlanInterface[]>([]);
 
@@ -34,12 +35,24 @@ const attachment = ref<any>(null);
 const timeout = ref(0);
 const is_loading_create = ref(false);
 
+//--- GET STATUS APPROVAL
+const { data: dataApproval } = useQuery({
+  queryKey: ["getApprovalAtQcPlan"],
+  queryFn: async () => {
+    const { data } = await transactionStore.getProject(
+      route.params.id_project as string
+    );
+    const response = data.data.data as ProjectInterface;
+
+    return response;
+  },
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
+
 //--- GET QC PLAN
-const {
-  data: dataQcPlan,
-  isFetching: isLoadingQcPlan,
-  refetch: refetchQcPlan,
-} = useQuery({
+const { isFetching: isLoadingQcPlan, refetch: refetchQcPlan } = useQuery({
   queryKey: ["getQcPlan"],
   queryFn: async () => {
     try {
@@ -79,6 +92,7 @@ const {
       throw err.response;
     }
   },
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -107,6 +121,7 @@ const { mutate: createDocument } = useMutation({
     });
     is_loading_create.value = false;
   },
+  retry: 0,
 });
 //--- END
 
@@ -204,11 +219,14 @@ function searchTable() {
   >
     <template #column_attachment="{ entity }">
       <div class="w-full flex justify-center">
+        <p v-if="dataApproval?.status === 'approve' && !entity.document">-</p>
         <FormOnlyUploadFile
+          v-else
           ref="attachment"
           :value="entity.document"
           :label="entity.name"
           :loading="is_loading_create"
+          :disabled="dataApproval?.status === 'approve'"
           @save="(e) => saveFile(e, entity)"
         />
       </div>
