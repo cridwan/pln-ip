@@ -71,6 +71,7 @@ export interface ResponseAddScopeInterface {
   day: number;
   sequence_animation: ResponseSequenceAnimationInterface;
   animation: string;
+  original_uuid: string;
 }
 
 export interface CreateAddScopeInterface {
