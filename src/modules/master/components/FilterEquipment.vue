@@ -597,23 +597,11 @@ watch(modelValue, (value) => {
   }
 });
 
-const selectBidang = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getSubBidangScope"] });
-  model.value.sub_bidang_uuid = "";
-  params_sub_bidang.filters = [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "bidang_uuid",
-      value: e.value,
-    },
-  ];
-  refetchSubBidang();
-};
-
 const selectLocation = (e: OptionType) => {
   queryClient.removeQueries({ queryKey: ["getMachineManpower"] });
   queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
+  options_machine.value = [];
+  options_inspection.value = [];
   model.value.unit_uuid = "";
   model.value.machine_uuid = "";
   model.value.inspection_type_uuid = "";
@@ -625,11 +613,16 @@ const selectLocation = (e: OptionType) => {
       value: e.value,
     },
   ];
+  model.value.bidang_uuid = "";
+  model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
   refetchUnit();
 };
 
 const selectUnit = (e: OptionType) => {
   queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
+  queryClient.removeQueries({ queryKey: ["getBidangScope"] });
+  options_inspection.value = [];
   model.value.machine_uuid = "";
   model.value.inspection_type_uuid = "";
   params_machine.filters = [
@@ -640,6 +633,10 @@ const selectUnit = (e: OptionType) => {
       value: e.value,
     },
   ];
+  model.value.bidang_uuid = "";
+  model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
+
   refetchMachine();
 };
 
@@ -653,6 +650,39 @@ const selectMachine = (e: OptionType) => {
       value: e.value,
     },
   ];
+  model.value.bidang_uuid = "";
+  model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
+
+  refetchInspection();
+};
+const selectInspection = (e: OptionType) => {
+  model.value.bidang_uuid = "";
+  model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
+
+  refetchInspection();
+};
+
+const selectBidang = (e: OptionType) => {
+  queryClient.removeQueries({ queryKey: ["getSubBidangScope"] });
+  model.value.sub_bidang_uuid = "";
+  params_sub_bidang.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "bidang_uuid",
+      value: e.value,
+    },
+  ];
+  model.value.scope_standart_uuid = "";
+
+  refetchSubBidang();
+};
+
+const selectSubBidang = (e: OptionType) => {
+  model.value.scope_standart_uuid = "";
+
   refetchInspection();
 };
 
@@ -1023,42 +1053,131 @@ watch(
 
 <template>
   <div
-    class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md">
+    class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
+  >
     <span class="text-blue-950 font-semibold">Pilih Jenis Inspeksi</span>
     <form class="" @submit.prevent="handleSubmit">
-      <Select v-model="model.location_uuid" label="Lokasi" options_label="label" options_value="value"
-        v-model:model-search="params_location.search" :search="true" :loading="is_loading_location"
-        :loading-next-page="isFetchingNextPageLocation" :rules="rules.location_uuid" :options="options_location"
-        @scroll="scrollLocation" @search="searchLocation" @select="selectLocation" />
-      <Select v-model="model.unit_uuid" label="Unit" options_label="label" options_value="value"
-        v-model:model-search="params_unit.search" :search="true" :loading="is_loading_unit"
-        :loading-next-page="isFetchingNextPageUnit" :rules="rules.unit_uuid" :options="options_unit"
-        @scroll="scrollUnit" @search="searchUnit" @select="selectUnit" />
-      <Select v-model="model.machine_uuid" label="Mesin" options_label="label" options_value="value"
-        v-model:model-search="params_machine.search" :search="true" :loading="is_loading_machine"
-        :loading-next-page="isFetchingNextPageMachine" :rules="rules.machine_uuid" :options="options_machine"
-        @scroll="scrollMachine" @search="searchMachine" @select="selectMachine" />
-      <Select v-model="model.inspection_type_uuid" label="Tipe Inspeksi" options_label="label" options_value="value"
-        v-model:model-search="params_inspection.search" :search="true" :loading="is_loading_inspection"
-        :loading-next-page="isFetchingNextPageInspection" :rules="rules.inspection_type_uuid"
-        :options="options_inspection" @scroll="scrollInspection" @search="searchInspection" />
-      <Select v-model="model.bidang_uuid" label="Bidang" options_label="label" options_value="value"
-        v-model:model-search="params_bidang.search" :search="true" :loading="is_loading_bidang"
-        :loading-next-page="isFetchingNextPageBidang" :rules="rules.bidang_uuid" :options="options_bidang"
-        @scroll="scrollBidang" @search="searchBidang" @select="selectBidang" />
-      <Select v-model="model.sub_bidang_uuid" label="Sub Bidang" options_label="label" options_value="value"
-        v-model:model-search="params_sub_bidang.search" :search="true" :loading="is_loading_sub_bidang"
-        :loading-next-page="isFetchingNextPageSubBidang" :rules="rules.sub_bidang_uuid" :options="options_sub_bidang"
-        @scroll="scrollSubBidang" @search="searchSubBidang" />
-      <Select v-model="model.scope_standart_uuid" label="Scope" options_label="label" options_value="value"
-        v-model:model-search="params_scope.search" :search="true" :loading="is_loading_scope"
-        :loading-next-page="isFetchingNextPageScope" :rules="rules.scope_standart_uuid" :options="options_scope"
-        @scroll="scrollScope" @search="searchScope" />
+      <Select
+        v-model="model.location_uuid"
+        label="Lokasi"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_location.search"
+        :search="true"
+        :loading="is_loading_location"
+        :loading-next-page="isFetchingNextPageLocation"
+        :rules="rules.location_uuid"
+        :options="options_location"
+        @scroll="scrollLocation"
+        @search="searchLocation"
+        @select="selectLocation"
+      />
+      <Select
+        v-model="model.unit_uuid"
+        label="Unit"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_unit.search"
+        :search="true"
+        :loading="is_loading_unit"
+        :loading-next-page="isFetchingNextPageUnit"
+        :rules="rules.unit_uuid"
+        :options="options_unit"
+        @scroll="scrollUnit"
+        @search="searchUnit"
+        @select="selectUnit"
+      />
+      <Select
+        v-model="model.machine_uuid"
+        label="Mesin"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_machine.search"
+        :search="true"
+        :loading="is_loading_machine"
+        :loading-next-page="isFetchingNextPageMachine"
+        :rules="rules.machine_uuid"
+        :options="options_machine"
+        @scroll="scrollMachine"
+        @search="searchMachine"
+        @select="selectMachine"
+      />
+      <Select
+        v-model="model.inspection_type_uuid"
+        label="Tipe Inspeksi"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_inspection.search"
+        :search="true"
+        :loading="is_loading_inspection"
+        :loading-next-page="isFetchingNextPageInspection"
+        :rules="rules.inspection_type_uuid"
+        :options="options_inspection"
+        @scroll="scrollInspection"
+        @search="searchInspection"
+        @select="selectInspection"
+      />
+      <Select
+        v-model="model.bidang_uuid"
+        label="Bidang"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_bidang.search"
+        :search="true"
+        :loading="is_loading_bidang"
+        :loading-next-page="isFetchingNextPageBidang"
+        :rules="rules.bidang_uuid"
+        :options="options_bidang"
+        @scroll="scrollBidang"
+        @search="searchBidang"
+        @select="selectBidang"
+      />
+      <Select
+        v-model="model.sub_bidang_uuid"
+        label="Sub Bidang"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_sub_bidang.search"
+        :search="true"
+        :loading="is_loading_sub_bidang"
+        :loading-next-page="isFetchingNextPageSubBidang"
+        :rules="rules.sub_bidang_uuid"
+        :options="options_sub_bidang"
+        @scroll="scrollSubBidang"
+        @search="searchSubBidang"
+        @select="selectSubBidang"
+      />
+      <Select
+        v-model="model.scope_standart_uuid"
+        label="Scope"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_scope.search"
+        :search="true"
+        :loading="is_loading_scope"
+        :loading-next-page="isFetchingNextPageScope"
+        :rules="rules.scope_standart_uuid"
+        :options="options_scope"
+        @scroll="scrollScope"
+        @search="searchScope"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Reset" class="w-full" variant="secondary" :disabled="props.loading" @click="resetValue" />
-        <Button type="submit" text="Terapkan" class="w-full" color="blue" :disabled="props.loading"
-          :loading="props.loading" />
+        <Button
+          text="Reset"
+          class="w-full"
+          variant="secondary"
+          :disabled="props.loading"
+          @click="resetValue"
+        />
+        <Button
+          type="submit"
+          text="Terapkan"
+          class="w-full"
+          color="blue"
+          :disabled="props.loading"
+          :loading="props.loading"
+        />
       </div>
     </form>
   </div>

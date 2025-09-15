@@ -682,12 +682,14 @@ const scrollEquipment = (e: Event) => {
 const selectLocation = (e: OptionType) => {
   queryClient.removeQueries({ queryKey: ["getMachineManpower"] });
   queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
+  options_machine.value = [];
+  options_inspection.value = [];
   model.value.unit_uuid = "";
   model.value.machine_uuid = "";
   model.value.inspection_type_uuid = "";
-  model.value.scope_standart_uuid = "";
   model.value.bidang_uuid = "";
   model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
   model.value.equipment_uuid = "";
   params_unit.filters = [
     {
@@ -702,11 +704,12 @@ const selectLocation = (e: OptionType) => {
 
 const selectUnit = (e: OptionType) => {
   queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
+  options_inspection.value = [];
   model.value.machine_uuid = "";
   model.value.inspection_type_uuid = "";
-  model.value.scope_standart_uuid = "";
   model.value.bidang_uuid = "";
   model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
   model.value.equipment_uuid = "";
   params_machine.filters = [
     {

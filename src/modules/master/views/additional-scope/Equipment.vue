@@ -15,6 +15,7 @@ import type {
 } from "../../types/EquipmentType";
 import FormAdEquipment from "../../components/FormAdEquipment.vue";
 import FilterAdEquipment from "../../components/FilterAdEquipment.vue";
+import ButtonGroup from "../../components/ButtonGroup.vue";
 
 const dataForm = ref<EquipmentFilterInterface | null>(null);
 const masterStore = useMasterStore();
@@ -92,6 +93,60 @@ const { mutate: deleteEquipment, isPending: isLoadingDelete } = useMutation({
   },
 });
 //--- END
+
+//--- DOWNLOAD
+const { mutate: downloadEquipment, isPending: isLoadingDownload } = useMutation(
+  {
+    mutationFn: async () => {
+      return await masterStore.downloadEquipment(params);
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  }
+);
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateEquipment, isPending: isLoadingTemplate } = useMutation(
+  {
+    mutationFn: async () => {
+      return await masterStore.templateEquipment();
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  }
+);
+//--- END
+
+//--- IMPORT
+const { mutate: importEquipment, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importEquipment(payload);
+  },
+  onSuccess: () => {
+    refetchEquipment();
+  },
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+const handleDownload = () => {
+  downloadEquipment();
+};
+
+const handleExportTemplate = () => {
+  templateEquipment();
+};
+
+const handleImport = (file: File) => {
+  importEquipment(file);
+};
 
 const pagination = computed(() => {
   return {
@@ -212,15 +267,24 @@ const handleRemoveSuccess = () => {
   />
 
   <div class="relative w-full">
-    <Button
-      v-if="dataForm?.scope_standart_uuid"
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <div class="flex items-center gap-2 absolute right-0 top-0">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.scope_standart_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
+    </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
