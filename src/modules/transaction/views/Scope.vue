@@ -8,6 +8,7 @@ import { Button, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 import { useGlobalStore } from "@/stores/GlobalStore";
+import type { EquipmentInterface } from "@/modules/transaction/types/EquipmentType";
 
 import FormAssetWelness from "../components/FormAssetWelness.vue";
 import FormWithUploadFile from "../components/FormWithUploadFile.vue";
@@ -23,6 +24,7 @@ import { useTransactionStore } from "../stores/TransactionStore";
 import FilterScope from "../components/FilterScope.vue";
 import FormScope from "../components/FormScope.vue";
 import type { ProjectInterface } from "../types/ProjectType";
+import ExpandScope from "../components/scope/TableEquipment.vue";
 
 const open_form = ref(false);
 const entitiesScope = ref<ScopeInterface[]>([]);
@@ -57,6 +59,7 @@ const file = ref<File | null>(null);
 const is_loading_create = ref(false);
 const timeout = ref(0);
 const file_deleted = ref("");
+const children_active = ref<{ id: string; open: boolean }[]>([]);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
@@ -87,6 +90,7 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
           return {
             id: item.uuid,
             asset: item.name || "",
+            children: [],
             asset_welness: item.asset_welnes
               ? {
                   color: item.asset_welnes?.color,
@@ -504,6 +508,29 @@ const handleError = (error: any) => {
     type: "error",
   });
 };
+
+const openChildren = (value: boolean, item: ScopeInterface) => {
+  const find_index = children_active.value.findIndex((el) => el.id === item.id);
+  if (find_index < 0) {
+    children_active.value = [
+      ...children_active.value,
+      { id: item.id, open: value },
+    ];
+  } else {
+    children_active.value[find_index].open = value;
+  }
+};
+
+const getData = (id: string, response: EquipmentInterface[]) => {
+  console.log("MASUK", id, response);
+  entitiesScope.value = entitiesScope.value.map((item) => {
+    if (item.id === id) {
+      return { ...item, children: response };
+    } else {
+      return { ...item };
+    }
+  });
+};
 </script>
 
 <template>
@@ -520,8 +547,8 @@ const handleError = (error: any) => {
     <span v-if="isLoadingDuration">Loading...</span>
     <span v-else>{{ dataDuration }} Days</span>
   </div>
+  <!-- v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'" -->
   <Button
-    v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'"
     icon_only="plus"
     class="absolute right-[9rem] top-[6.5rem]"
     size="sm"
@@ -552,6 +579,7 @@ const handleError = (error: any) => {
           @change-page="changePage"
           @change-limit="changeLimit"
           @search="searchTable"
+          @open-children="openChildren"
         >
           <template #column_asset_welness="{ entity }">
             <div class="w-full flex justify-center">
@@ -650,6 +678,40 @@ const handleError = (error: any) => {
                 @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
               />
             </div>
+          </template>
+          <template #children="{ entity, index, parentActive }">
+            <tr
+              v-if="
+                children_active.find((el) => el.id === entity.id)?.open === true
+              "
+            >
+              <td :colspan="ColumnsScope.length + 1">
+                <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
+                  <ExpandScope
+                    :id="entity.id"
+                    :entity="entity.children"
+                    :status-approval="dataApproval?.status"
+                    :open="
+                      children_active.find((el) => el.id === entity.id)?.open
+                    "
+                    @get-data="getData"
+                  />
+                </div>
+              </td>
+            </tr>
+            <!-- <tr
+              v-else-if="entity.children.length > 0"
+              v-for="(child, childIndex) in entity.children"
+              :key="childIndex"
+            >
+              <td :colspan="ColumnsScope.length + 1" class="td-child">
+                <div class="v-table-body">
+                  <p class="v-table-body-text pl-11">
+                    {{ child.name }}
+                  </p>
+                </div>
+              </td>
+            </tr> -->
           </template>
         </Table>
       </div>

@@ -1,6 +1,7 @@
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import type { SubBidangInterface } from "@/modules/master/types/SubBidangType";
 import type { ResponseDocumentInterface } from "@/types/GlobalType";
+import type { EquipmentInterface } from "@/modules/transaction/types/EquipmentType";
 
 interface WithFileInterface {
   note: string;
@@ -28,6 +29,7 @@ export interface ScopeInterface {
   //   document: ResponseDocumentInterface | null;
   // }[];
   document: ResponseDocumentInterface | null;
+  children: EquipmentInterface[];
 }
 
 interface Category {
@@ -83,10 +85,10 @@ export interface FilterScopeInterface {
 
 export interface FormScopeInterface {
   scope_standart_uuid: string;
-  project_uuid: string
+  project_uuid: string;
 }
 
 export interface FormAdScopeInterface {
   scope_standart_uuid: string;
-  additional_scope_uuid: string
+  additional_scope_uuid: string;
 }
