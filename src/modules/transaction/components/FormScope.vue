@@ -102,24 +102,15 @@ watch(modelValue, (value) => {
     }
 });
 
-const handleChangeFile = (e: File) => {
-    modelUpload.value = e;
-}
-
-const removeSuccess = () => {
-    documentValues.value = null;
-    emit('removeSucess');
-}
-
 //--- GET SCOPE
-const params_scope = reactive<IParams & { from_transaction: boolean, project_uuid: string }>({
+const params_scope = reactive<IParams & { project_uuid: string, sub_bidang_uuid: string }>({
     search: "",
     filter: "",
     filters: [],
     currentPage: 1,
     perPage: 10,
-    from_transaction: true,
-    project_uuid: route.params.id_project as string
+    project_uuid: route.params.id_project as string,
+    sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string
 });
 const {
     data: dataScope,
@@ -132,12 +123,12 @@ const {
     enabled: !is_loading_scope.value,
     queryFn: async ({ pageParam = 1 }) => {
         try {
-            const { data } = await masterStore.getScope({
+            const { data } = await transactionStore.getSelectScopeStandar({
                 ...params_scope,
                 currentPage: pageParam,
             });
 
-            const response = data as IPagination<ScopeInterface[]>;
+            const response = data.data as IPagination<ScopeInterface[]>;
 
             return response;
         } catch (error: any) {
@@ -190,6 +181,11 @@ watch(
     },
     { deep: true, immediate: true }
 );
+
+watch(() => props.dataForm, (newVal) => {
+    params_scope.sub_bidang_uuid = newVal?.sub_bidang_uuid as string
+    refetchScope();
+}, { deep: true, immediate: true })
 </script>
 
 <template>

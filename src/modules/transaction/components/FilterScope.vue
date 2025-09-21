@@ -74,7 +74,7 @@ const {
     hasNextPage: hasNextPageBidang,
     isFetchingNextPage: isFetchingNextPageBidang,
 } = useInfiniteQuery({
-    queryKey: ["getBidangScope"],
+    queryKey: ["getBidangScopeTransactionFilter"],
     enabled: !props.selectedValue && !is_loading_bidang.value,
     queryFn: async ({ pageParam = 1 }) => {
         try {
@@ -123,7 +123,7 @@ const {
     hasNextPage: hasNextPageSubBidang,
     isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
-    queryKey: ["getSubBidangScope"],
+    queryKey: ["getSubBidangScopeTransactionFilter"],
     enabled: !props.selectedValue && !is_loading_sub_bidang.value,
     queryFn: async ({ pageParam = 1 }) => {
         try {
@@ -233,7 +233,7 @@ watch(modelValue, (value) => {
 });
 
 const selectBidang = (e: OptionType) => {
-    queryClient.removeQueries({ queryKey: ["getSubBidangScope"] });
+    queryClient.removeQueries({ queryKey: ["getSubBidangScopeTransaction"] });
     model.value.sub_bidang_uuid = "";
     params_sub_bidang.filters = [
         {

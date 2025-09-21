@@ -118,23 +118,14 @@ watch(modelValue, (value) => {
   }
 });
 
-const handleChangeFile = (e: File) => {
-  modelUpload.value = e;
-};
-
-const removeSuccess = () => {
-  documentValues.value = null;
-  emit("removeSucess");
-};
-
 //--- GET SCOPE
-const params_Equipment = reactive<IParams & { from_transaction: boolean, project_uuid: string }>({
+const params_Equipment = reactive<IParams & { scope_standart_uuid: string, project_uuid: string }>({
   search: "",
   filter: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  from_transaction: true,
+  scope_standart_uuid: props.dataForm?.scope_standart_uuid as string,
   project_uuid: route.params.id_project as string,
 });
 const {
@@ -148,7 +139,7 @@ const {
   enabled: !is_loading_Equipment.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await masterStore.getEquipment({
+      const { data } = await transaction.getSelectEquipment({
         ...params_Equipment,
         currentPage: pageParam,
       });
@@ -206,6 +197,11 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+watch(() => props.dataForm, (newVal) => {
+  params_Equipment.scope_standart_uuid = newVal?.scope_standart_uuid as string
+  refetchEquipment();
+}, { immediate: true, deep: true })
 </script>
 
 <template>

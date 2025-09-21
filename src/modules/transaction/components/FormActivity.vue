@@ -108,13 +108,13 @@ watch(modelValue, (value) => {
 });
 
 //--- GET SCOPE
-const params_activity = reactive<IParams & { from_transaction: boolean, project_uuid: string }>({
+const params_activity = reactive<IParams & { equipment_uuid: string, project_uuid: string }>({
   search: "",
   filter: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  from_transaction: true,
+  equipment_uuid: props.dataForm?.equipment_uuid as string,
   project_uuid: route.params.id_project as string,
 });
 const {
@@ -128,7 +128,7 @@ const {
   enabled: !is_loading_activity.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await masterStore.getActivity({
+      const { data } = await transaction.getSelectActivity({
         ...params_activity,
         currentPage: pageParam,
       });
@@ -185,6 +185,11 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+watch(() => props.dataForm, (newVal) => {
+  params_activity.equipment_uuid = newVal?.equipment_uuid as string;
+  refetchScope();
+}, { deep: true, immediate: true })
 </script>
 
 <template>

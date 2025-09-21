@@ -51,6 +51,19 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getSelectScopeStandar = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/scope-standart/resource/select/options`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const cloneScopeStandar = async (payload: FormScopeInterface) => {
       return await api
         .post(`/transaction/scope-standart/resource/clone`, payload)
@@ -108,6 +121,19 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getSelectActivity = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/activity/resource/select/options`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const createActivity = async (payload: CreateScopeInterface) => {
       return await api
         .post(`/transaction/activity/resource/asset`, payload)
@@ -143,6 +169,19 @@ export const useTransactionStore = defineStore(
     const getEquipment = async (payload: IParams) => {
       return await api
         .get(`/transaction/equipment/resource/pagination`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getSelectEquipment = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/equipment/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -759,7 +798,10 @@ export const useTransactionStore = defineStore(
       cloneAdScopeStandar,
       getProject,
       approveProject,
-      deleteAdScope
+      deleteAdScope,
+      getSelectScopeStandar,
+      getSelectEquipment,
+      getSelectActivity
     };
   },
   {
