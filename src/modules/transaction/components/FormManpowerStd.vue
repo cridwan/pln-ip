@@ -66,12 +66,12 @@ const rules = computed(() => {
 });
 
 //--- GET MANPOWER
-const params_manpower = reactive<IParams & { from_transaction: true, project_uuid: string }>({
+const params_manpower = reactive<IParams & { activity_uuid: string, project_uuid: string }>({
   search: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  from_transaction: true,
+  activity_uuid: props.dataForm?.activity_uuid as string,
   project_uuid: route.params.id_project as string,
 });
 const {
@@ -81,16 +81,16 @@ const {
   hasNextPage: hasNextPageManpower,
   isFetchingNextPage: isFetchingNextPageManpower,
 } = useInfiniteQuery({
-  queryKey: ["getManpowerStdForm"],
+  queryKey: ["getManpowerStdFormTransaction"],
   enabled: !props.selectedValue && !is_loading_manpower.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await masterStore.getManpowerStd({
+      const { data } = await transactionStore.getManPowerSelect({
         ...params_manpower,
         currentPage: pageParam,
       });
 
-      const response = data.data as IPagination<ManpowerStdInterface[]>;
+      const response = data as IPagination<ManpowerStdInterface[]>;
 
       return response;
     } catch (error: any) {
@@ -220,6 +220,11 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+watch(() => props.dataForm, (newVal) => {
+  params_manpower.activity_uuid = newVal?.activity_uuid as string;
+  refetchManpower();
+}, { deep: true, immediate: true })
 </script>
 
 <template>

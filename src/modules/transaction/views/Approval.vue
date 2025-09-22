@@ -47,31 +47,19 @@ const handleApprove = () => {
 </script>
 
 <template>
-  <div
-    class="w-full flex items-center justify-center bg-white p-4 shadow-md rounded-sm"
-  >
+  <div class="w-full flex items-center justify-center bg-white p-4 shadow-md rounded-sm">
     <div class="flex flex-col items-center gap-3">
       <h1 class="text-blue-950 font-semibold">Approve Project</h1>
-      <p class="text-blue-950 tracking-wide font-normal text-lg">
-        Silahkan tekan button dibawah ini untuk melakukan approve untuk project
+      <p class="text-blue-950 tracking-wide font-normal text-lg text-center">
+        Silahkan tekan button dibawah ini untuk melakukan approve/unapprove untuk project
         <span class="font-bold">{{ dataProject?.name }}</span>
       </p>
 
-      <Button
-        :text="
-          dataProject?.status == 'pending'
-            ? 'Approve'
-            : 'Project sudah di approve'
-        "
-        variant="primary"
-        color="blue"
-        size="lg"
-        icon_before="check-list"
-        type="button"
-        @click="handleApprove"
-        :loading="isLoadingProject || isLoadingApprove"
-        :disabled="dataProject?.status == 'approve'"
-      />
+      <Button :text="dataProject?.status == 'pending'
+        ? 'Approve'
+        : 'UnApprove'
+        " variant="primary" :color="dataProject?.status == 'pending' ? 'blue' : 'green'" size="lg"
+        icon_before="check-list" type="button" @click="handleApprove" :loading="isLoadingProject || isLoadingApprove" />
     </div>
   </div>
 </template>

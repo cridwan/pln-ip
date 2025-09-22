@@ -8,6 +8,7 @@ export interface PartStdInterface {
     part_uuid: string;
     part: PartInterface;
     qty: number;
+    total_qty?: number;
     created_at: string;
     updated_at: string;
 }

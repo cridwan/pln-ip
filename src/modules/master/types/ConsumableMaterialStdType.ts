@@ -8,6 +8,7 @@ export interface ConsumableMaterialStdInterface {
     cons_mat_uuid: string;
     consmat: ConsMatInterface;
     qty: number;
+    total_qty?: number;
     created_at: string;
     updated_at: string;
 }

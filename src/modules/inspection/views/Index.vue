@@ -402,8 +402,8 @@ const searchScope = () => {
       ? "ci"
       : inspection === "turbine inspection" ||
         inspection === "turbin inspection"
-      ? "ti"
-      : "mi";
+        ? "ti"
+        : "mi";
   refetchProject();
 };
 
@@ -418,8 +418,8 @@ const generateScope = () => {
       ? "ci"
       : inspection === "turbine inspection" ||
         inspection === "turbin inspection"
-      ? "ti"
-      : "mi";
+        ? "ti"
+        : "mi";
 
   const payload: TCreateGenerate = {
     name: model.value,
@@ -486,89 +486,44 @@ const toDelete = (item: ResponseProject) => {
       <Breadcrumb :items="breadcrumb" />
     </div>
     <div class="scope-video-container">
-      <video
-        ref="videoRef"
-        :src="videos[currentVideoIndex === null ? 0 : currentVideoIndex]"
-        class="scope-video"
-        @loadedmetadata="handleFirstVideoLoad"
-        @ended="handleVideoEnd"
-        autoplay
-        muted
-        playsinline
-      ></video>
+      <video ref="videoRef" :src="videos[currentVideoIndex === null ? 0 : currentVideoIndex]" class="scope-video"
+        @loadedmetadata="handleFirstVideoLoad" @ended="handleVideoEnd" autoplay muted playsinline></video>
       <div class="scope-button-home">
-        <button
-          v-for="(item, key) in dataInspectionType?.data"
-          :id="`button-home-${key}`"
-          :key="key"
-          :class="{ 'scope-button-home--active': scopeSelected === item.uuid }"
-          @mouseover="handleMouseOver(key)"
-          @mouseleave="handleMouseLeave"
-          @click="selectInspection(item)"
-        >
+        <button v-for="(item, key) in dataInspectionType?.data" :id="`button-home-${key}`" :key="key"
+          :class="{ 'scope-button-home--active': scopeSelected === item.uuid }" @mouseover="handleMouseOver(key)"
+          @mouseleave="handleMouseLeave" @click="selectInspection(item)">
           {{ item.name }}
         </button>
       </div>
       <div v-show="scopeSelected" id="scope-menu" class="scope-button-menus">
         <div class="w-[450px] relative">
           <Input rounded="full" v-model="model" />
-          <div
-            v-if="open_search"
-            class="absolute top-11 right-0 left-0 bg-neutral-950 bg-opacity-50 rounded-xl py-3 text-sm text-neutral-50"
-          >
+          <div v-if="open_search"
+            class="absolute top-11 right-0 left-0 bg-neutral-950 bg-opacity-50 rounded-xl py-3 text-sm text-neutral-50">
             <p v-if="isLoadingProject" class="w-full text-center">Loading...</p>
-            <p
-              v-if="!isLoadingProject && (dataProject || []).length === 0"
-              class="w-full text-center"
-            >
+            <p v-if="!isLoadingProject && (dataProject || []).length === 0" class="w-full text-center">
               Not Found Data
             </p>
-            <p
-              v-else-if="!isLoadingProject && (dataProject || []).length > 0"
-              v-for="(item, key) in dataProject"
-              :key="key"
-              class="px-4 hover:text-neutral-200 py-1 flex justify-between"
-            >
+            <p v-else-if="!isLoadingProject && (dataProject || []).length > 0" v-for="(item, key) in dataProject"
+              :key="key" class="px-4 hover:text-neutral-200 py-1 flex justify-between">
               <span class="cursor-pointer" @click="toTransaction(item.uuid)">{{
                 item.name
-              }}</span>
-              <Icon
-                name="trash"
-                class="cursor-pointer"
-                @click="toDelete(item)"
-              />
+                }}</span>
+              <Icon v-if="item.status != 'approve'" name="trash" class="cursor-pointer" @click="toDelete(item)" />
             </p>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <Button
-            text="Search"
-            color="blue"
-            rounded="full"
-            class="!px-6"
-            :disabled="isLoadingGenerate"
-            @click="searchScope"
-          />
-          <Button
-            text="Generate"
-            color="blue"
-            rounded="full"
-            class="!px-6"
-            :disabled="isLoadingGenerate"
-            :loading="isLoadingGenerate"
-            @click="generateScope"
-          />
+          <Button text="Search" color="blue" rounded="full" class="!px-6" :disabled="isLoadingGenerate"
+            @click="searchScope" />
+          <Button text="Generate" color="blue" rounded="full" class="!px-6" :disabled="isLoadingGenerate"
+            :loading="isLoadingGenerate" @click="generateScope" />
         </div>
       </div>
     </div>
   </div>
 
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>
 
 <style lang="sass">

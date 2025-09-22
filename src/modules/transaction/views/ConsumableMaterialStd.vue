@@ -38,12 +38,6 @@ const params = reactive({
       column: "activity.equipment.scopeStandart.project_uuid",
       value: route.params.id_project,
     },
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "activity.original_uuid",
-      value: "",
-    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -79,7 +73,7 @@ const {
   isFetching: isLoadingConsMat,
   refetch: refetchConsMat,
 } = useQuery({
-  queryKey: ["getConsMat"],
+  queryKey: ["getConsMatTransaction"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getConsMat(params);
@@ -214,12 +208,6 @@ const resetFilter = () => {
       column: "activity.equipment.scopeStandart.project_uuid",
       value: route.params.id_project,
     },
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "activity.original_uuid",
-      value: "",
-    },
   ];
 };
 
@@ -251,80 +239,49 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <Button v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'" icon_only="plus"
+      class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterConsumableMaterialStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="isLoadingConsMat"
-        />
+        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
+          :loading="isLoadingConsMat" />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table
-            label-create="Material"
-            :columns="ColumnsConsumableMaterial"
-            :entities="dataConsMat?.data || []"
-            :loading="isLoadingConsMat"
-            :pagination="pagination"
-            :is-create="false"
-            :is-action="false"
-            class="mt-6"
-            v-model:model-search="params.search"
-            @change-page="changePage"
-            @change-limit="changeLimit"
-            @search="searchTable"
-          >
-            <!-- <template #column_action="{ entity }">
+          <Table label-create="Material" :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []"
+            :loading="isLoadingConsMat" :pagination="pagination" :is-create="false" :is-action="true" class="mt-6"
+            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+            @search="searchTable">
+            <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon
-                  name="pencil"
-                  class="icon-action-table"
-                  @click="handleUpdate(entity)"
-                />
-                <Icon
-                  name="trash"
-                  class="icon-action-table"
-                  @click="handleDelete(entity)"
-                />
+                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
               </div>
-            </template> -->
+            </template>
             <template #column_material="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 {{ entity.consmat?.name ?? "-" }}
               </p>
             </template>
             <template #column_merk="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 {{ entity.consmat?.merk ?? "-" }}
               </p>
             </template>
+            <template #column_total_qty="{ entity }">
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+                {{ Number(entity.total_qty).toLocaleString('id') ?? "-" }}
+              </p>
+            </template>
             <template #column_price="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
             <template #column_unit="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 {{ entity.consmat?.global_unit?.name ?? "-" }}
               </p>
             </template>
@@ -335,18 +292,8 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormConsumableMaterialStd
-    v-model="open_form"
-    :data-form="dataForm"
-    :selected-value="selected_item"
-    @success="handleSuccess"
-    @error="handleError"
-    @removeSucess="handleRemoveSuccess"
-  />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.consmat?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <FormConsumableMaterialStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
+    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
+    @delete="onDelete" />
 </template>

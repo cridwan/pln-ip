@@ -227,7 +227,20 @@ export const useTransactionStore = defineStore(
 
     const getConsMat = async (payload: IParams) => {
       return await api
-        .get(`/transaction/consumable-material/resource/pagination`, {
+        .get(`/transaction/consumable-material/resource/grouping`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getConsMatSelect = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/consumable-material/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -276,7 +289,20 @@ export const useTransactionStore = defineStore(
 
     const getManPower = async (payload: IParams) => {
       return await api
-        .get(`/transaction/manpower/resource/pagination`, {
+        .get(`/transaction/manpower/resource/grouping`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getManPowerSelect = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/manpower/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -325,7 +351,20 @@ export const useTransactionStore = defineStore(
 
     const getPart = async (payload: IParams) => {
       return await api
-        .get(`/transaction/part/resource/pagination`, {
+        .get(`/transaction/part/resource/grouping`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getPartSelect = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/part/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -801,7 +840,10 @@ export const useTransactionStore = defineStore(
       deleteAdScope,
       getSelectScopeStandar,
       getSelectEquipment,
-      getSelectActivity
+      getSelectActivity,
+      getPartSelect,
+      getManPowerSelect,
+      getConsMatSelect
     };
   },
   {

@@ -66,13 +66,13 @@ const rules = computed(() => {
 });
 
 //--- GET PART
-const params_part = reactive<IParams & { from_transaction: true, project_uuid: string }>({
+const params_part = reactive<IParams & { activity_uuid: string, project_uuid: string }>({
   search: "",
   filter: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  from_transaction: true,
+  activity_uuid: props.dataForm?.activity_uuid as string,
   project_uuid: route.params.id_project as string,
 });
 const {
@@ -82,16 +82,18 @@ const {
   hasNextPage: hasNextPagePart,
   isFetchingNextPage: isFetchingNextPagePart,
 } = useInfiniteQuery({
-  queryKey: ["getPartStdForm"],
+  queryKey: ["getPartStdFormTransaction"],
   enabled: !props.selectedValue && !is_loading_part.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await masterStore.getPartStd({
+      const { data } = await transactionStore.getPartSelect({
         ...params_part,
         currentPage: pageParam,
       });
 
-      const response = data.data as IPagination<PartStdInterface[]>;
+      console.log(data)
+
+      const response = data as IPagination<PartStdInterface[]>;
 
       return response;
     } catch (error: any) {
@@ -218,6 +220,12 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+watch(() => props.dataForm, (newVal) => {
+  params_part.activity_uuid = newVal?.activity_uuid as string;
+
+  refetchPart();
+}, { deep: true, immediate: true })
 </script>
 
 <template>

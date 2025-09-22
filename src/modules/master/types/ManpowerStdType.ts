@@ -8,6 +8,7 @@ export interface ManpowerStdInterface {
     manpower_uuid: string;
     manpower: ManpowerInterface;
     qty: number;
+    total_qty?: number;
     created_at: string;
     updated_at: string;
 }

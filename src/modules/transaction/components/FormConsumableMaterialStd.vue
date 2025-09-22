@@ -72,12 +72,12 @@ const rules = computed(() => {
 });
 
 //--- GET CONSMAT
-const params_consumable_material = reactive<IParams & { from_transaction: true, project_uuid: string }>({
+const params_consumable_material = reactive<IParams & { activity_uuid: string, project_uuid: string }>({
   search: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  from_transaction: true,
+  activity_uuid: props.dataForm?.activity_uuid as string,
   project_uuid: route.params.id_project as string,
 });
 const {
@@ -87,16 +87,16 @@ const {
   hasNextPage: hasNextPageConsumableMaterial,
   isFetchingNextPage: isFetchingNextPageConsumableMaterial,
 } = useInfiniteQuery({
-  queryKey: ["getConsumableMaterialStdForm"],
+  queryKey: ["getConsumableMaterialStdFormTransaction"],
   enabled: !props.selectedValue && !is_loading_consumable_material.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await masterStore.getConsumableMaterialStd({
+      const { data } = await transactionStore.getConsMatSelect({
         ...params_consumable_material,
         currentPage: pageParam,
       });
 
-      const response = data.data as IPagination<ConsumableMaterialStdInterface[]>;
+      const response = data as IPagination<ConsumableMaterialStdInterface[]>;
 
       return response;
     } catch (error: any) {
@@ -227,6 +227,12 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+watch(() => props.dataForm, (newVal) => {
+  params_consumable_material.activity_uuid = newVal?.activity_uuid as string;
+
+  refetchConsumableMaterial();
+}, { deep: true, immediate: true })
 </script>
 
 <template>

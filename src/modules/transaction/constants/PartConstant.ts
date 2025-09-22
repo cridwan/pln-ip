@@ -8,7 +8,7 @@ export const ColumnsPart: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "qty",
+    key: "total_qty",
     label: "Quantity",
     align: "center",
     sort: false,

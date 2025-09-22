@@ -21,4 +21,5 @@ export interface ResponseProject {
   created_at: string;
   updated_at: string;
   inspection_type: TInspection;
+  status: string;
 }
