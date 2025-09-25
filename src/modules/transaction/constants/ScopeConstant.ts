@@ -6,6 +6,7 @@ export const ColumnsScope: TableColumnType[] = [
     label: "Scope",
     align: "left",
     sort: false,
+    width: "300",
   },
   {
     key: "asset_welness",

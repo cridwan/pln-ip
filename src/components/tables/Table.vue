@@ -85,6 +85,7 @@ const emit = defineEmits([
   "changeLimit",
   "create",
   "delete",
+  "open-children",
 ]);
 
 const open_create = ref(false);
@@ -134,8 +135,9 @@ const styleTitle = (align: string) => {
   }
 };
 
-const toggleRow = (index: number) => {
+const toggleRow = (index: number, item: T) => {
   expandedRow.value = expandedRow.value === index ? null : index;
+  emit("open-children", expandedRow.value === null ? false : true, item);
 };
 
 const rowClick = (item: any, index: number) => {
@@ -186,7 +188,7 @@ defineSlots<{
     </div>
     <div class="v-table--body">
       <div class="v-table-wrapper">
-        <table class="mt-4">
+        <table>
           <thead>
             <tr>
               <th
@@ -253,7 +255,7 @@ defineSlots<{
                           name="caret-down"
                           class="cursor-pointer text-base transition-all duration-300"
                           :class="{ 'rotate-180': expandedRow === index }"
-                          @click.stop="toggleRow(index)"
+                          @click.stop="toggleRow(index, entity)"
                         />
                         <p
                           class="v-table-body-text"
@@ -343,7 +345,7 @@ defineSlots<{
 .v-table
   @apply flex flex-col gap-2
   &--head
-    @apply flex items-center gap-5
+    @apply flex items-center gap-5 mt-4
     .v-table-search
       @apply w-[25%]
   &--body

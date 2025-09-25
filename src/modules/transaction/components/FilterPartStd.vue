@@ -34,7 +34,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["success", "error", "filter", "resetFilter"]);
+const emit = defineEmits(["success", "error", "filter", "resetFilter", "selectActivity"]);
 
 const masterStore = useMasterStore();
 const transactionStore = useTransactionStore();
@@ -299,7 +299,7 @@ const handleSubmit = async () => {
 
   if (!isValid) return;
 
-  emit("filter", model.value);
+  emit("filter", model.value, dataActivity.value?.pages?.flatMap((page) => page?.data)?.find((item) => item.uuid == model.value.activity_uuid));
 };
 
 const setValue = () => {
@@ -520,6 +520,10 @@ const selectEquipment = (e: OptionType) => {
   ];
   refetchActivity();
 };
+
+const selectActivity = (e: OptionType) => {
+  emit('selectActivity', e);
+}
 
 // bidang
 watch(
@@ -749,7 +753,7 @@ watch(
       <Select v-model="model.activity_uuid" label="Activity" options_label="label" options_value="value"
         v-model:model-search="params_activity.search" :search="true" :loading="is_loading_activity"
         :loading-next-page="isFetchingNextPageActivity" :rules="rules.activity_uuid" :options="options_activity"
-        @scroll="scrollActivity" @search="searchActivity" />
+        @scroll="scrollActivity" @search="searchActivity" @select="selectActivity" />
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button text="Reset" class="w-full" variant="secondary" :disabled="props.loading" @click="resetValue" />

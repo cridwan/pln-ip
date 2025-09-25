@@ -30,18 +30,18 @@ export const Menus: MenuInterface[] = [
     url: "/work-instruction",
     icon: "megaphone",
   },
-  {
-    id: 11,
-    name: "Equipment",
-    url: "/equipment",
-    icon: "wrench",
-  },
-  {
-    id: 11,
-    name: "Activity",
-    url: "/activity",
-    icon: "pulse-line",
-  },
+  // {
+  //   id: 11,
+  //   name: "Equipment",
+  //   url: "/equipment",
+  //   icon: "wrench",
+  // },
+  // {
+  //   id: 11,
+  //   name: "Activity",
+  //   url: "/activity",
+  //   icon: "pulse-line",
+  // },
   {
     id: 11,
     name: "Part Standart",

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AxiosError } from "axios";
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import {
@@ -19,13 +19,18 @@ import type {
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
 
-import { ColumnsPart } from "../constants/PartConstant";
+import { ColumnsPart, ColumnsPartFilter } from "../constants/PartConstant";
 import { useTransactionStore } from "../stores/TransactionStore";
 import FilterPartStd from "../components/FilterPartStd.vue";
 import FormPartStd from "../components/FormPartStd.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 import InputQty from "../components/InputQty.vue";
+import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
 
+type OptionType = {
+  value: string;
+  label: string;
+};
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const params = reactive({
@@ -46,6 +51,7 @@ const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const dataForm = ref<PartStdCreateModelInterface | null>(null);
+const dataActivity = ref<ActivityInterface | null>(null)
 const selected_item = ref<PartStdInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
@@ -204,6 +210,7 @@ const setFilter = () => {
 
 const resetFilter = () => {
   dataForm.value = null;
+  dataActivity.value = null;
   params.filters = [
     {
       group: "AND",
@@ -214,8 +221,9 @@ const resetFilter = () => {
   ];
 };
 
-const handleOnFilter = (data: PartStdCreateModelInterface) => {
+const handleOnFilter = (data: PartStdCreateModelInterface, activity: ActivityInterface) => {
   dataForm.value = data;
+  dataActivity.value = activity;
   setFilter();
   refetchPart();
 };
@@ -224,6 +232,11 @@ const handleResetFilter = () => {
   resetFilter();
   refetchPart();
 };
+
+
+const selectActivity = (e: OptionType) => {
+  console.log(e);
+}
 
 const handleRemoveSuccess = () => {
   refetchPart();
@@ -244,6 +257,7 @@ onMounted(() => {
     },
   ];
 });
+
 </script>
 
 <template>
@@ -253,20 +267,27 @@ onMounted(() => {
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingPart" />
+        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" @select-activity="selectActivity"
+          :loading="isLoadingPart" />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
-            :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve'" class="mt-6"
-            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
+          <Table label-create="Part" :columns="dataForm?.activity_uuid ? ColumnsPartFilter : ColumnsPart"
+            :entities="dataPart?.data || []" :loading="isLoadingPart" :pagination="pagination" :is-create="false"
+            :is-action="dataApproval?.status !== 'approve'" class="mt-6" v-model:model-search="params.search"
+            @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
                 <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
               </div>
             </template>
+            <template #column_activity="{ entity, index }" v-if="dataForm?.activity_uuid">
+              <p class="text-neutral-50">
+                {{ index == 0 ? dataActivity?.name : "" }}
+              </p>
+            </template>
+
             <template #column_part="{ entity }">
               <p class="text-neutral-50">
                 {{ entity.part?.name ?? "-" }}
