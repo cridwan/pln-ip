@@ -108,7 +108,7 @@ const { mutate: downloadManpowerStd, isPending: isLoadingDownload } =
     mutationFn: async () => {
       return await masterStore.downloadManpowerStd();
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -121,7 +121,7 @@ const { mutate: templateManpowerStd, isPending: isLoadingTemplate } =
     mutationFn: async () => {
       return await masterStore.templateManpowerStd();
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -210,6 +210,12 @@ const setFilter = () => {
   params.filters = [
     {
       group: "AND",
+      operator: "NOT_NULL",
+      column: "inspection_type_uuid",
+      value: "",
+    },
+    {
+      group: "AND",
       operator: "EQ",
       column: "activity_uuid",
       value: String(dataForm.value?.activity_uuid),
@@ -223,7 +229,13 @@ const resetFilter = () => {
     {
       group: "AND",
       operator: "NOT_NULL",
-      column: "inspection_type_uuid",
+      column: "activity.equipment.scopeStandart.inspection_type_uuid",
+      value: "",
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
       value: "",
     },
   ];
@@ -243,7 +255,7 @@ const handleResetFilter = () => {
 const previewDocument = (document: ResponseDocumentInterface) => {
   window.open(
     import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-      document.document_link,
+    document.document_link,
     "_blank"
   );
 };
@@ -283,65 +295,31 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        v-if="dataForm?.activity_uuid"
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button v-if="dataForm?.activity_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
+        @click="handleCreate" />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterManpowerStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="isLoadingManpowerStd"
-        />
+        <FilterManpowerStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingManpowerStd" />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table
-          label-create="User"
-          :columns="ColumnsManpowerStd"
-          :entities="dataManpowerStd?.data || []"
-          :loading="isLoadingManpowerStd"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          class="mt-6"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="User" :columns="ColumnsManpowerStd" :entities="dataManpowerStd?.data || []"
+          :loading="isLoadingManpowerStd" :pagination="pagination" :is-create="false"
+          v-model:model-search="params.search" class="mt-6" @change-page="changePage" @change-limit="changeLimit"
+          @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-              />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>
           <template #column_manpower="{ entity }">
-            <p
-              class="text-base text-neutral-50 text-left underline cursor-pointer"
-            >
+            <p class="text-base text-neutral-50 text-left underline cursor-pointer">
               {{ entity.manpower?.name ?? "-" }}
             </p>
           </template>
@@ -349,21 +327,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormManpowerStd
-      :data-form="dataForm"
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-      @removeSucess="handleRemoveSuccess"
-    />
+    <FormManpowerStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
+      @error="handleError" @removeSucess="handleRemoveSuccess" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.uuid"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

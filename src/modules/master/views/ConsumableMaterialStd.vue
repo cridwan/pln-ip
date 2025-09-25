@@ -107,7 +107,7 @@ const { mutate: downloadConsMatStd, isPending: isLoadingDownload } =
     mutationFn: async () => {
       return await masterStore.downloadConsumableMaterialStd(params);
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -120,7 +120,7 @@ const { mutate: templateConsMatStd, isPending: isLoadingTemplate } =
     mutationFn: async () => {
       return await masterStore.templateConsumableMaterialStd();
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -222,7 +222,7 @@ const resetFilter = () => {
     {
       group: "AND",
       operator: "NOT_NULL",
-      column: "inspection_type_uuid",
+      column: "activity.equipment.scopeStandart.inspection_type_uuid",
       value: "",
     },
   ];
@@ -274,65 +274,32 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        v-if="dataForm?.activity_uuid"
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button v-if="dataForm?.activity_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
+        @click="handleCreate" />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterConsumableMaterialStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="isLoadingConsMatStd"
-        />
+        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
+          :loading="isLoadingConsMatStd" />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table
-          label-create="User"
-          :columns="ColumnConsumableMaterialStd"
-          :entities="dataConsMatStd?.data || []"
-          :loading="isLoadingConsMatStd"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          class="mt-6"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="User" :columns="ColumnConsumableMaterialStd" :entities="dataConsMatStd?.data || []"
+          :loading="isLoadingConsMatStd" :pagination="pagination" :is-create="false"
+          v-model:model-search="params.search" class="mt-6" @change-page="changePage" @change-limit="changeLimit"
+          @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-              />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>
           <template #column_cons_mat="{ entity }">
-            <p
-              class="text-base text-neutral-50 text-left underline cursor-pointer"
-            >
+            <p class="text-base text-neutral-50 text-left underline cursor-pointer">
               {{ entity.consmat?.name ?? "-" }}
             </p>
           </template>
@@ -340,21 +307,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormConsumableMaterialStd
-      :data-form="dataForm"
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-      @removeSucess="handleRemoveSuccess"
-    />
+    <FormConsumableMaterialStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item"
+      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.uuid"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
 </template>
