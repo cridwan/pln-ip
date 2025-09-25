@@ -29,6 +29,13 @@ export const ColumnsConsumableMaterial: TableColumnType[] = [
     width: "150",
   },
   {
+    key: "total",
+    label: "Total",
+    align: "left",
+    sort: false,
+    width: "150",
+  },
+  {
     key: "unit",
     label: "Unit",
     align: "left",

@@ -280,6 +280,11 @@ onMounted(() => {
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
+            <template #column_total="{ entity }">
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+                Rp. {{ numberFormat(entity.consmat?.price * Number(entity?.total_qty || 0)) ?? "-" }}
+              </p>
+            </template>
             <template #column_unit="{ entity }">
               <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 {{ entity.consmat?.global_unit?.name ?? "-" }}
