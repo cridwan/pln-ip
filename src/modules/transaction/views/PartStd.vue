@@ -273,19 +273,14 @@ onMounted(() => {
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Part" :columns="dataForm?.activity_uuid ? ColumnsPartFilter : ColumnsPart"
-            :entities="dataPart?.data || []" :loading="isLoadingPart" :pagination="pagination" :is-create="false"
-            :is-action="dataApproval?.status !== 'approve'" class="mt-6" v-model:model-search="params.search"
-            @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+          <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
+            :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve'" class="mt-6"
+            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+            @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
                 <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
               </div>
-            </template>
-            <template #column_activity="{ entity, index }" v-if="dataForm?.activity_uuid">
-              <p class="text-neutral-50">
-                {{ index == 0 ? dataActivity?.name : "" }}
-              </p>
             </template>
 
             <template #column_part="{ entity }">
