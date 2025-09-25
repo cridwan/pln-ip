@@ -9,6 +9,13 @@ export const routeMaster = [
     meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
   },
   {
+    path: "/master/qc-plan",
+    name: "QC Plan",
+    component: () => import("@/modules/master/views/QcPlan.vue"),
+    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+  },
+
+  {
     path: "/master/unit",
     name: "master unit",
     component: () => import("@/modules/master/views/Unit.vue"),
@@ -90,26 +97,46 @@ export const routeMaster = [
   {
     path: "/master/additional-scope/:id/:name/tools",
     name: "master additional tools",
-    component: () => import("@/modules/master/views/additional-scope/Tools.vue"),
-    meta: { layout: MasterAdditionalLayout, requireAuth: true, role: "superuser" },
+    component: () =>
+      import("@/modules/master/views/additional-scope/Tools.vue"),
+    meta: {
+      layout: MasterAdditionalLayout,
+      requireAuth: true,
+      role: "superuser",
+    },
   },
   {
     path: "/master/additional-scope/:id/:name/sequence",
     name: "master additional sequence",
-    component: () => import("@/modules/master/views/additional-scope/Sequence.vue"),
-    meta: { layout: MasterAdditionalLayout, requireAuth: true, role: "superuser" },
+    component: () =>
+      import("@/modules/master/views/additional-scope/Sequence.vue"),
+    meta: {
+      layout: MasterAdditionalLayout,
+      requireAuth: true,
+      role: "superuser",
+    },
   },
   {
     path: "/master/additional-scope/:id/:name/equipment",
     name: "master additional equipment",
-    component: () => import("@/modules/master/views/additional-scope/Equipment.vue"),
-    meta: { layout: MasterAdditionalLayout, requireAuth: true, role: "superuser" },
+    component: () =>
+      import("@/modules/master/views/additional-scope/Equipment.vue"),
+    meta: {
+      layout: MasterAdditionalLayout,
+      requireAuth: true,
+      role: "superuser",
+    },
   },
   {
     path: "/master/additional-scope/:id/:name/activity",
     name: "master additional activity",
-    component: () => import("@/modules/master/views/additional-scope/Activity.vue"),
-    meta: { layout: MasterAdditionalLayout, requireAuth: true, role: "superuser" },
+    component: () =>
+      import("@/modules/master/views/additional-scope/Activity.vue"),
+    meta: {
+      layout: MasterAdditionalLayout,
+      requireAuth: true,
+      role: "superuser",
+    },
   },
   {
     path: "/master/consumable-materials",

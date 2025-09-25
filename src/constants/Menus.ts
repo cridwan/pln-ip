@@ -334,6 +334,12 @@ export const MenusMaster: MenuInterface[] = [
         url: "/hse-doc",
         icon: "hse-doc",
       },
+      {
+        id: 17,
+        name: "QC Plan",
+        url: "/qc-plan",
+        icon: "qc-plan",
+      },
     ],
   },
   {

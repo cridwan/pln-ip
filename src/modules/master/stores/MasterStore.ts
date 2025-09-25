@@ -36,6 +36,7 @@ import type {
   AxiosInstance,
   AxiosRequestConfig,
 } from "axios";
+import type { QCPlanCreateInterface } from "../types/QcPlanType";
 
 export const useMasterStore = defineStore(
   "master",
@@ -2863,6 +2864,137 @@ export const useMasterStore = defineStore(
     };
     // END
 
+    // QC PLAN
+    const getQcPlan = async (payload: IParams) => {
+      return await api
+        .get(`/qc-plan`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const createQcPlan = async (payload: QCPlanCreateInterface) => {
+      return await api
+        .post(`/qc-plan`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const updateQcPlan = async (id: string, payload: QCPlanCreateInterface) => {
+      return await api
+        .put(`/qc-plan/${id}`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteQcPlan = async (id: string) => {
+      return await api
+        .delete(`/qc-plan/${id}`)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const downloadQcPlan = async (params?: AxiosRequestConfig["params"]) => {
+      return await api
+        .post(
+          `/qc-plan/export`,
+          {},
+          {
+            responseType: "blob",
+            params,
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `QC Plan.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const templateQcPlan = async () => {
+      return await api
+        .post(
+          `/qc-plan/template`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `QC Plan Template.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const importQcPlan = async (payload: File) => {
+      const formData = new FormData();
+      formData.append("file", payload);
+
+      return await api
+        .post(`/qc-plan/import`, formData)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+    // END
+
     return {
       getLocation,
       createLocation,
@@ -3017,6 +3149,13 @@ export const useMasterStore = defineStore(
       downloadConsumableMaterialStd,
       templateConsumableMaterialStd,
       importConsumableMaterialStd,
+      getQcPlan,
+      createQcPlan,
+      updateQcPlan,
+      deleteQcPlan,
+      downloadQcPlan,
+      templateQcPlan,
+      importQcPlan,
     };
   },
   {
