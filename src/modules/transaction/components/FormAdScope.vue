@@ -9,7 +9,7 @@ import {
     useMutation,
 } from "@tanstack/vue-query";
 import type { IPagination, IParams, ResponseDocumentInterface } from "@/types/GlobalType";
-import type { FilterScopeInterface, FormScopeInterface } from "../types/ScopeType";
+import type { FilterScopeInterface, FormAdScopeInterface, FormScopeInterface } from "../types/ScopeType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
 import type { ScopeInterface } from "@/modules/master/types/ScopeType";
 import Select from "@/components/fields/Select.vue";
@@ -33,15 +33,15 @@ const model_details = ref<{ name: string; id: string }[]>([
     { id: "0", name: "" },
 ]);
 
-const model = ref<FormScopeInterface>({
-    scope_standart_uuid: "",
+const model = ref<FormAdScopeInterface>({
+    additional_scope_uuid: "",
     project_uuid: ""
 });
 const route = useRoute();
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
     return {
-        scope_standart_uuid: {
+        additional_scope_uuid: {
             required: helpers.withMessage(`This field is required`, required),
         },
     };
@@ -53,17 +53,17 @@ const handleSubmit = async () => {
     if (!isValid) return;
 
     createScope({
-        scope_standart_uuid: model.value.scope_standart_uuid,
         project_uuid: route.params.id_project as string,
+        additional_scope_uuid: model.value.additional_scope_uuid,
     });
 };
 
 const setValue = () => {
-    model.value.scope_standart_uuid = "";
+    model.value.additional_scope_uuid = "";
 };
 
 const resetValue = () => {
-    model.value.scope_standart_uuid = "";
+    model.value.additional_scope_uuid = "";
     model_details.value = [{ name: "", id: "0" }];
     uploadProgress.value = 0;
 };
@@ -71,8 +71,8 @@ const resetValue = () => {
 
 // create documnet
 const { mutate: createScope, isPending: isLoadingScope } = useMutation({
-    mutationFn: async (payload: FormScopeInterface) => {
-        return transactionStore.cloneScopeStandar(payload);
+    mutationFn: async (payload: FormAdScopeInterface) => {
+        return transactionStore.cloneAdScopeStandar(payload);
     },
     onSuccess: (data) => {
         modelValue.value = false;
@@ -94,15 +94,6 @@ watch(modelValue, (value) => {
         setValue()
     }
 });
-
-const handleChangeFile = (e: File) => {
-    modelUpload.value = e;
-}
-
-const removeSuccess = () => {
-    documentValues.value = null;
-    emit('removeSucess');
-}
 
 //--- GET SCOPE
 const params_scope = reactive<IParams & { from_transaction: boolean, project_uuid: string }>({
@@ -189,10 +180,10 @@ watch(
     <Modal width="440" height="200" :showButtonClose="false" title="Tambah Scope" v-model="modelValue">
         <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
             @submit.prevent="handleSubmit">
-            <Select v-model="model.scope_standart_uuid" label="Scope" options_label="label" options_value="value"
+            <Select v-model="model.additional_scope_uuid" label="Scope" options_label="label" options_value="value"
                 v-model:model-search="params_scope.search" :search="true" :loading="is_loading_scope"
-                :loading-next-page="isFetchingNextPageScope" :rules="rules.scope_standart_uuid" :options="options_scope"
-                @scroll="scrollScope" @search="searchScope" />
+                :loading-next-page="isFetchingNextPageScope" :rules="rules.additional_scope_uuid"
+                :options="options_scope" @scroll="scrollScope" @search="searchScope" />
 
             <div class="w-full flex items-center gap-4 mt-4">
                 <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingScope"

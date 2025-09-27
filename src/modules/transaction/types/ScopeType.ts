@@ -89,6 +89,6 @@ export interface FormScopeInterface {
 }
 
 export interface FormAdScopeInterface {
-  scope_standart_uuid: string;
   additional_scope_uuid: string;
+  project_uuid: string;
 }

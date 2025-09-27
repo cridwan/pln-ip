@@ -21,6 +21,7 @@ import type { FormActivityInterfaceClone } from "../types/ActivityType";
 import type { FormPartCloneInterface } from "../types/PartStdType";
 import type { FormConsMatCloneInterface } from "../types/ConsumableMaterialStdType";
 import type { FormManpowerCloneInterface } from "../types/ManpowerStdType";
+import type { FormApprovalInterface } from "../types/ApprovalType";
 
 export const useTransactionStore = defineStore(
   "transaction",
@@ -77,7 +78,7 @@ export const useTransactionStore = defineStore(
 
     const cloneAdScopeStandar = async (payload: FormAdScopeInterface) => {
       return await api
-        .post(`/transaction/scope-standart/resource/clone`, payload)
+        .post(`/transaction/additional-scope/resource/clone`, payload)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -780,9 +781,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const approveProject = async (uuid: string) => {
+    const approveProject = async (uuid: string, payload: FormApprovalInterface) => {
       return await api
-        .put(`/transaction/project/${uuid}/approve`)
+        .put(`/transaction/project/${uuid}/approve`, payload)
         .then((resp) => {
           return Promise.resolve(resp);
         })

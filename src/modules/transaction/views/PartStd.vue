@@ -296,6 +296,20 @@ onMounted(() => {
                 {{ Number(entity.total_qty)?.toLocaleString('id') ?? "-" }}
               </p>
             </template>
+            <template #column_price="{ entity, index }">
+              <InputQty :qty="Number(entity.total_qty)" v-if="edit_qty && edit_id == index" @change="handleEdit" />
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer" v-else
+                @click="handleUpdate(index)">
+                Rp. {{ Number(entity.part.price)?.toLocaleString('id') ?? "-" }}
+              </p>
+            </template>
+            <template #column_total="{ entity, index }">
+              <InputQty :qty="Number(entity.total_qty)" v-if="edit_qty && edit_id == index" @change="handleEdit" />
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer" v-else
+                @click="handleUpdate(index)">
+                Rp. {{ (Number(entity.part.price) * Number(entity.total_qty)).toLocaleString("id") }}
+              </p>
+            </template>
 
             <template #column_unit="{ entity }">
               <p class="text-base text-neutral-50 text-left">

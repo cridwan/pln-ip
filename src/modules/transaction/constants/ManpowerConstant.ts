@@ -14,4 +14,18 @@ export const ColumnsManpower: TableColumnType[] = [
     sort: false,
     width: "150",
   },
+  {
+    key: "price",
+    label: "Harga",
+    align: "left",
+    sort: false,
+    width: "150",
+  },
+  {
+    key: "total",
+    label: "Total",
+    align: "left",
+    sort: false,
+    width: "150",
+  },
 ];

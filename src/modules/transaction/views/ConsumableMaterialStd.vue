@@ -250,10 +250,10 @@ onMounted(() => {
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Material" :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []"
-            :loading="isLoadingConsMat" :pagination="pagination" :is-create="false" :is-action="true" class="mt-6"
-            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
+          <Table label-create="Material" :is-action="dataApproval?.status !== 'approve'"
+            :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []" :loading="isLoadingConsMat"
+            :pagination="pagination" :is-create="false" class="mt-6" v-model:model-search="params.search"
+            @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
                 <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />

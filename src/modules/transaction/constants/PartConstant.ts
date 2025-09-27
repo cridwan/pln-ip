@@ -15,6 +15,20 @@ export const ColumnsPart: TableColumnType[] = [
     width: "150",
   },
   {
+    key: "price",
+    label: "Harga",
+    align: "center",
+    sort: false,
+    width: "150",
+  },
+  {
+    key: "total",
+    label: "Total Harga",
+    align: "center",
+    sort: false,
+    width: "150",
+  },
+  {
     key: "unit",
     label: "Unit",
     align: "left",

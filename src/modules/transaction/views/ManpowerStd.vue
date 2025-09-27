@@ -269,6 +269,16 @@ onMounted(() => {
                 {{ Number(entity.total_qty)?.toLocaleString('id') ?? "-" }}
               </p>
             </template>
+            <template #column_price="{ entity }">
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+                Rp. {{ Number(entity.manpower.price)?.toLocaleString('id') ?? "-" }}
+              </p>
+            </template>
+            <template #column_total="{ entity }">
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+                Rp. {{ (Number(entity.manpower.price) * Number(entity.total_qty)).toLocaleString('id') }}
+              </p>
+            </template>
           </Table>
         </div>
       </div>
