@@ -223,18 +223,18 @@ export const MenusAddScope: MenuInterface[] = [
     url: "/scope",
     icon: "document",
   },
-  {
-    id: 2,
-    name: "Equipment",
-    url: "/equipment",
-    icon: "wrench",
-  },
-  {
-    id: 2,
-    name: "Activity",
-    url: "/activity",
-    icon: "pulse-line",
-  },
+  // {
+  //   id: 2,
+  //   name: "Equipment",
+  //   url: "/equipment",
+  //   icon: "wrench",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Activity",
+  //   url: "/activity",
+  //   icon: "pulse-line",
+  // },
   {
     id: 4,
     name: "Consumable Material",

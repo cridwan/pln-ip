@@ -24,7 +24,7 @@ import { useTransactionStore } from "../stores/TransactionStore";
 import FilterScope from "../components/FilterScope.vue";
 import FormScope from "../components/FormScope.vue";
 import type { ProjectInterface } from "../types/ProjectType";
-import ExpandScope from "../components/scope/TableEquipment.vue";
+import TableEquipment from "../components/scope/TableEquipment.vue";
 
 const open_form = ref(false);
 const entitiesScope = ref<ScopeInterface[]>([]);
@@ -522,7 +522,6 @@ const openChildren = (value: boolean, item: ScopeInterface) => {
 };
 
 const getData = (id: string, response: EquipmentInterface[]) => {
-  console.log("MASUK", id, response);
   entitiesScope.value = entitiesScope.value.map((item) => {
     if (item.id === id) {
       return { ...item, children: response };
@@ -541,8 +540,20 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     <span v-else>{{ dataDuration }} Days</span>
   </div>
   <!-- v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'" -->
+<<<<<<< HEAD
   <Button icon_only="plus" class="absolute right-[9rem] top-[6.5rem]" size="sm" rounded="full" color="blue"
     v-if="dataForm?.sub_bidang_uuid" @click="handleCreate" />
+=======
+  <Button
+    v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'"
+    icon_only="plus"
+    class="absolute right-[9rem] top-[6.5rem]"
+    size="sm"
+    rounded="full"
+    color="blue"
+    @click="handleCreate"
+  />
+>>>>>>> eb7a2ea (feat: implement aexpand in ik and add scope)
   <div class="flex gap-8">
     <div class="basis-1/5">
       <FilterScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingScope" />
@@ -617,8 +628,20 @@ const getData = (id: string, response: EquipmentInterface[]) => {
             ">
               <td :colspan="ColumnsScope.length + 1">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
+<<<<<<< HEAD
                   <ExpandScope :id="entity.id" :entity="entity.children" :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
                     " @get-data="getData" />
+=======
+                  <TableEquipment
+                    :id="entity.id"
+                    :entity="entity.children"
+                    :status-approval="dataApproval?.status"
+                    :open="
+                      children_active.find((el) => el.id === entity.id)?.open
+                    "
+                    @get-data="getData"
+                  />
+>>>>>>> eb7a2ea (feat: implement aexpand in ik and add scope)
                 </div>
               </td>
             </tr>
