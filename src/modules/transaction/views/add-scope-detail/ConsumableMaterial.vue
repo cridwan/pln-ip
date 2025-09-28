@@ -36,14 +36,8 @@ const params = reactive({
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.project_uuid",
-      value: route.params.id_project,
-    },
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "activity.original_uuid",
-      value: "",
+      column: "activity.equipment.scopeStandart.additional_scope_uuid",
+      value: route.params.id_scope,
     },
   ],
   currentPage: 1,
@@ -294,6 +288,11 @@ onMounted(() => {
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
+            <template #column_total="{ entity }">
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+                Rp. {{ (Number(entity.consmat?.price) * Number(entity.total_qty)).toLocaleString('id') }}
+              </p>
+            </template>
             <template #column_unit="{ entity }">
               <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 {{ entity.consmat?.global_unit?.name ?? "-" }}
@@ -306,8 +305,10 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormAdCosumableMaterial v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
-    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <FormConsumableMaterialStd :is-additional="true" v-model="open_form" :data-form="dataForm"
+    :selected-value="selected_item" @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <!-- <FormAdCosumableMaterial v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
+    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" /> -->
   <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
     @delete="onDelete" />
 </template>

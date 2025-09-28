@@ -38,12 +38,6 @@ const params = reactive({
       column: "activity.equipment.scopeStandart.additional_scope_uuid",
       value: route.params.id_scope,
     },
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "activity.original_uuid",
-      value: "",
-    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -276,7 +270,17 @@ onMounted(() => {
             </template>
             <template #column_qty="{ entity }">
               <p class="text-base text-neutral-50 text-left underline cursor-pointer">
-                {{ entity.qty ?? "-" }}
+                {{ entity.total_qty ?? "-" }}
+              </p>
+            </template>
+            <template #column_price="{ entity }">
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+                Rp. {{ Number(entity.manpower.price).toLocaleString('id') }}
+              </p>
+            </template>
+            <template #column_total="{ entity }">
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+                Rp. {{ (Number(entity.total_qty) * Number(entity.manpower.price)).toLocaleString('id') }}
               </p>
             </template>
           </Table>

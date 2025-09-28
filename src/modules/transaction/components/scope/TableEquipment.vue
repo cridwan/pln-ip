@@ -31,6 +31,10 @@ const props = defineProps({
     type: String,
     default: "approve",
   },
+  isAction: {
+    type: Boolean,
+    default: true,
+  }
 });
 
 const emit = defineEmits(["getData"]);
@@ -43,12 +47,12 @@ const params = reactive({
   search: "",
   filter: "",
   filters: [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "scopeStandart.project_uuid",
-      value: route.params.id_project,
-    },
+    // {
+    //   group: "AND",
+    //   operator: "EQ",
+    //   column: "scopeStandart.project_uuid",
+    //   value: route.params.id_project,
+    // },
     {
       group: "AND",
       operator: "EQ",
@@ -75,7 +79,7 @@ const { refetch: refetchEquipment, isFetching: isLoading } = useQuery({
 
       total_item.value = response.total;
 
-      const id = config?.params?.filters?.[1]?.value;
+      const id = config?.params?.filters?.[0]?.value;
       emit("getData", id, response.data);
       // entitiesScope.value = entitiesScope.value.map((item) => {
       //   if (item.id === id) {
@@ -209,7 +213,7 @@ watch(
   () => props.open,
   (value) => {
     if (value === true) {
-      params.filters[1].value = props.id;
+      params.filters[0].value = props.id;
       params.currentPage = 1;
       refetchEquipment();
     }
@@ -221,37 +225,15 @@ watch(
 <template>
   <div class="flex flex-col">
     <div v-if="statusApproval !== 'approve'" class="flex justify-end">
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
     </div>
-    <Table
-      :columns="ColumnsEquipment"
-      :entities="entity || []"
-      :pagination="pagination"
-      :loading="isLoading"
-      :is-create="false"
-      :is-search="false"
-      :is-action="statusApproval !== 'approve'"
-      @change-page="changePage"
-      @change-limit="changeLimit"
-    >
+    <Table :columns="ColumnsEquipment" :entities="entity || []" :pagination="pagination" :loading="isLoading"
+      :is-create="false" :is-search="false" :is-action="true" @change-page="changePage" @change-limit="changeLimit">
       <template #column_action="{ entity: element }">
         <div class="flex items-center justify-center gap-4">
-          <Icon
-            name="eye"
-            class="icon-action-table"
-            @click="handleDetail(element)"
-          />
-          <Icon
-            name="trash"
-            class="icon-action-table"
-            @click="handleDelete(element)"
-          />
+          <Icon name="eye" class="icon-action-table" @click="handleDetail(element)" />
+          <Icon name="trash" class="icon-action-table" @click="handleDelete(element)"
+            v-if="props.isAction && statusApproval !== 'approve'" />
         </div>
       </template>
       <template #column_scope_standart="{ entity: element }">
@@ -262,26 +244,11 @@ watch(
     </Table>
   </div>
 
-  <FormEquipment
-    v-model="open_form"
-    :data-form="dataForm"
-    :selected-value="selected_item"
-    @success="handleSuccess"
-    @error="handleError"
-    @removeSucess="handleRemoveSuccess"
-  />
+  <FormEquipment v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
+    @error="handleError" @removeSucess="handleRemoveSuccess" />
 
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 
-  <ModalActivity
-    v-model="open_detail"
-    :id="selected_item?.uuid"
-    :status-approval="statusApproval"
-  />
+  <ModalActivity v-model="open_detail" :id="selected_item?.uuid" :status-approval="statusApproval" />
   <Toast ref="toastRef" />
 </template>

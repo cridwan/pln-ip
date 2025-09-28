@@ -19,7 +19,11 @@ import { useTransactionStore } from "../stores/TransactionStore";
 const props = defineProps({
     dataForm: {
         type: Object as PropType<FilterScopeInterface | null>
-    }
+    },
+    isAdditional: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 type OptionType = {
@@ -27,14 +31,10 @@ type OptionType = {
     label: string;
 };
 const transactionStore = useTransactionStore();
-const localForm = ref<FilterScopeInterface | null | undefined>(props.dataForm)
 const uploadProgress = ref<number>(0);
-const modelUpload = ref<File | null>(null);
-const documentValues = ref<ResponseDocumentInterface | null>(null);
 const emit = defineEmits(["success", "error", "removeSucess", "refetchScope"]);
 const is_loading_scope = ref(false);
 const options_scope = ref<OptionType[]>([]);
-const masterStore = useMasterStore();
 const modelValue = defineModel<boolean>({ default: false });
 const model_details = ref<{ name: string; id: string }[]>([
     { id: "0", name: "" },
@@ -59,7 +59,10 @@ const handleSubmit = async () => {
 
     if (!isValid) return;
 
-    createScope({
+    createScope(props.isAdditional ? {
+        scope_standart_uuid: model.value.scope_standart_uuid,
+        additional_scope_uuid: route.params.id_scope as string,
+    } : {
         scope_standart_uuid: model.value.scope_standart_uuid,
         project_uuid: route.params.id_project as string,
     });
@@ -103,14 +106,19 @@ watch(modelValue, (value) => {
 });
 
 //--- GET SCOPE
-const params_scope = reactive<IParams & { project_uuid: string, sub_bidang_uuid: string }>({
+const params_scope = reactive({
     search: "",
     filter: "",
     filters: [],
     currentPage: 1,
     perPage: 10,
-    project_uuid: route.params.id_project as string,
-    sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string
+    ...(props.isAdditional ? {
+        sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string,
+        additional_scope_uuid: route.params.id_scope as string
+    } : {
+        project_uuid: route.params.id_project as string,
+        sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string
+    })
 });
 const {
     data: dataScope,
