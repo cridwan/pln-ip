@@ -30,6 +30,8 @@ const getMenuActive = computed(() => {
     return "Turbine Inspection";
   } else if (route.params.menu === "mi") {
     return "Major Inspection";
+  } else {
+    return "Guest";
   }
 });
 </script>
