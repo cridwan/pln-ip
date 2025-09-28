@@ -7,9 +7,9 @@ import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import { mergeArrays } from "@/helpers/global";
-import { useMasterStore } from "@/modules/master/stores/MasterStore";
 import type { IPagination, IParams } from "@/types/GlobalType";
 import type {
+  FilterPartStdInterface,
   PartStdCreateModelInterface,
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
@@ -27,18 +27,17 @@ const props = defineProps({
     type: Object as PropType<PartStdInterface | null>,
   },
   dataForm: {
-    type: Object as PropType<PartStdCreateModelInterface | null>,
+    type: Object as PropType<FilterPartStdInterface | null>,
   },
   isAdditional: {
     type: Boolean,
     default: false,
-  }
+  },
 });
 
 const emit = defineEmits(["success", "error"]);
 
 const route = useRoute();
-const masterStore = useMasterStore();
 const transactionStore = useTransactionStore();
 const is_loading_part = ref(false);
 const options_part = ref<OptionType[]>([]);
@@ -60,9 +59,6 @@ const model = ref<PartStdCreateModelInterface>({
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
   return {
-    qty: {
-      required: helpers.withMessage(`This field is required`, required),
-    },
     part_uuid: {
       required: helpers.withMessage(`This field is required`, required),
     },
@@ -76,13 +72,15 @@ const params_part = reactive({
   filters: [],
   currentPage: 1,
   perPage: 10,
-  ...(props.isAdditional ? {
-    activity_uuid: props.dataForm?.activity_uuid as string,
-    additional_scope_uuid: route.params.id_scope as string,
-  } : {
-    activity_uuid: props.dataForm?.activity_uuid as string,
-    project_uuid: route.params.id_project as string,
-  })
+  ...(props.isAdditional
+    ? {
+        activity_uuid: props.dataForm?.activity_uuid as string,
+        additional_scope_uuid: route.params.id_scope as string,
+      }
+    : {
+        activity_uuid: props.dataForm?.activity_uuid as string,
+        project_uuid: route.params.id_project as string,
+      }),
 });
 const {
   data: dataPart,
@@ -99,8 +97,6 @@ const {
         ...params_part,
         currentPage: pageParam,
       });
-
-      console.log(data)
 
       const response = data as IPagination<PartStdInterface[]>;
 
@@ -230,27 +226,60 @@ watch(
   { deep: true, immediate: true }
 );
 
-watch(() => props.dataForm, (newVal) => {
-  params_part.activity_uuid = newVal?.activity_uuid as string;
+watch(
+  () => props.dataForm,
+  (newVal) => {
+    params_part.activity_uuid = newVal?.activity_uuid as string;
 
-  refetchPart();
-}, { deep: true, immediate: true })
+    refetchPart();
+  },
+  { deep: true, immediate: true }
+);
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue ? 'Ubah Part' : 'Tambah Part'"
-    v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Select v-model="model.part_uuid" v-model:model-search="params_part.search" label="Part" options_label="label"
-        options_value="value" :search="true" :loading="is_loading_part" :loading-next-page="isFetchingNextPagePart"
-        :rules="rules.part_uuid" :options="options_part" @scroll="scrollPart" @search="searchPart" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Part' : 'Tambah Part'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Select
+        v-model="model.part_uuid"
+        v-model:model-search="params_part.search"
+        label="Part"
+        options_label="label"
+        options_value="value"
+        :search="true"
+        :loading="is_loading_part"
+        :loading-next-page="isFetchingNextPagePart"
+        :rules="rules.part_uuid"
+        :options="options_part"
+        @scroll="scrollPart"
+        @search="searchPart"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate"
-          :loading="isLoadingCreate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate"
+          :loading="isLoadingCreate"
+        />
       </div>
     </form>
   </Modal>

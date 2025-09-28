@@ -19,7 +19,7 @@ import type {
   ActivityInterface,
   ActivityModelCreateInterface,
 } from "@/modules/master/types/AcitivityType";
-import FormActivity from "@/modules/transaction/components/FormActivity.vue";
+// import FormActivity from "@/modules/transaction/components/FormActivity.vue";
 import FilterActivity from "@/modules/transaction/components/add-scope/FilterActivity.vue";
 import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
 
@@ -56,6 +56,7 @@ const selected_item = ref<ActivityInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
@@ -86,10 +87,12 @@ const {
       const response = data.data as IPagination<ActivityInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -218,12 +221,14 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: ActivityModelCreateInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchActivity();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchActivity();
 };
@@ -245,22 +250,47 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button v-if="dataForm?.equipment_uuid && dataApproval?.status !== 'approve'" icon_only="plus"
-      class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <Button
+      v-if="dataForm?.equipment_uuid && dataApproval?.status !== 'approve'"
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterActivity @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingActivity" />
+        <FilterActivity
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
-          :loading="isLoadingActivity" :pagination="pagination" :is-create="false"
-          :is-action="dataApproval?.status !== 'approve'" v-model:model-search="params.search" class="mt-6"
-          @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+        <Table
+          label-create="Sub Bidang"
+          :columns="ColumnsActivity"
+          :entities="dataActivity?.data || []"
+          :loading="isLoadingActivity"
+          :pagination="pagination"
+          :is-create="false"
+          :is-action="dataApproval?.status !== 'approve'"
+          v-model:model-search="params.search"
+          class="mt-6"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+              />
             </div>
           </template>
           <template #column_equipment="{ entity }">
@@ -272,12 +302,23 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormAdActivity v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+    <FormAdActivity
+      v-model="open_form"
+      :data-form="dataForm"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+    />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>
 
 <style lang="sass"></style>

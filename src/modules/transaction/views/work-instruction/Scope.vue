@@ -4,16 +4,16 @@ import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
 
 import type {
-  CreateDocumentInterface,
+  // CreateDocumentInterface,
   IPagination,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
 import { Button, ModalDelete, Table, Toast } from "@/components";
-import type { ValueUploadType } from "@/components/fields/Upload.vue";
+// import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useQuery, useMutation } from "@tanstack/vue-query";
-import { useGlobalStore } from "@/stores/GlobalStore";
+// import { useGlobalStore } from "@/stores/GlobalStore";
 import type {
-  CreateScopeInterface,
+  // CreateScopeInterface,
   FilterScopeInterface,
   ResponseScopeInterface,
   ScopeInterface,
@@ -25,17 +25,17 @@ import type { EquipmentInterface } from "@/modules/transaction/types/EquipmentTy
 
 import { ColumnsWorkInstruction } from "../../constants/WorkInstructionConstant";
 import ButtonPreview from "../../components/ButtonPreview.vue";
-import FormOnlyUploadFile from "../../components/FormOnlyUploadFile.vue";
+// import FormOnlyUploadFile from "../../components/FormOnlyUploadFile.vue";
 import type { ProjectInterface } from "../../types/ProjectType";
 import TableEquipment from "../../components/scope/TableEquipment.vue";
 
-const attachment = ref<any>(null);
+// const attachment = ref<any>(null);
 const open_form = ref(false);
 const entitiesScope = ref<ScopeInterface[]>([]);
 const selected_item = ref<ScopeInterface>();
 const dataForm = ref<FilterScopeInterface | null>(null);
 const transactionStore = useTransactionStore();
-const globalStore = useGlobalStore();
+// const globalStore = useGlobalStore();
 const route = useRoute();
 const params = reactive({
   search: "",
@@ -52,18 +52,19 @@ const params = reactive({
 });
 const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
-const asset_welness = ref<any>(null);
-const oh_recom = ref<any>(null);
-const wo_priority = ref<any>(null);
-const history = ref<any>(null);
-const rla = ref<any>(null);
-const ncr = ref<any>(null);
+// const asset_welness = ref<any>(null);
+// const oh_recom = ref<any>(null);
+// const wo_priority = ref<any>(null);
+// const history = ref<any>(null);
+// const rla = ref<any>(null);
+// const ncr = ref<any>(null);
 const open_delete = ref(false);
-const file = ref<File | null>(null);
-const is_loading_create = ref(false);
+// const file = ref<File | null>(null);
+// const is_loading_create = ref(false);
 const timeout = ref(0);
-const file_deleted = ref("");
+// const file_deleted = ref("");
 const children_active = ref<{ id: string; open: boolean }[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
@@ -97,104 +98,106 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
             children: [],
             asset_welness: item.asset_welnes
               ? {
-                color: item.asset_welnes?.color,
-                note: item.asset_welnes?.note,
-                file: item.asset_welnes?.document
-                  ? [
-                    {
-                      id: item.asset_welnes.document.uuid,
-                      name: item.asset_welnes.document
-                        .document_original_name,
-                      size: item.asset_welnes.document.document_size,
-                      file: item.asset_welnes.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  color: item.asset_welnes?.color,
+                  note: item.asset_welnes?.note,
+                  file: item.asset_welnes?.document
+                    ? [
+                        {
+                          id: item.asset_welnes.document.uuid,
+                          name: item.asset_welnes.document
+                            .document_original_name,
+                          size: item.asset_welnes.document.document_size,
+                          file: item.asset_welnes.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             oh_recom: item.oh_recom
               ? {
-                note: item.oh_recom?.note,
-                file: item.oh_recom?.document
-                  ? [
-                    {
-                      id: item.oh_recom.document.uuid,
-                      name: item.oh_recom.document.document_original_name,
-                      size: item.oh_recom.document.document_size,
-                      file: item.oh_recom.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.oh_recom?.note,
+                  file: item.oh_recom?.document
+                    ? [
+                        {
+                          id: item.oh_recom.document.uuid,
+                          name: item.oh_recom.document.document_original_name,
+                          size: item.oh_recom.document.document_size,
+                          file: item.oh_recom.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             wo_priority: item.wo_priority
               ? {
-                note: item.wo_priority?.note,
-                file: item.wo_priority?.document
-                  ? [
-                    {
-                      id: item.wo_priority.document.uuid,
-                      name: item.wo_priority.document
-                        .document_original_name,
-                      size: item.wo_priority.document.document_size,
-                      file: item.wo_priority.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.wo_priority?.note,
+                  file: item.wo_priority?.document
+                    ? [
+                        {
+                          id: item.wo_priority.document.uuid,
+                          name: item.wo_priority.document
+                            .document_original_name,
+                          size: item.wo_priority.document.document_size,
+                          file: item.wo_priority.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             history: item.history
               ? {
-                note: item.history?.note,
-                file: item.history?.document
-                  ? [
-                    {
-                      id: item.history.document.uuid,
-                      name: item.history.document.document_original_name,
-                      size: item.history.document.document_size,
-                      file: item.history.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.history?.note,
+                  file: item.history?.document
+                    ? [
+                        {
+                          id: item.history.document.uuid,
+                          name: item.history.document.document_original_name,
+                          size: item.history.document.document_size,
+                          file: item.history.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             rla: item.rla
               ? {
-                note: item.rla?.note,
-                file: item.rla?.document
-                  ? [
-                    {
-                      id: item.rla.document.uuid,
-                      name: item.rla.document.document_original_name,
-                      size: item.rla.document.document_size,
-                      file: item.rla.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.rla?.note,
+                  file: item.rla?.document
+                    ? [
+                        {
+                          id: item.rla.document.uuid,
+                          name: item.rla.document.document_original_name,
+                          size: item.rla.document.document_size,
+                          file: item.rla.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             ncr: item.ncr
               ? {
-                note: item.ncr?.note,
-                file: item.ncr?.document
-                  ? [
-                    {
-                      id: item.ncr.document.uuid,
-                      name: item.ncr.document.document_original_name,
-                      size: item.ncr.document.document_size,
-                      file: item.ncr.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.ncr?.note,
+                  file: item.ncr?.document
+                    ? [
+                        {
+                          id: item.ncr.document.uuid,
+                          name: item.ncr.document.document_original_name,
+                          size: item.ncr.document.document_size,
+                          file: item.ncr.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             document: item.document,
           };
         }) || [];
       entitiesScope.value = new_arr;
+      is_loading_filter.value = false;
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -293,40 +296,40 @@ const {
 // });
 // //--- END
 
-//--- CREATE DOCUMENT
-const { mutate: createDocument } = useMutation({
-  mutationFn: async (payload: CreateDocumentInterface) => {
-    return await globalStore.createDocument(payload);
-  },
-  onSuccess: () => {
-    refetchScope();
-    refetchDuration();
-    oh_recom.value.modelOpenInputData = false;
-    wo_priority.value.modelOpenInputData = false;
-    history.value.modelOpenInputData = false;
-    rla.value.modelOpenInputData = false;
-    ncr.value.modelOpenInputData = false;
-    toastRef.value?.showToast({
-      title: "Success",
-      description: "Saved successfully",
-      type: "success",
-    });
-    file.value = null;
-    is_loading_create.value = false;
-  },
-  onError: (error: any) => {
-    console.log(error);
-    toastRef.value?.showToast({
-      title: "Error",
-      description: error?.response?.data?.message || "Something went wrong",
-      type: "error",
-    });
-    file.value = null;
-    is_loading_create.value = false;
-  },
-  retry: 0,
-});
-//--- END
+// //--- CREATE DOCUMENT
+// const { mutate: createDocument } = useMutation({
+//   mutationFn: async (payload: CreateDocumentInterface) => {
+//     return await globalStore.createDocument(payload);
+//   },
+//   onSuccess: () => {
+//     refetchScope();
+//     refetchDuration();
+//     oh_recom.value.modelOpenInputData = false;
+//     wo_priority.value.modelOpenInputData = false;
+//     history.value.modelOpenInputData = false;
+//     rla.value.modelOpenInputData = false;
+//     ncr.value.modelOpenInputData = false;
+//     toastRef.value?.showToast({
+//       title: "Success",
+//       description: "Saved successfully",
+//       type: "success",
+//     });
+//     file.value = null;
+//     is_loading_create.value = false;
+//   },
+//   onError: (error: any) => {
+//     console.log(error);
+//     toastRef.value?.showToast({
+//       title: "Error",
+//       description: error?.response?.data?.message || "Something went wrong",
+//       type: "error",
+//     });
+//     file.value = null;
+//     is_loading_create.value = false;
+//   },
+//   retry: 0,
+// });
+// //--- END
 
 //--- DELETE SCOPE
 const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
@@ -374,10 +377,10 @@ const changeLimit = (e: string) => {
   refetchScope();
 };
 
-const handleDelete = (e: ScopeInterface) => {
-  selected_item.value = e;
-  open_delete.value = true;
-};
+// const handleDelete = (e: ScopeInterface) => {
+//   selected_item.value = e;
+//   open_delete.value = true;
+// };
 
 const onDelete = () => {
   deleteScope(selected_item.value?.id as string);
@@ -421,11 +424,13 @@ const resetFilter = () => {
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchScope();
 };
 
 const handleOnFilter = (data: FilterScopeInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchScope();
@@ -525,36 +530,73 @@ const getData = (id: string, response: EquipmentInterface[]) => {
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.asset" :loading="isLoadingDelete" @delete="onDelete" />
-  <div class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1">
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.asset"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
+  <div
+    class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1"
+  >
     <span v-if="isLoadingDuration">Loading...</span>
     <span v-else>{{ dataDuration }} Days</span>
   </div>
-  <Button v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'" icon_only="plus"
-    class="absolute right-[9rem] top-[6.5rem]" size="sm" rounded="full" color="blue" @click="handleCreate" />
+  <Button
+    v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'"
+    icon_only="plus"
+    class="absolute right-[9rem] top-[6.5rem]"
+    size="sm"
+    rounded="full"
+    color="blue"
+    @click="handleCreate"
+  />
   <div class="flex gap-8">
     <div class="basis-1/5">
-      <FilterScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingScope" />
+      <FilterScope
+        @filter="handleOnFilter"
+        @reset-filter="handleResetFilter"
+        :loading="is_loading_filter"
+      />
     </div>
     <div class="flex-1 overflow-auto">
       <div class="max-w-full min-w-full">
-        <Table label-create="Asset" :columns="ColumnsWorkInstruction" :entities="entitiesScope"
-          :loading="isLoadingScope" :pagination="pagination" :is-create="false" :isAction="false"
-          v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-          @search="searchTable" @open-children="openChildren">
+        <Table
+          label-create="Asset"
+          :columns="ColumnsWorkInstruction"
+          :entities="entitiesScope"
+          :loading="isLoadingScope"
+          :pagination="pagination"
+          :is-create="false"
+          :isAction="false"
+          v-model:model-search="params.search"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+          @open-children="openChildren"
+        >
           <template #column_preview="{ entity }">
             <p v-if="!entity.document" class="text-white">No Document</p>
             <ButtonPreview v-else @click="preview(entity.document)" />
           </template>
           <template #children="{ entity, index, parentActive }">
-            <tr v-if="
-              children_active.find((el) => el.id === entity.id)?.open === true
-            ">
+            <tr
+              v-if="
+                children_active.find((el) => el.id === entity.id)?.open === true
+              "
+            >
               <td :colspan="ColumnsWorkInstruction.length + 1">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
-                  <TableEquipment :is-action="false" :id="entity.id" :entity="entity.children"
-                    :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
-                      " @get-data="getData" />
+                  <TableEquipment
+                    :is-action="false"
+                    :id="entity.id"
+                    :entity="entity.children"
+                    :status-approval="dataApproval?.status"
+                    :open="
+                      children_active.find((el) => el.id === entity.id)?.open
+                    "
+                    @get-data="getData"
+                  />
                 </div>
               </td>
             </tr>
@@ -563,7 +605,12 @@ const getData = (id: string, response: EquipmentInterface[]) => {
       </div>
     </div>
 
-    <FormScope v-model="open_form" :dataForm="dataForm" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" />
+    <FormScope
+      v-model="open_form"
+      :dataForm="dataForm"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+    />
   </div>
 </template>

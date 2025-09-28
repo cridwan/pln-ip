@@ -9,15 +9,16 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/vue-query";
 import type { IPagination, IParams } from "@/types/GlobalType";
 import { mergeArrays } from "@/helpers/global";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
-
 import type { ScopeInterface } from "@/modules/master/types/ScopeType";
 import type { SubBidangInterface } from "@/modules/master/types/SubBidangType";
 import type { BidangInterface } from "@/modules/master/types/BidangType";
 import type { EquipmentInterface } from "@/modules/master/types/EquipmentType";
 import type {
-  PartStdCreateModelInterface,
+  FilterPartStdInterface,
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
+import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
+
 import { useTransactionStore } from "../stores/TransactionStore";
 
 type OptionType = {
@@ -34,7 +35,13 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["success", "error", "filter", "resetFilter", "selectActivity"]);
+const emit = defineEmits([
+  "success",
+  "error",
+  "filter",
+  "resetFilter",
+  "selectActivity",
+]);
 
 const masterStore = useMasterStore();
 const transactionStore = useTransactionStore();
@@ -52,14 +59,12 @@ const options_equipment = ref<OptionType[]>([]);
 const is_loading_activity = ref(false);
 const options_activity = ref<OptionType[]>([]);
 
-const model = ref<PartStdCreateModelInterface>({
+const model = ref<FilterPartStdInterface>({
   bidang_uuid: "",
   sub_bidang_uuid: "",
   scope_standart_uuid: "",
   equipment_uuid: "",
   activity_uuid: "",
-  part_uuid: "",
-  qty: "",
 });
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
@@ -186,7 +191,8 @@ const {
   isFetchingNextPage: isFetchingNextPageScope,
 } = useInfiniteQuery({
   queryKey: ["getScopeFilterPartStd"],
-  enabled: !props.selectedValue && !is_loading_scope.value,
+  // enabled: !props.selectedValue && !is_loading_scope.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await transactionStore.getScopeStandar({
@@ -227,7 +233,8 @@ const {
   isFetchingNextPage: isFetchingNextPageEquipment,
 } = useInfiniteQuery({
   queryKey: ["getEquipmentFIlterPartStd"],
-  enabled: !props.selectedValue && !is_loading_equipment.value,
+  // enabled: !props.selectedValue && !is_loading_equipment.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await transactionStore.getEquipment({
@@ -268,7 +275,8 @@ const {
   isFetchingNextPage: isFetchingNextPageActivity,
 } = useInfiniteQuery({
   queryKey: ["getActivityFilterPartStd"],
-  enabled: !props.selectedValue && !is_loading_activity.value,
+  // enabled: !props.selectedValue && !is_loading_activity.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await transactionStore.getActivity({
@@ -276,7 +284,7 @@ const {
         currentPage: pageParam,
       });
 
-      const response = data.data as IPagination<ScopeInterface[]>;
+      const response = data.data as IPagination<ActivityInterface[]>;
 
       return response;
     } catch (error: any) {
@@ -299,7 +307,13 @@ const handleSubmit = async () => {
 
   if (!isValid) return;
 
-  emit("filter", model.value, dataActivity.value?.pages?.flatMap((page) => page?.data)?.find((item) => item.uuid == model.value.activity_uuid));
+  emit(
+    "filter",
+    model.value,
+    dataActivity.value?.pages
+      ?.flatMap((page) => page?.data)
+      ?.find((item) => item.uuid == model.value.activity_uuid)
+  );
 };
 
 const setValue = () => {
@@ -314,8 +328,6 @@ const setValue = () => {
       props.selectedValue?.activity?.equipment?.scope_standart_uuid || "",
     equipment_uuid: props.selectedValue?.activity?.equipment_uuid || "",
     activity_uuid: props.selectedValue?.activity_uuid || "",
-    part_uuid: props.selectedValue?.part_uuid || "",
-    qty: String(props.selectedValue?.qty) || "",
   };
 };
 
@@ -326,8 +338,6 @@ const resetValue = () => {
     scope_standart_uuid: "",
     equipment_uuid: "",
     activity_uuid: "",
-    part_uuid: "",
-    qty: "",
   };
   emit("resetFilter");
 };
@@ -470,6 +480,7 @@ const selectBidang = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_sub_bidang.value = true;
   refetchSubBidang();
 };
 
@@ -491,6 +502,7 @@ const selectSubBidang = (e: OptionType) => {
       value: route.params.id_project,
     },
   ];
+  is_loading_scope.value = true;
   refetchScope();
 };
 
@@ -505,6 +517,7 @@ const selectScope = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_equipment.value = true;
   refetchEquipment();
 };
 
@@ -518,14 +531,14 @@ const selectEquipment = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_activity.value = true;
   refetchActivity();
 };
 
 const selectActivity = (e: OptionType) => {
-  emit('selectActivity', e);
-}
+  emit("selectActivity", e);
+};
 
-// bidang
 watch(
   dataBidang,
   (newBidang) => {
@@ -567,9 +580,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end bidang
 
-// sub bidang
 watch(
   dataSubBidang,
   (newSubBidang) => {
@@ -611,9 +622,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end sub bidang
 
-// scope
 watch(
   [modelValue, dataScope],
   ([_, newScope]) => {
@@ -652,9 +661,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end scope
 
-// equipment
 watch(
   [modelValue, dataEquipment],
   ([_, newEquipment]) => {
@@ -689,9 +696,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end equipment
 
-// activity
 watch(
   [modelValue, dataActivity],
   ([_, newActivity]) => {
@@ -726,39 +731,108 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end activity
 </script>
 
 <template>
   <div
-    class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md">
+    class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
+  >
     <span class="text-blue-950 font-semibold">Pilih Aktifitas</span>
     <form class="" @submit.prevent="handleSubmit">
-      <Select v-model="model.bidang_uuid" label="Bidang" options_label="label" options_value="value"
-        v-model:model-search="params_bidang.search" :search="true" :loading="is_loading_bidang"
-        :loading-next-page="isFetchingNextPageBidang" :rules="rules.bidang_uuid" :options="options_bidang"
-        @scroll="scrollBidang" @search="searchBidang" @select="selectBidang" />
-      <Select v-model="model.sub_bidang_uuid" label="Sub Bidang" options_label="label" options_value="value"
-        v-model:model-search="params_sub_bidang.search" :search="true" :loading="is_loading_sub_bidang"
-        :loading-next-page="isFetchingNextPageSubBidang" :rules="rules.sub_bidang_uuid" :options="options_sub_bidang"
-        @scroll="scrollSubBidang" @search="searchSubBidang" @select="selectSubBidang" />
-      <Select v-model="model.scope_standart_uuid" label="Scope Standart" options_label="label" options_value="value"
-        v-model:model-search="params_scope.search" :search="true" :loading="is_loading_scope"
-        :loading-next-page="isFetchingNextPageScope" :rules="rules.scope_standart_uuid" :options="options_scope"
-        @scroll="scrollScope" @search="searchScope" @select="selectScope" />
-      <Select v-model="model.equipment_uuid" label="Equipment" options_label="label" options_value="value"
-        v-model:model-search="params_equipment.search" :search="true" :loading="is_loading_equipment"
-        :loading-next-page="isFetchingNextPageEquipment" :rules="rules.equipment_uuid" :options="options_equipment"
-        @scroll="scrollEquipment" @search="searchEquipment" @select="selectEquipment" />
-      <Select v-model="model.activity_uuid" label="Activity" options_label="label" options_value="value"
-        v-model:model-search="params_activity.search" :search="true" :loading="is_loading_activity"
-        :loading-next-page="isFetchingNextPageActivity" :rules="rules.activity_uuid" :options="options_activity"
-        @scroll="scrollActivity" @search="searchActivity" @select="selectActivity" />
+      <div class="flex flex-col gap-2">
+        <Select
+          v-model="model.bidang_uuid"
+          label="Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_bidang.search"
+          :search="true"
+          :loading="is_loading_bidang"
+          :loading-next-page="isFetchingNextPageBidang"
+          :rules="rules.bidang_uuid"
+          :options="options_bidang"
+          @scroll="scrollBidang"
+          @search="searchBidang"
+          @select="selectBidang"
+        />
+        <Select
+          v-model="model.sub_bidang_uuid"
+          label="Sub Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_sub_bidang.search"
+          :search="true"
+          :loading="is_loading_sub_bidang"
+          :loading-next-page="isFetchingNextPageSubBidang"
+          :rules="rules.sub_bidang_uuid"
+          :options="options_sub_bidang"
+          @scroll="scrollSubBidang"
+          @search="searchSubBidang"
+          @select="selectSubBidang"
+        />
+        <Select
+          v-model="model.scope_standart_uuid"
+          label="Scope Standart"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_scope.search"
+          :search="true"
+          :loading="is_loading_scope"
+          :loading-next-page="isFetchingNextPageScope"
+          :rules="rules.scope_standart_uuid"
+          :options="options_scope"
+          @scroll="scrollScope"
+          @search="searchScope"
+          @select="selectScope"
+        />
+        <Select
+          v-model="model.equipment_uuid"
+          label="Equipment"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_equipment.search"
+          :search="true"
+          :loading="is_loading_equipment"
+          :loading-next-page="isFetchingNextPageEquipment"
+          :rules="rules.equipment_uuid"
+          :options="options_equipment"
+          @scroll="scrollEquipment"
+          @search="searchEquipment"
+          @select="selectEquipment"
+        />
+        <Select
+          v-model="model.activity_uuid"
+          label="Activity"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_activity.search"
+          :search="true"
+          :loading="is_loading_activity"
+          :loading-next-page="isFetchingNextPageActivity"
+          :rules="rules.activity_uuid"
+          :options="options_activity"
+          @scroll="scrollActivity"
+          @search="searchActivity"
+          @select="selectActivity"
+        />
+      </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Reset" class="w-full" variant="secondary" :disabled="props.loading" @click="resetValue" />
-        <Button type="submit" text="Terapkan" class="w-full" color="blue" :disabled="props.loading"
-          :loading="props.loading" />
+        <Button
+          text="Reset"
+          class="w-full"
+          variant="secondary"
+          :disabled="props.loading"
+          @click="resetValue"
+        />
+        <Button
+          type="submit"
+          text="Terapkan"
+          class="w-full"
+          color="blue"
+          :disabled="props.loading"
+          :loading="props.loading"
+        />
       </div>
     </form>
   </div>

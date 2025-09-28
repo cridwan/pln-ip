@@ -15,17 +15,17 @@ import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 import type {
-  PartStdCreateModelInterface,
+  FilterPartStdInterface,
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
+import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
 
-import { ColumnsPart, ColumnsPartFilter } from "../constants/PartConstant";
+import { ColumnsPart } from "../constants/PartConstant";
 import { useTransactionStore } from "../stores/TransactionStore";
 import FilterPartStd from "../components/FilterPartStd.vue";
 import FormPartStd from "../components/FormPartStd.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 import InputQty from "../components/InputQty.vue";
-import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
 
 type OptionType = {
   value: string;
@@ -50,14 +50,15 @@ const params = reactive({
 const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
-const dataForm = ref<PartStdCreateModelInterface | null>(null);
-const dataActivity = ref<ActivityInterface | null>(null)
+const dataForm = ref<FilterPartStdInterface | null>(null);
+const dataActivity = ref<ActivityInterface | null>(null);
 const selected_item = ref<PartStdInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
 const edit_qty = ref(false);
 const edit_id = ref<number | null>(null);
+const is_loading_filter = ref(false);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
@@ -87,10 +88,12 @@ const {
       const { data } = await transactionStore.getPart(params);
       const response = data as IPagination<PartStdInterface[]>;
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -221,7 +224,11 @@ const resetFilter = () => {
   ];
 };
 
-const handleOnFilter = (data: PartStdCreateModelInterface, activity: ActivityInterface) => {
+const handleOnFilter = (
+  data: FilterPartStdInterface,
+  activity: ActivityInterface
+) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   dataActivity.value = activity;
   setFilter();
@@ -229,24 +236,19 @@ const handleOnFilter = (data: PartStdCreateModelInterface, activity: ActivityInt
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchPart();
 };
-
-
-const selectActivity = (e: OptionType) => {
-  console.log(e);
-}
 
 const handleRemoveSuccess = () => {
   refetchPart();
 };
 
 const handleEdit = (value: string) => {
-  console.log('edte', value)
   edit_id.value = null;
   edit_qty.value = false;
-}
+};
 
 onMounted(() => {
   breadcrumb.value = [
@@ -257,29 +259,52 @@ onMounted(() => {
     },
   ];
 });
-
 </script>
 
 <template>
   <div class="relative w-full">
-    <Button v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'" icon_only="plus"
-      class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <Button
+      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" @select-activity="selectActivity"
-          :loading="isLoadingPart" />
+        <FilterPartStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
-            :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve'" class="mt-6"
-            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
+          <Table
+            label-create="Part"
+            :columns="ColumnsPart"
+            :entities="dataPart?.data || []"
+            :loading="isLoadingPart"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="dataApproval?.status !== 'approve'"
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+                <Icon
+                  name="trash"
+                  class="icon-action-table"
+                  @click="handleDelete(entity)"
+                />
               </div>
             </template>
 
@@ -290,24 +315,50 @@ onMounted(() => {
             </template>
 
             <template #column_total_qty="{ entity, index }">
-              <InputQty :qty="Number(entity.total_qty)" v-if="edit_qty && edit_id == index" @change="handleEdit" />
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer" v-else
-                @click="handleUpdate(index)">
-                {{ Number(entity.total_qty)?.toLocaleString('id') ?? "-" }}
+              <InputQty
+                :qty="Number(entity.total_qty)"
+                v-if="edit_qty && edit_id == index"
+                @change="handleEdit"
+              />
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+                v-else
+                @click="handleUpdate(index)"
+              >
+                {{ Number(entity.total_qty)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
             <template #column_price="{ entity, index }">
-              <InputQty :qty="Number(entity.total_qty)" v-if="edit_qty && edit_id == index" @change="handleEdit" />
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer" v-else
-                @click="handleUpdate(index)">
-                Rp. {{ Number(entity.part.price)?.toLocaleString('id') ?? "-" }}
+              <InputQty
+                :qty="Number(entity.total_qty)"
+                v-if="edit_qty && edit_id == index"
+                @change="handleEdit"
+              />
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+                v-else
+                @click="handleUpdate(index)"
+              >
+                Rp. {{ Number(entity.part.price)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity, index }">
-              <InputQty :qty="Number(entity.total_qty)" v-if="edit_qty && edit_id == index" @change="handleEdit" />
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer" v-else
-                @click="handleUpdate(index)">
-                Rp. {{ (Number(entity.part.price) * Number(entity.total_qty)).toLocaleString("id") }}
+              <InputQty
+                :qty="Number(entity.total_qty)"
+                v-if="edit_qty && edit_id == index"
+                @change="handleEdit"
+              />
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+                v-else
+                @click="handleUpdate(index)"
+              >
+                Rp.
+                {{
+                  (
+                    Number(entity.part.price) * Number(entity.total_qty)
+                  ).toLocaleString("id")
+                }}
               </p>
             </template>
 
@@ -329,7 +380,18 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormPartStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-    @error="handleError" @removeSucess="handleRemoveSuccess" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <FormPartStd
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.part?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

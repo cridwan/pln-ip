@@ -6,7 +6,7 @@ import { useRoute } from "vue-router";
 import {
   Breadcrumb,
   Button,
-  Icon,
+  // Icon,
   ModalDelete,
   Table,
   Toast,
@@ -14,13 +14,13 @@ import {
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type {
-  ConsumableMaterialStdCreateModelInterface,
   ConsumableMaterialStdInterface,
+  FilterConsumableMaterialStdInterface,
 } from "@/modules/master/types/ConsumableMaterialStdType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 import { ColumnsConsumableMaterial } from "@/modules/transaction/constants/ConsumableMaterialConstant";
 import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
-import FormConsumableMaterialStd from "@/modules/transaction/components/FormConsumableMaterialStd.vue";
+// import FormConsumableMaterialStd from "@/modules/transaction/components/FormConsumableMaterialStd.vue";
 import FilterConsumableMaterialStd from "@/modules/transaction/components/add-scope/FilterConsumableMaterialStd.vue";
 import { numberFormat } from "@/helpers/global";
 
@@ -46,11 +46,12 @@ const params = reactive({
 const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
-const dataForm = ref<ConsumableMaterialStdCreateModelInterface | null>(null);
+const dataForm = ref<FilterConsumableMaterialStdInterface | null>(null);
 const selected_item = ref<ConsumableMaterialStdInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
+const is_loading_filter = ref(false);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
@@ -81,10 +82,12 @@ const {
       const response = data as IPagination<ConsumableMaterialStdInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -216,13 +219,15 @@ const resetFilter = () => {
   ];
 };
 
-const handleOnFilter = (data: ConsumableMaterialStdCreateModelInterface) => {
+const handleOnFilter = (data: FilterConsumableMaterialStdInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchConsMat();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchConsMat();
 };
@@ -244,21 +249,41 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'" icon_only="plus"
-      class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <Button
+      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
-          :loading="isLoadingConsMat" />
+        <FilterConsumableMaterialStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Material" :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []"
-            :loading="isLoadingConsMat" :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
-            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
+          <Table
+            label-create="Material"
+            :columns="ColumnsConsumableMaterial"
+            :entities="dataConsMat?.data || []"
+            :loading="isLoadingConsMat"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="false"
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
             <!-- <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
                 <Icon
@@ -274,27 +299,42 @@ onMounted(() => {
               </div>
             </template> -->
             <template #column_material="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.name ?? "-" }}
               </p>
             </template>
             <template #column_merk="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.merk ?? "-" }}
               </p>
             </template>
             <template #column_price="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
-                Rp. {{ (Number(entity.consmat?.price) * Number(entity.total_qty)).toLocaleString('id') }}
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
+                Rp.
+                {{
+                  (
+                    Number(entity.consmat?.price) * Number(entity.total_qty)
+                  ).toLocaleString("id")
+                }}
               </p>
             </template>
             <template #column_unit="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
+              >
                 {{ entity.consmat?.global_unit?.name ?? "-" }}
               </p>
             </template>
@@ -305,10 +345,21 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormConsumableMaterialStd :is-additional="true" v-model="open_form" :data-form="dataForm"
-    :selected-value="selected_item" @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <FormConsumableMaterialStd
+    :is-additional="true"
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
   <!-- <FormAdCosumableMaterial v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
     @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" /> -->
-  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.consmat?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>
