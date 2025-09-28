@@ -26,6 +26,10 @@ const props = defineProps({
   dataForm: {
     type: Object as PropType<ActivityModelCreateInterface | null>,
   },
+  isAdditional: {
+    type: Boolean,
+    default: false
+  }
 });
 
 type OptionType = {
@@ -108,14 +112,19 @@ watch(modelValue, (value) => {
 });
 
 //--- GET SCOPE
-const params_activity = reactive<IParams & { equipment_uuid: string, project_uuid: string }>({
+const params_activity = reactive({
   search: "",
   filter: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  equipment_uuid: props.dataForm?.equipment_uuid as string,
-  project_uuid: route.params.id_project as string,
+  ...(props.isAdditional ? {
+    equipment_uuid: props.dataForm?.equipment_uuid as string,
+    additional_scope_uuid: route.params.id_scope as string,
+  } : {
+    equipment_uuid: props.dataForm?.equipment_uuid as string,
+    project_uuid: route.params.id_project as string,
+  })
 });
 const {
   data: dataScope,

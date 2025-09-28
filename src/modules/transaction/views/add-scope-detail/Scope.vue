@@ -623,8 +623,8 @@ const getData = (id: string, response: EquipmentInterface[]) => {
             ">
               <td :colspan="ColumnsScope.length + 1">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
-                  <TableEquipment :id="entity.id" :entity="entity.children" :status-approval="dataApproval?.status"
-                    :open="children_active.find((el) => el.id === entity.id)?.open
+                  <TableEquipment :is-additional="true" :id="entity.id" :entity="entity.children"
+                    :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
                       " @get-data="getData" />
                 </div>
               </td>
