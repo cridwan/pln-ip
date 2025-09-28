@@ -330,13 +330,18 @@ const onDelete = () => {
 
 const selectInspection = (item: TInspection) => {
   console.log("USER", authStore.users);
-  if (authStore.users && authStore.users.role == "planner") {
-    toScope(item);
+  if (!authStore.users) {
+    router.push(`/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${item.uuid}/undefined/public/scope`)
   } else {
-    // TODO handle not planner
-    // console.log('role not planner')
     toScope(item);
   }
+  // if (authStore.users && authStore.users.role == "planner") {
+  //   toScope(item);
+  // } else {
+  //   // TODO handle not planner
+  //   // console.log('role not planner')
+  //   toScope(item);
+  // }
 };
 
 const toScope = (url: TInspection) => {

@@ -34,6 +34,10 @@ const props = defineProps({
   isAction: {
     type: Boolean,
     default: true,
+  },
+  isAdditional: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -249,6 +253,7 @@ watch(
 
   <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 
-  <ModalActivity v-model="open_detail" :id="selected_item?.uuid" :status-approval="statusApproval" />
+  <ModalActivity :is-additional="props.isAdditional" v-model="open_detail" :id="selected_item?.uuid"
+    :status-approval="statusApproval" />
   <Toast ref="toastRef" />
 </template>

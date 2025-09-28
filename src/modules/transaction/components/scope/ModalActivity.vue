@@ -28,6 +28,10 @@ const props = defineProps({
     type: String,
     default: "approve",
   },
+  isAdditional: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -215,8 +219,8 @@ watch(model, (value) => {
     </div>
   </Modal>
 
-  <FormActivity v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-    @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <FormActivity :is-additional="props.isAdditional" v-model="open_form" :data-form="dataForm"
+    :selected-value="selected_item" @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
 
   <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
   <Toast ref="toastRef" />

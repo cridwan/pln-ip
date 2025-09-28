@@ -81,7 +81,7 @@ const handleError = (error: any) => {
         Silahkan tekan button dibawah ini untuk melakukan approve/unapprove
       </p>
       <div class="w-full">
-        <table>
+        <table class="table">
           <tbody>
             <tr>
               <td class="font-bold">Nama Project</td>
@@ -133,3 +133,7 @@ const handleError = (error: any) => {
   <Toast ref="toastRef" />
   <FormApproval v-model="open_form" @success="handleSuccess" @error="handleError" />
 </template>
+<style lang="sass">
+.table 
+    @apply w-full text-blue-950
+</style>
