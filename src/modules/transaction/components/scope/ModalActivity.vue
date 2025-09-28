@@ -39,12 +39,12 @@ const params = reactive({
   search: "",
   filter: "",
   filters: [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "equipment.scopeStandart.project_uuid",
-      value: route.params.id_project,
-    },
+    // {
+    //   group: "AND",
+    //   operator: "EQ",
+    //   column: "equipment.scopeStandart.project_uuid",
+    //   value: route.params.id_project,
+    // },
     {
       group: "AND",
       operator: "EQ",
@@ -185,7 +185,7 @@ const handleRemoveSuccess = () => {
 
 watch(model, (value) => {
   if (value === true) {
-    params.filters[1].value = props.id;
+    params.filters[0].value = props.id;
     params.currentPage = 1;
     refetchActivity();
   }
@@ -193,43 +193,17 @@ watch(model, (value) => {
 </script>
 
 <template>
-  <Modal
-    width="1000"
-    height="500"
-    :showButtonClose="false"
-    :title="'Data Activity'"
-    v-model="model"
-  >
+  <Modal width="1000" height="500" :showButtonClose="false" :title="'Data Activity'" v-model="model">
     <div class="flex flex-col">
       <div v-if="statusApproval !== 'approve'" class="flex justify-end">
-        <Button
-          icon_only="plus"
-          size="sm"
-          rounded="full"
-          color="blue"
-          @click="handleCreate"
-        />
+        <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
       </div>
-      <Table
-        label-create="Sub Bidang"
-        :columns="ColumnsActivity"
-        :entities="dataActivity?.data || []"
-        :loading="isLoading"
-        :pagination="pagination"
-        :is-create="false"
-        :is-search="false"
-        :is-action="statusApproval !== 'approve'"
-        class="mt-6"
-        @change-page="changePage"
-        @change-limit="changeLimit"
-      >
+      <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
+        :loading="isLoading" :pagination="pagination" :is-create="false" :is-search="false"
+        :is-action="statusApproval !== 'approve'" class="mt-6" @change-page="changePage" @change-limit="changeLimit">
         <template #column_action="{ entity }">
           <div class="flex items-center justify-center gap-4">
-            <Icon
-              name="trash"
-              class="icon-action-table"
-              @click="handleDelete(entity)"
-            />
+            <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
           </div>
         </template>
         <template #column_equipment="{ entity }">
@@ -241,20 +215,9 @@ watch(model, (value) => {
     </div>
   </Modal>
 
-  <FormActivity
-    v-model="open_form"
-    :data-form="dataForm"
-    :selected-value="selected_item"
-    @success="handleSuccess"
-    @error="handleError"
-    @removeSucess="handleRemoveSuccess"
-  />
+  <FormActivity v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
+    @error="handleError" @removeSucess="handleRemoveSuccess" />
 
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
   <Toast ref="toastRef" />
 </template>

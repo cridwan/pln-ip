@@ -29,6 +29,10 @@ const props = defineProps({
   dataForm: {
     type: Object as PropType<PartStdCreateModelInterface | null>,
   },
+  isAdditional: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const emit = defineEmits(["success", "error"]);
@@ -66,14 +70,19 @@ const rules = computed(() => {
 });
 
 //--- GET PART
-const params_part = reactive<IParams & { activity_uuid: string, project_uuid: string }>({
+const params_part = reactive({
   search: "",
   filter: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  activity_uuid: props.dataForm?.activity_uuid as string,
-  project_uuid: route.params.id_project as string,
+  ...(props.isAdditional ? {
+    activity_uuid: props.dataForm?.activity_uuid as string,
+    additional_scope_uuid: route.params.id_scope as string,
+  } : {
+    activity_uuid: props.dataForm?.activity_uuid as string,
+    project_uuid: route.params.id_project as string,
+  })
 });
 const {
   data: dataPart,
