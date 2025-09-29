@@ -2,19 +2,14 @@
 import { computed, reactive, ref } from "vue";
 import type { AxiosError } from "axios";
 import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 
-import {
-  Button,
-  ButtonDots,
-  Icon,
-  ModalDelete,
-  Table,
-  Toast,
-} from "@/components";
+import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
 import { useGlobalStore } from "@/stores/GlobalStore";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import type {
   ResponseAddScopeInterface,
@@ -29,8 +24,12 @@ import { useTransactionStore } from "../stores/TransactionStore";
 import FormAdScope from "../components/FormAdScope.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const open_form = ref(false);
-const entitiesScope = ref<(AddScopeInterface & { original_uuid: string })[]>([]);
+const entitiesScope = ref<(AddScopeInterface & { original_uuid: string })[]>(
+  []
+);
 const selected_item = ref<AddScopeInterface>();
 const transactionStore = useTransactionStore();
 const globalStore = useGlobalStore();
@@ -100,96 +99,96 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
             asset: item.name || "",
             asset_welness: item.asset_welnes
               ? {
-                color: item.asset_welnes?.color,
-                note: item.asset_welnes?.note,
-                file: item.asset_welnes?.document
-                  ? [
-                    {
-                      id: item.asset_welnes.document.uuid,
-                      name: item.asset_welnes.document
-                        .document_original_name,
-                      size: item.asset_welnes.document.document_size,
-                      file: item.asset_welnes.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  color: item.asset_welnes?.color,
+                  note: item.asset_welnes?.note,
+                  file: item.asset_welnes?.document
+                    ? [
+                        {
+                          id: item.asset_welnes.document.uuid,
+                          name: item.asset_welnes.document
+                            .document_original_name,
+                          size: item.asset_welnes.document.document_size,
+                          file: item.asset_welnes.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             oh_recom: item.oh_recom
               ? {
-                note: item.oh_recom?.note,
-                file: item.oh_recom?.document
-                  ? [
-                    {
-                      id: item.oh_recom.document.uuid,
-                      name: item.oh_recom.document.document_original_name,
-                      size: item.oh_recom.document.document_size,
-                      file: item.oh_recom.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.oh_recom?.note,
+                  file: item.oh_recom?.document
+                    ? [
+                        {
+                          id: item.oh_recom.document.uuid,
+                          name: item.oh_recom.document.document_original_name,
+                          size: item.oh_recom.document.document_size,
+                          file: item.oh_recom.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             wo_priority: item.wo_priority
               ? {
-                note: item.wo_priority?.note,
-                file: item.wo_priority?.document
-                  ? [
-                    {
-                      id: item.wo_priority.document.uuid,
-                      name: item.wo_priority.document
-                        .document_original_name,
-                      size: item.wo_priority.document.document_size,
-                      file: item.wo_priority.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.wo_priority?.note,
+                  file: item.wo_priority?.document
+                    ? [
+                        {
+                          id: item.wo_priority.document.uuid,
+                          name: item.wo_priority.document
+                            .document_original_name,
+                          size: item.wo_priority.document.document_size,
+                          file: item.wo_priority.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             history: item.history
               ? {
-                note: item.history?.note,
-                file: item.history?.document
-                  ? [
-                    {
-                      id: item.history.document.uuid,
-                      name: item.history.document.document_original_name,
-                      size: item.history.document.document_size,
-                      file: item.history.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.history?.note,
+                  file: item.history?.document
+                    ? [
+                        {
+                          id: item.history.document.uuid,
+                          name: item.history.document.document_original_name,
+                          size: item.history.document.document_size,
+                          file: item.history.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             rla: item.rla
               ? {
-                note: item.rla?.note,
-                file: item.rla?.document
-                  ? [
-                    {
-                      id: item.rla.document.uuid,
-                      name: item.rla.document.document_original_name,
-                      size: item.rla.document.document_size,
-                      file: item.rla.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.rla?.note,
+                  file: item.rla?.document
+                    ? [
+                        {
+                          id: item.rla.document.uuid,
+                          name: item.rla.document.document_original_name,
+                          size: item.rla.document.document_size,
+                          file: item.rla.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             ncr: item.ncr
               ? {
-                note: item.ncr?.note,
-                file: item.ncr?.document
-                  ? [
-                    {
-                      id: item.ncr.document.uuid,
-                      name: item.ncr.document.document_original_name,
-                      size: item.ncr.document.document_size,
-                      file: item.ncr.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.ncr?.note,
+                  file: item.ncr?.document
+                    ? [
+                        {
+                          id: item.ncr.document.uuid,
+                          name: item.ncr.document.document_original_name,
+                          size: item.ncr.document.document_size,
+                          file: item.ncr.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
           };
         }) || [];
@@ -460,12 +459,34 @@ const handleError = (error: any) => {
 <template>
   <div class="relative w-full">
     <Toast ref="toastRef" />
-    <ModalDelete v-model="open_delete" :title="selected_item?.asset" :loading="isLoadingDelete" @delete="onDelete" />
-    <Button v-if="dataApproval?.status !== 'approve'" icon_only="plus" class="absolute right-0" size="sm" rounded="full"
-      color="blue" @click="handleCreate" />
-    <Table label-create="Asset" :columns="ColumnsScope" :entities="entitiesScope" :loading="isLoadingScope"
-      :pagination="pagination" :is-create="false" v-model:model-search="params.search" @delete="handleDelete"
-      @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+    <ModalDelete
+      v-model="open_delete"
+      :title="selected_item?.asset"
+      :loading="isLoadingDelete"
+      @delete="onDelete"
+    />
+    <Button
+      v-if="dataApproval?.status !== 'approve' && access_token"
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
+    <Table
+      label-create="Asset"
+      :columns="ColumnsScope"
+      :entities="entitiesScope"
+      :loading="isLoadingScope"
+      :pagination="pagination"
+      :is-create="false"
+      v-model:model-search="params.search"
+      @delete="handleDelete"
+      @change-page="changePage"
+      @change-limit="changeLimit"
+      @search="searchTable"
+    >
       <template #header_action>
         <div class="px-3 py-1.5">
           <p class="v-table-th-text">Action</p>
@@ -473,64 +494,153 @@ const handleError = (error: any) => {
       </template>
       <template #column_asset_welness="{ entity }">
         <div class="w-full flex justify-center">
-          <p v-if="dataApproval?.status === 'approve' && !entity.asset_welness">
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.asset_welness) ||
+              (!access_token && !entity.asset_welness)
+            "
+          >
             -
           </p>
-          <FormAssetWelness v-else ref="asset_welness" :value="entity.asset_welness" :label="entity.asset"
-            :loading="is_loading_create" :disabled="dataApproval?.status === 'approve'"
-            @save="(e) => saveAssetWelness(e, entity)" />
+          <FormAssetWelness
+            v-else
+            ref="asset_welness"
+            :value="entity.asset_welness"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="dataApproval?.status === 'approve' || !access_token"
+            @save="(e) => saveAssetWelness(e, entity)"
+          />
         </div>
       </template>
       <template #column_oh_recom="{ entity }">
         <div class="w-full flex justify-center">
-          <p v-if="dataApproval?.status === 'approve' && !entity.oh_recom">-</p>
-          <FormWithUploadFile v-else ref="oh_recom" :value="entity.oh_recom" :label="entity.asset"
-            :loading="is_loading_create" :disabled="dataApproval?.status === 'approve'"
-            @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')" />
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.oh_recom) ||
+              (!access_token && !entity.oh_recom)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="oh_recom"
+            :value="entity.oh_recom"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="dataApproval?.status === 'approve' || !access_token"
+            @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')"
+          />
         </div>
       </template>
       <template #column_wo_priority="{ entity }">
         <div class="w-full flex justify-center">
-          <p v-if="dataApproval?.status === 'approve' && !entity.wo_priority">
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.wo_priority) ||
+              (!access_token && !entity.wo_priority)
+            "
+          >
             -
           </p>
-          <FormWithUploadFile v-else ref="wo_priority" :value="entity.wo_priority" :label="entity.asset"
-            :loading="is_loading_create" :disabled="dataApproval?.status === 'approve'"
-            @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')" />
+          <FormWithUploadFile
+            v-else
+            ref="wo_priority"
+            :value="entity.wo_priority"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="dataApproval?.status === 'approve' || !access_token"
+            @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')"
+          />
         </div>
       </template>
       <template #column_history="{ entity }">
         <div class="w-full flex justify-center">
-          <p v-if="dataApproval?.status === 'approve' && !entity.history">-</p>
-          <FormWithUploadFile v-else ref="history" :value="entity.history" :label="entity.asset"
-            :loading="is_loading_create" :disabled="dataApproval?.status === 'approve'"
-            @save="(e) => saveFieldWithFile(e, entity, 'history')" />
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.history) ||
+              (!access_token && !entity.history)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="history"
+            :value="entity.history"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="dataApproval?.status === 'approve' || !access_token"
+            @save="(e) => saveFieldWithFile(e, entity, 'history')"
+          />
         </div>
       </template>
       <template #column_rla="{ entity }">
         <div class="w-full flex justify-center">
-          <p v-if="dataApproval?.status === 'approve' && !entity.rla">-</p>
-          <FormWithUploadFile v-else ref="rla" :value="entity.rla" :label="entity.asset" :loading="is_loading_create"
-            :disabled="dataApproval?.status === 'approve'" @save="(e) => saveFieldWithFile(e, entity, 'rla')" />
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.rla) ||
+              (!access_token && !entity.rla)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="rla"
+            :value="entity.rla"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="dataApproval?.status === 'approve' || !access_token"
+            @save="(e) => saveFieldWithFile(e, entity, 'rla')"
+          />
         </div>
       </template>
       <template #column_ncr="{ entity }">
         <div class="w-full flex justify-center">
-          <p v-if="dataApproval?.status === 'approve' && !entity.ncr">-</p>
-          <FormWithUploadFile v-else ref="ncr" :value="entity.ncr" :label="entity.asset" :loading="is_loading_create"
-            :disabled="dataApproval?.status === 'approve'" @save="(e) => saveFieldWithFile(e, entity, 'ncr')" />
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.ncr) ||
+              (!access_token && !entity.ncr)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="ncr"
+            :value="entity.ncr"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="dataApproval?.status === 'approve' || !access_token"
+            @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
+          />
         </div>
       </template>
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-2">
           <!-- <ButtonDots :day="entity.day" @detail="toDetail(entity.id)" @squence="toSquence(entity)" /> -->
-          <Icon name="eye" class="cursor-pointer text-white" @click="toDetail(entity.id, entity.original_uuid)" />
-          <Icon v-if="dataApproval?.status !== 'approve'" name="trash" class="cursor-pointer text-white"
-            @click="handleDelete(entity)" />
+          <Icon
+            name="eye"
+            class="cursor-pointer text-white"
+            @click="toDetail(entity.id, entity.original_uuid)"
+          />
+          <Icon
+            v-if="dataApproval?.status !== 'approve' && access_token"
+            name="trash"
+            class="cursor-pointer text-white"
+            @click="handleDelete(entity)"
+          />
         </div>
       </template>
     </Table>
 
-    <FormAdScope v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
+    <FormAdScope
+      v-model="open_form"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+    />
   </div>
 </template>

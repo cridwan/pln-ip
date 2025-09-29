@@ -7,8 +7,11 @@ import { required, helpers } from "@vuelidate/validators";
 import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import { mergeArrays } from "@/helpers/global";
 
+// import { useMasterStore } from "@/modules/master/stores/MasterStore";
 import type {
   IPagination,
+  IParams,
+  // ResponseDocumentInterface,
 } from "@/types/GlobalType";
 import type {
   ConsumableMaterialStdCreateModelInterface,
@@ -33,12 +36,15 @@ const props = defineProps({
   },
   isAdditional: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
+// const modelUpload = ref<File | null>(null);
+// const documentValues = ref<ResponseDocumentInterface | null>(null);
 const emit = defineEmits(["success", "error", "removeSucess"]);
 const route = useRoute();
+// const masterStore = useMasterStore();
 const transactionStore = useTransactionStore();
 const is_loading_consumable_material = ref(false);
 const options_consumable_material = ref<OptionType[]>([]);
@@ -70,25 +76,22 @@ const rules = computed(() => {
 });
 
 //--- GET CONSMAT
-<<<<<<< HEAD
 const params_consumable_material = reactive({
-=======
-const params_consumable_material = reactive<
-  IParams & { activity_uuid: string; project_uuid: string }
->({
->>>>>>> 653528c (fix: fixed transaction)
   search: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  ...(props.isAdditional ? {
-    activity_uuid: props.dataForm?.activity_uuid as string,
-    additional_scope_uuid: route.params.id_scope as string,
-  } : {
-    activity_uuid: props.dataForm?.activity_uuid as string,
-    project_uuid: route.params.id_project as string,
-  })
+  ...(props.isAdditional
+    ? {
+        activity_uuid: props.dataForm?.activity_uuid as string,
+        additional_scope_uuid: route.params.id_scope as string,
+      }
+    : {
+        activity_uuid: props.dataForm?.activity_uuid as string,
+        project_uuid: route.params.id_project as string,
+      }),
 });
+
 const {
   data: dataConsumableMaterial,
   refetch: refetchConsumableMaterial,

@@ -2,6 +2,7 @@
 import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 
 import {
   Breadcrumb,
@@ -18,6 +19,7 @@ import type {
   FilterManpowerStdInterface,
   ManpowerStdInterface,
 } from "@/modules/master/types/ManpowerStdType";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import { ColumnsManpower } from "../constants/ManpowerConstant";
 import { useTransactionStore } from "../stores/TransactionStore";
@@ -25,6 +27,8 @@ import FilterManpowerStd from "../components/FilterManpowerStd.vue";
 import FormManpowerStd from "../components/FormManpowerStd.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const params = reactive({
@@ -244,7 +248,11 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <Button
-      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
+      v-if="
+        dataForm?.activity_uuid &&
+        dataApproval?.status !== 'approve' &&
+        access_token
+      "
       icon_only="plus"
       class="absolute right-0"
       size="sm"
@@ -271,7 +279,9 @@ onMounted(() => {
             :loading="isLoadingManPower"
             :pagination="pagination"
             :is-create="false"
-            :is-action="dataApproval?.status !== 'approve'"
+            :is-action="
+              dataApproval?.status !== 'approve' && access_token !== ''
+            "
             class="mt-6"
             v-model:model-search="params.search"
             @change-page="changePage"

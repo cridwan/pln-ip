@@ -2,12 +2,14 @@
 import type { AxiosError } from "axios";
 import { computed, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 
 import { Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
 import { useGlobalStore } from "@/stores/GlobalStore";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import { ColumnsQcPlan } from "../constants/QcPlan";
 import type {
@@ -18,14 +20,15 @@ import FormOnlyUploadFile from "../components/FormOnlyUploadFile.vue";
 import { useTransactionStore } from "../stores/TransactionStore";
 import type { ProjectInterface } from "../types/ProjectType";
 
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const entitiesQcPlan = ref<QcPlanInterface[]>([]);
-
 const transactionStore = useTransactionStore();
 const globalStore = useGlobalStore();
 const route = useRoute();
 const params = reactive({
   search: "",
-  filter: '',
+  filter: "",
   filters: [
     {
       group: "AND",
@@ -76,17 +79,17 @@ const { isFetching: isLoadingQcPlan, refetch: refetchQcPlan } = useQuery({
             name: item.name,
             document: item.document
               ? {
-                file: item.document
-                  ? [
-                    {
-                      id: item.document.uuid,
-                      name: item.document.document_original_name,
-                      size: item.document.document_size,
-                      file: item.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  file: item.document
+                    ? [
+                        {
+                          id: item.document.uuid,
+                          name: item.document.document_original_name,
+                          size: item.document.document_size,
+                          file: item.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             note: null,
             document_original: item.document,
@@ -212,22 +215,46 @@ function searchTable() {
 
 <template>
   <Toast ref="toastRef" />
-  <Table label-create="QC Plan Document" :columns="ColumnsQcPlan" :entities="entitiesQcPlan" :loading="isLoadingQcPlan"
-    :pagination="pagination" :is-create="false" :is-action="false" v-model:model-search="params.search"
-    @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+  <Table
+    label-create="QC Plan Document"
+    :columns="ColumnsQcPlan"
+    :entities="entitiesQcPlan"
+    :loading="isLoadingQcPlan"
+    :pagination="pagination"
+    :is-create="false"
+    :is-action="false"
+    v-model:model-search="params.search"
+    @change-page="changePage"
+    @change-limit="changeLimit"
+    @search="searchTable"
+  >
     <template #column_attachment="{ entity }">
       <div class="w-full flex justify-center">
-        <p v-if="dataApproval?.status === 'approve' && !entity.document">-</p>
-        <FormOnlyUploadFile v-else ref="attachment" :value="entity.document" :label="entity.name"
-          :loading="is_loading_create" :disabled="dataApproval?.status === 'approve'"
-          @save="(e) => saveFile(e, entity)" />
+        <p
+          v-if="
+            (dataApproval?.status === 'approve' && !entity.document) ||
+            (!access_token && !entity.document)
+          "
+        >
+          -
+        </p>
+        <FormOnlyUploadFile
+          v-else
+          ref="attachment"
+          :value="entity.document"
+          :label="entity.name"
+          :loading="is_loading_create"
+          :disabled="dataApproval?.status === 'approve' || !access_token"
+          @save="(e) => saveFile(e, entity)"
+        />
       </div>
     </template>
     <template #column_preview="{ entity }">
       <div v-if="entity.document" class="w-full flex justify-center">
         <div
           class="bg-cyan-500 text-center border border-neutral-50 rounded-lg px-2 min-w-[120px] text-base text-neutral-50 cursor-pointer"
-          @click="preview(entity)">
+          @click="preview(entity)"
+        >
           Preview
         </div>
       </div>

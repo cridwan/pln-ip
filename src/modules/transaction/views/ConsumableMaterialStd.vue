@@ -2,6 +2,7 @@
 import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 
 import {
   Breadcrumb,
@@ -19,6 +20,7 @@ import type {
 } from "@/modules/master/types/ConsumableMaterialStdType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 import { numberFormat } from "@/helpers/global";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import { ColumnsConsumableMaterial } from "../constants/ConsumableMaterialConstant";
 import { useTransactionStore } from "../stores/TransactionStore";
@@ -26,6 +28,8 @@ import FormConsumableMaterialStd from "../components/FormConsumableMaterialStd.v
 import FilterConsumableMaterialStd from "../components/FilterConsumableMaterialStd.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const params = reactive({
@@ -245,7 +249,11 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <Button
-      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
+      v-if="
+        dataForm?.activity_uuid &&
+        dataApproval?.status !== 'approve' &&
+        access_token
+      "
       icon_only="plus"
       class="absolute right-0"
       size="sm"
@@ -267,7 +275,9 @@ onMounted(() => {
           <Breadcrumb :items="breadcrumb" />
           <Table
             label-create="Material"
-            :is-action="dataApproval?.status !== 'approve'"
+            :is-action="
+              dataApproval?.status !== 'approve' && access_token !== ''
+            "
             :columns="ColumnsConsumableMaterial"
             :entities="dataConsMat?.data || []"
             :loading="isLoadingConsMat"

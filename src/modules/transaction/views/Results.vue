@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { AxiosError } from "axios";
+import { storeToRefs } from "pinia";
+import { useRoute } from "vue-router";
 
 import { Loading, Table } from "@/components";
 import { useQuery } from "@tanstack/vue-query";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import type { ResultsInterface } from "../types/ResultsType";
 import { ColumnsResults } from "../constants/ResultsConstant";
-import { useRoute } from "vue-router";
 import { useTransactionStore } from "../stores/TransactionStore";
 
 const Data = ref<ResultsInterface[]>([
@@ -48,6 +50,8 @@ const Data = ref<ResultsInterface[]>([
   },
 ]);
 
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const is_loading = ref<string | null>(null);

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from "vue";
-import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
+import { storeToRefs } from "pinia";
 
 import { Modal, Table, Button, Icon, Toast, ModalDelete } from "@/components";
 import { ColumnsActivity } from "@/modules/master/constants/ActivityConstant";
@@ -11,6 +11,7 @@ import type {
   ActivityModelCreateInterface,
 } from "@/modules/master/types/AcitivityType";
 import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import { useTransactionStore } from "../../stores/TransactionStore";
 import FormActivity from "../../components/FormActivity.vue";
@@ -30,13 +31,14 @@ const props = defineProps({
   },
   isAdditional: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
 
-const route = useRoute();
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const total_item = ref(0);
 const params = reactive({
@@ -197,17 +199,46 @@ watch(model, (value) => {
 </script>
 
 <template>
-  <Modal width="1000" height="500" :showButtonClose="false" :title="'Data Activity'" v-model="model">
+  <Modal
+    width="1000"
+    height="500"
+    :showButtonClose="false"
+    :title="'Data Activity'"
+    v-model="model"
+  >
     <div class="flex flex-col">
-      <div v-if="statusApproval !== 'approve'" class="flex justify-end">
-        <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
+      <div
+        v-if="statusApproval !== 'approve' && access_token"
+        class="flex justify-end"
+      >
+        <Button
+          icon_only="plus"
+          size="sm"
+          rounded="full"
+          color="blue"
+          @click="handleCreate"
+        />
       </div>
-      <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
-        :loading="isLoading" :pagination="pagination" :is-create="false" :is-search="false"
-        :is-action="statusApproval !== 'approve'" class="mt-6" @change-page="changePage" @change-limit="changeLimit">
+      <Table
+        label-create="Sub Bidang"
+        :columns="ColumnsActivity"
+        :entities="dataActivity?.data || []"
+        :loading="isLoading"
+        :pagination="pagination"
+        :is-create="false"
+        :is-search="false"
+        :is-action="statusApproval !== 'approve' && access_token !== ''"
+        class="mt-6"
+        @change-page="changePage"
+        @change-limit="changeLimit"
+      >
         <template #column_action="{ entity }">
           <div class="flex items-center justify-center gap-4">
-            <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+            <Icon
+              name="trash"
+              class="icon-action-table"
+              @click="handleDelete(entity)"
+            />
           </div>
         </template>
         <template #column_equipment="{ entity }">
@@ -219,9 +250,21 @@ watch(model, (value) => {
     </div>
   </Modal>
 
-  <FormActivity :is-additional="props.isAdditional" v-model="open_form" :data-form="dataForm"
-    :selected-value="selected_item" @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <FormActivity
+    :is-additional="props.isAdditional"
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
 
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
   <Toast ref="toastRef" />
 </template>

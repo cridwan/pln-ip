@@ -2,6 +2,7 @@
 import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 
 import {
   Breadcrumb,
@@ -23,10 +24,13 @@ import { useTransactionStore } from "@/modules/transaction/stores/TransactionSto
 // import FormConsumableMaterialStd from "@/modules/transaction/components/FormConsumableMaterialStd.vue";
 import FilterConsumableMaterialStd from "@/modules/transaction/components/add-scope/FilterConsumableMaterialStd.vue";
 import { numberFormat } from "@/helpers/global";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import type { ProjectInterface } from "../../types/ProjectType";
-import FormAdCosumableMaterial from "../../components/add-scope/FormAdCosumableMaterial.vue";
+// import FormAdCosumableMaterial from "../../components/add-scope/FormAdCosumableMaterial.vue";
 
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const params = reactive({
@@ -250,7 +254,11 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <Button
-      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
+      v-if="
+        dataForm?.activity_uuid &&
+        dataApproval?.status !== 'approve' &&
+        access_token
+      "
       icon_only="plus"
       class="absolute right-0"
       size="sm"

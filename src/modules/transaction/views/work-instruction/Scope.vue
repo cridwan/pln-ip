@@ -2,6 +2,7 @@
 import { computed, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
+import { storeToRefs } from "pinia";
 
 import type {
   // CreateDocumentInterface,
@@ -22,6 +23,7 @@ import { useTransactionStore } from "@/modules/transaction/stores/TransactionSto
 import FilterScope from "@/modules/transaction/components/FilterScope.vue";
 import FormScope from "@/modules/transaction/components/FormScope.vue";
 import type { EquipmentInterface } from "@/modules/transaction/types/EquipmentType";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import { ColumnsWorkInstruction } from "../../constants/WorkInstructionConstant";
 import ButtonPreview from "../../components/ButtonPreview.vue";
@@ -31,6 +33,8 @@ import TableEquipment from "../../components/scope/TableEquipment.vue";
 
 // const attachment = ref<any>(null);
 const open_form = ref(false);
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const entitiesScope = ref<ScopeInterface[]>([]);
 const selected_item = ref<ScopeInterface>();
 const dataForm = ref<FilterScopeInterface | null>(null);
@@ -543,7 +547,11 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     <span v-else>{{ dataDuration }} Days</span>
   </div>
   <Button
-    v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'"
+    v-if="
+      dataForm?.sub_bidang_uuid &&
+      dataApproval?.status !== 'approve' &&
+      access_token
+    "
     icon_only="plus"
     class="absolute right-[9rem] top-[6.5rem]"
     size="sm"

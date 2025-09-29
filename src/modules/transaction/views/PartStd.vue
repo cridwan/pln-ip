@@ -2,6 +2,7 @@
 import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 
 import {
   Breadcrumb,
@@ -19,6 +20,7 @@ import type {
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
 import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import { ColumnsPart } from "../constants/PartConstant";
 import { useTransactionStore } from "../stores/TransactionStore";
@@ -26,11 +28,8 @@ import FilterPartStd from "../components/FilterPartStd.vue";
 import FormPartStd from "../components/FormPartStd.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 import InputQty from "../components/InputQty.vue";
-
-type OptionType = {
-  value: string;
-  label: string;
-};
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const params = reactive({
@@ -264,7 +263,11 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <Button
-      v-if="dataForm?.activity_uuid && dataApproval?.status !== 'approve'"
+      v-if="
+        dataForm?.activity_uuid &&
+        dataApproval?.status !== 'approve' &&
+        access_token
+      "
       icon_only="plus"
       class="absolute right-0"
       size="sm"
@@ -291,7 +294,9 @@ onMounted(() => {
             :loading="isLoadingPart"
             :pagination="pagination"
             :is-create="false"
-            :is-action="dataApproval?.status !== 'approve'"
+            :is-action="
+              dataApproval?.status !== 'approve' && access_token !== ''
+            "
             class="mt-6"
             v-model:model-search="params.search"
             @change-page="changePage"
@@ -315,42 +320,53 @@ onMounted(() => {
             </template>
 
             <template #column_total_qty="{ entity, index }">
+              <p v-if="!access_token && !entity.total_qty">-</p>
               <InputQty
+                v-else-if="edit_qty && edit_id == index"
                 :qty="Number(entity.total_qty)"
-                v-if="edit_qty && edit_id == index"
                 @change="handleEdit"
               />
               <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
                 v-else
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
                 @click="handleUpdate(index)"
               >
                 {{ Number(entity.total_qty)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
             <template #column_price="{ entity, index }">
+              <p
+                v-if="!access_token && !entity.total_qty && !entity.part?.price"
+              >
+                -
+              </p>
               <InputQty
+                v-else-if="edit_qty && edit_id == index"
                 :qty="Number(entity.total_qty)"
-                v-if="edit_qty && edit_id == index"
                 @change="handleEdit"
               />
               <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
                 v-else
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
                 @click="handleUpdate(index)"
               >
                 Rp. {{ Number(entity.part.price)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity, index }">
+              <p
+                v-if="!access_token && !entity.total_qty && !entity.part?.price"
+              >
+                -
+              </p>
               <InputQty
+                v-else-if="edit_qty && edit_id == index"
                 :qty="Number(entity.total_qty)"
-                v-if="edit_qty && edit_id == index"
                 @change="handleEdit"
               />
               <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
                 v-else
+                class="text-base text-neutral-50 text-left underline cursor-pointer"
                 @click="handleUpdate(index)"
               >
                 Rp.

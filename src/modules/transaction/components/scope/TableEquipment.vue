@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch, type PropType } from "vue";
-import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
+import { storeToRefs } from "pinia";
 
 import { Table, Toast, Icon, ModalDelete, Button } from "@/components";
 import { ColumnsEquipment } from "@/modules/master/constants/EquipmentConstant";
@@ -9,9 +9,11 @@ import type { EquipmentInterface } from "@/modules/transaction/types/EquipmentTy
 import type { EquipmentCreateInterface } from "@/modules/master/types/EquipmentType";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import FormEquipment from "../../components/FormEquipment.vue";
 import { useTransactionStore } from "../../stores/TransactionStore";
+
 import ModalActivity from "./ModalActivity.vue";
 
 const props = defineProps({
@@ -37,15 +39,16 @@ const props = defineProps({
   },
   isAdditional: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const emit = defineEmits(["getData"]);
 
 const transactionStore = useTransactionStore();
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
-const route = useRoute();
 const total_item = ref(0);
 const params = reactive({
   search: "",
@@ -228,16 +231,44 @@ watch(
 
 <template>
   <div class="flex flex-col">
-    <div v-if="statusApproval !== 'approve'" class="flex justify-end">
-      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <div
+      v-if="statusApproval !== 'approve' && access_token"
+      class="flex justify-end"
+    >
+      <Button
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
     </div>
-    <Table :columns="ColumnsEquipment" :entities="entity || []" :pagination="pagination" :loading="isLoading"
-      :is-create="false" :is-search="false" :is-action="true" @change-page="changePage" @change-limit="changeLimit">
+    <Table
+      :columns="ColumnsEquipment"
+      :entities="entity || []"
+      :pagination="pagination"
+      :loading="isLoading"
+      :is-create="false"
+      :is-search="false"
+      :is-action="true"
+      @change-page="changePage"
+      @change-limit="changeLimit"
+    >
       <template #column_action="{ entity: element }">
         <div class="flex items-center justify-center gap-4">
-          <Icon name="eye" class="icon-action-table" @click="handleDetail(element)" />
-          <Icon name="trash" class="icon-action-table" @click="handleDelete(element)"
-            v-if="props.isAction && statusApproval !== 'approve'" />
+          <Icon
+            name="eye"
+            class="icon-action-table"
+            @click="handleDetail(element)"
+          />
+          <Icon
+            name="trash"
+            class="icon-action-table"
+            @click="handleDelete(element)"
+            v-if="
+              props.isAction && statusApproval !== 'approve' && access_token
+            "
+          />
         </div>
       </template>
       <template #column_scope_standart="{ entity: element }">
@@ -248,12 +279,27 @@ watch(
     </Table>
   </div>
 
-  <FormEquipment v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-    @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <FormEquipment
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
 
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 
-  <ModalActivity :is-additional="props.isAdditional" v-model="open_detail" :id="selected_item?.uuid"
-    :status-approval="statusApproval" />
+  <ModalActivity
+    :is-additional="props.isAdditional"
+    v-model="open_detail"
+    :id="selected_item?.uuid"
+    :status-approval="statusApproval"
+  />
   <Toast ref="toastRef" />
 </template>

@@ -2,6 +2,7 @@
 import { computed, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
+import { storeToRefs } from "pinia";
 
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
 import { Button, ModalDelete, Table, Toast } from "@/components";
@@ -9,6 +10,7 @@ import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 import { useGlobalStore } from "@/stores/GlobalStore";
 import type { EquipmentInterface } from "@/modules/transaction/types/EquipmentType";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import FormAssetWelness from "../components/FormAssetWelness.vue";
 import FormWithUploadFile from "../components/FormWithUploadFile.vue";
@@ -32,6 +34,8 @@ const selected_item = ref<ScopeInterface>();
 const dataForm = ref<FilterScopeInterface | null>(null);
 const transactionStore = useTransactionStore();
 const globalStore = useGlobalStore();
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
 const route = useRoute();
 const params = reactive({
   search: "",
@@ -553,7 +557,11 @@ const getData = (id: string, response: EquipmentInterface[]) => {
   </div>
   <!-- v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'" -->
   <Button
-    v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'"
+    v-if="
+      dataForm?.sub_bidang_uuid &&
+      dataApproval?.status !== 'approve' &&
+      access_token
+    "
     icon_only="plus"
     class="absolute right-[9rem] top-[6.5rem]"
     size="sm"
@@ -578,7 +586,7 @@ const getData = (id: string, response: EquipmentInterface[]) => {
           :loading="isLoadingScope"
           :pagination="pagination"
           :is-create="false"
-          :is-action="dataApproval?.status !== 'approve'"
+          :is-action="dataApproval?.status !== 'approve' && access_token !== ''"
           v-model:model-search="params.search"
           @delete="handleDelete"
           @change-page="changePage"
@@ -590,7 +598,9 @@ const getData = (id: string, response: EquipmentInterface[]) => {
             <div class="w-full flex justify-center">
               <p
                 v-if="
-                  dataApproval?.status === 'approve' && !entity.asset_welness
+                  (dataApproval?.status === 'approve' &&
+                    !entity.asset_welness) ||
+                  (!access_token && !entity.asset_welness)
                 "
               >
                 -
@@ -601,14 +611,19 @@ const getData = (id: string, response: EquipmentInterface[]) => {
                 :value="entity.asset_welness"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve'"
+                :disabled="dataApproval?.status === 'approve' || !access_token"
                 @save="(e) => saveAssetWelness(e, entity)"
               />
             </div>
           </template>
           <template #column_oh_recom="{ entity }">
             <div class="w-full flex justify-center">
-              <p v-if="dataApproval?.status === 'approve' && !entity.oh_recom">
+              <p
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.oh_recom) ||
+                  (!access_token && !entity.oh_recom)
+                "
+              >
                 -
               </p>
               <FormWithUploadFile
@@ -617,7 +632,7 @@ const getData = (id: string, response: EquipmentInterface[]) => {
                 :value="entity.oh_recom"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve'"
+                :disabled="dataApproval?.status === 'approve' || !access_token"
                 @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')"
               />
             </div>
@@ -625,7 +640,10 @@ const getData = (id: string, response: EquipmentInterface[]) => {
           <template #column_wo_priority="{ entity }">
             <div class="w-full flex justify-center">
               <p
-                v-if="dataApproval?.status === 'approve' && !entity.wo_priority"
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.wo_priority) ||
+                  (!access_token && !entity.wo_priority)
+                "
               >
                 -
               </p>
@@ -635,14 +653,19 @@ const getData = (id: string, response: EquipmentInterface[]) => {
                 :value="entity.wo_priority"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve'"
+                :disabled="dataApproval?.status === 'approve' || !access_token"
                 @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')"
               />
             </div>
           </template>
           <template #column_history="{ entity }">
             <div class="w-full flex justify-center">
-              <p v-if="dataApproval?.status === 'approve' && !entity.history">
+              <p
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.history) ||
+                  (!access_token && !entity.history)
+                "
+              >
                 -
               </p>
               <FormWithUploadFile
@@ -651,35 +674,49 @@ const getData = (id: string, response: EquipmentInterface[]) => {
                 :value="entity.history"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve'"
+                :disabled="dataApproval?.status === 'approve' || !access_token"
                 @save="(e) => saveFieldWithFile(e, entity, 'history')"
               />
             </div>
           </template>
           <template #column_rla="{ entity }">
             <div class="w-full flex justify-center">
-              <p v-if="dataApproval?.status === 'approve' && !entity.rla">-</p>
+              <p
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.rla) ||
+                  (!access_token && !entity.rla)
+                "
+              >
+                -
+              </p>
               <FormWithUploadFile
                 v-else
                 ref="rla"
                 :value="entity.rla"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve'"
+                :disabled="dataApproval?.status === 'approve' || !access_token"
                 @save="(e) => saveFieldWithFile(e, entity, 'rla')"
               />
             </div>
           </template>
           <template #column_ncr="{ entity }">
             <div class="w-full flex justify-center">
-              <p v-if="dataApproval?.status === 'approve' && !entity.ncr">-</p>
+              <p
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.ncr) ||
+                  (!access_token && !entity.ncr)
+                "
+              >
+                -
+              </p>
               <FormWithUploadFile
                 v-else
                 ref="ncr"
                 :value="entity.ncr"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve'"
+                :disabled="dataApproval?.status === 'approve' || !access_token"
                 @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
               />
             </div>
