@@ -119,6 +119,12 @@ export const routeTransaction = [
     meta: { layout: AddScopeLayout, requireAuth: false, role: "planner" },
   },
   {
+    path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/hse-doc",
+    name: "transaction hse doc",
+    component: () => import("@/modules/transaction/views/HseDoc.vue"),
+    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+  },
+  {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/qc-plan",
     name: "transaction qc plan",
     component: () => import("@/modules/transaction/views/QcPlan.vue"),

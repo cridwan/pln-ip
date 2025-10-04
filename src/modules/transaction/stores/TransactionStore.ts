@@ -492,6 +492,19 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getHseDoc = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/hse/resource/pagination`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const getAddScope = async (payload: IParams) => {
       return await api
         .get(`/transaction/additional-scope/resource/pagination`, {
@@ -844,7 +857,8 @@ export const useTransactionStore = defineStore(
       getSelectActivity,
       getPartSelect,
       getManPowerSelect,
-      getConsMatSelect
+      getConsMatSelect,
+      getHseDoc,
     };
   },
   {

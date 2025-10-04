@@ -3,7 +3,7 @@ import type { TableColumnType } from "@/components/tables/Table.vue";
 export const ColumnsQcPlan: TableColumnType[] = [
   {
     key: "name",
-    label: "QC Plan Document",
+    label: "HSE Document",
     align: "left",
     sort: false,
   },
