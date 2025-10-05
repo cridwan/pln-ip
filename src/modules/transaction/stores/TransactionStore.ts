@@ -733,7 +733,7 @@ export const useTransactionStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Tools.xlsx`;
+          a.download = `Hse.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -763,10 +763,10 @@ export const useTransactionStore = defineStore(
               type: resp.headers["content-type"],
             })
           );
-
+          console.log('download pdf')
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Tools.xlsx`;
+          a.download = `QcPlan.xlsx`;
 
           document.body.appendChild(a);
           a.click();
