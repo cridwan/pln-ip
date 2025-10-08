@@ -15,29 +15,34 @@ import { useTransactionStore } from "../stores/TransactionStore";
 const Data = ref<ResultsInterface[]>([
   {
     id: 1,
+    uuid: "budget_activity",
+    manpower: "Budget Activity",
+  },
+  {
+    id: 2,
     uuid: "scope",
     manpower: "Scope",
   },
   {
-    id: 2,
+    id: 3,
     uuid: "consumable_material",
     manpower: "Consumable Material",
   },
   {
-    id: 3,
+    id: 4,
     uuid: "part_list",
     manpower: "Part List",
   },
   {
-    id: 4,
+    id: 5,
     uuid: "manpower",
     manpower: "Manpower",
   },
-  {
-    id: 5,
-    uuid: "tools",
-    manpower: "Tools",
-  },
+  // {
+  //   id: 5,
+  //   uuid: "tools",
+  //   manpower: "Tools",
+  // },
   {
     id: 6,
     uuid: "hse",
@@ -56,6 +61,29 @@ const transactionStore = useTransactionStore();
 const route = useRoute();
 const is_loading = ref<string | null>(null);
 
+//--- DOWNLOAD SCOPE
+const { refetch: refetchDownloadBudgetActivity } = useQuery({
+  queryKey: ["downloadResultScope"],
+  queryFn: async () => {
+    try {
+      await transactionStore.getDownloadResultBudgetActivity(
+        route.params.id_project as string
+      );
+      is_loading.value = null;
+
+      return true;
+    } catch (error: any) {
+      const err = error as AxiosError;
+      is_loading.value = null;
+
+      throw err.response;
+    }
+  },
+  enabled: false,
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
 //--- DOWNLOAD SCOPE
 const { refetch: refetchDownloadScope } = useQuery({
   queryKey: ["downloadResultScope"],
@@ -228,6 +256,10 @@ const handleDownload = (item: ResultsInterface) => {
   is_loading.value = item.uuid;
 
   switch (item.uuid) {
+    case "budget_activity":
+      refetchDownloadBudgetActivity();
+      break;
+
     case "scope":
       refetchDownloadScope();
       break;
@@ -263,15 +295,8 @@ const handleDownload = (item: ResultsInterface) => {
   <p class="text-center w-full font-bold text-2xl text-blue-900 mb-10">
     REPORT
   </p>
-  <Table
-    label-create="Manpower"
-    :is-create="false"
-    :is-search="false"
-    :is-action="false"
-    :columns="ColumnsResults"
-    :entities="Data"
-    :is-pagination="false"
-  >
+  <Table label-create="Manpower" :is-create="false" :is-search="false" :is-action="false" :columns="ColumnsResults"
+    :entities="Data" :is-pagination="false">
     <template #column_download="{ entity }">
       <div class="flex justify-center">
         <button class="button-download" @click="handleDownload(entity)">

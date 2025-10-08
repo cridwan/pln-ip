@@ -492,6 +492,19 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getHseDoc = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/hse/resource/pagination`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const getAddScope = async (payload: IParams) => {
       return await api
         .get(`/transaction/additional-scope/resource/pagination`, {
@@ -541,6 +554,39 @@ export const useTransactionStore = defineStore(
     const getDownloadResultScope = async (project_uuid: string) => {
       return await api
         .get(`/transaction/result/resource/export/scope-standart`, {
+          params: {
+            project_uuid,
+          },
+          responseType: "blob",
+        })
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Scope.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getDownloadResultBudgetActivity = async (project_uuid: string) => {
+      return await api
+        .get(`/transaction/result/resource/export/budget-activity`, {
           params: {
             project_uuid,
           },
@@ -720,7 +766,7 @@ export const useTransactionStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Tools.xlsx`;
+          a.download = `Hse.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -750,10 +796,10 @@ export const useTransactionStore = defineStore(
               type: resp.headers["content-type"],
             })
           );
-
+          console.log('download pdf')
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Tools.xlsx`;
+          a.download = `QcPlan.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -844,7 +890,9 @@ export const useTransactionStore = defineStore(
       getSelectActivity,
       getPartSelect,
       getManPowerSelect,
-      getConsMatSelect
+      getConsMatSelect,
+      getHseDoc,
+      getDownloadResultBudgetActivity,
     };
   },
   {

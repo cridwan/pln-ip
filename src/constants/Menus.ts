@@ -67,6 +67,12 @@ export const Menus: MenuInterface[] = [
     icon: "mind-gear",
   },
   {
+    id: 10,
+    name: "HSE DOC",
+    url: "/hse-doc",
+    icon: "mind-gear",
+  },
+  {
     id: 12,
     name: "Results",
     url: "/results",
@@ -338,7 +344,7 @@ export const MenusMaster: MenuInterface[] = [
         id: 17,
         name: "QC Plan",
         url: "/qc-plan",
-        icon: "qc-plan",
+        icon: "tag",
       },
     ],
   },
