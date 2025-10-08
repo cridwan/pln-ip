@@ -252,81 +252,45 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="
-        dataForm?.activity_uuid &&
-        dataApproval?.status !== 'approve' &&
-        access_token
-      "
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <Button v-if="
+      dataForm?.activity_uuid &&
+      dataApproval?.status !== 'approve' &&
+      access_token
+    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterPartStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table
-            label-create="Part"
-            :columns="ColumnsPart"
-            :entities="dataPart?.data || []"
-            :loading="isLoadingPart"
-            :pagination="pagination"
-            :is-create="false"
-            :is-action="
-              dataApproval?.status !== 'approve' && access_token !== ''
-            "
-            class="mt-6"
-            v-model:model-search="params.search"
-            @change-page="changePage"
-            @change-limit="changeLimit"
-            @search="searchTable"
-          >
+          <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
+            :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+              " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+            @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon
-                  name="pencil"
-                  class="icon-action-table"
-                  @click="handleUpdate(entity)"
-                />
-                <Icon
-                  name="trash"
-                  class="icon-action-table"
-                  @click="handleDelete(entity)"
-                />
+                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
+                  v-if="dataForm?.activity_uuid" />
+                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                  v-if="dataForm?.activity_uuid" />
               </div>
             </template>
             <template #column_part="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 {{ entity.part?.name ?? "-" }}
               </p>
             </template>
 
             <template #column_price="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 Rp. {{ Number(entity.part.price).toLocaleString("id") }}
               </p>
             </template>
 
             <template #column_total="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 Rp.
                 {{
                   (
@@ -337,17 +301,13 @@ onMounted(() => {
             </template>
 
             <template #column_unit="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 {{ entity.part?.global_unit?.name ?? "-" }}
               </p>
             </template>
 
             <template #column_number_drawing="{ entity }">
-              <p
-                class="text-base text-neutral-50 text-left underline cursor-pointer"
-              >
+              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
                 {{ entity.part?.no_drawing ?? "-" }}
               </p>
             </template>
@@ -358,21 +318,9 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormPartStd
-    :is-additional="true"
-    v-model="open_form"
-    :data-form="dataForm"
-    :selected-value="selected_item"
-    @success="handleSuccess"
-    @error="handleError"
-    @removeSucess="handleRemoveSuccess"
-  />
+  <FormPartStd :is-additional="true" v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
+    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
   <!-- <FormAdPart v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
     @error="handleError" @removeSucess="handleRemoveSuccess" /> -->
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.part?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

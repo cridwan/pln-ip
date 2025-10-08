@@ -584,6 +584,39 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getDownloadResultBudgetActivity = async (project_uuid: string) => {
+      return await api
+        .get(`/transaction/result/resource/export/budget-activity`, {
+          params: {
+            project_uuid,
+          },
+          responseType: "blob",
+        })
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Scope.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const getDownloadResultConsMat = async (project_uuid: string) => {
       return await api
         .get(`/transaction/result/resource/export/consmat`, {
@@ -859,6 +892,7 @@ export const useTransactionStore = defineStore(
       getManPowerSelect,
       getConsMatSelect,
       getHseDoc,
+      getDownloadResultBudgetActivity,
     };
   },
   {
