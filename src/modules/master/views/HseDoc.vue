@@ -47,8 +47,6 @@ const {
       const { data } = await masterStore.getHseDoc(params);
       const response = data.data as IPagination<HseDocInterface[]>;
 
-      console.log(response);
-
       total_item.value = response.total;
 
       return response;

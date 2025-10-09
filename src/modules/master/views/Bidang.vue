@@ -47,8 +47,6 @@ const {
       const { data } = await masterStore.getBidang(params);
       const response = data.data as IPagination<BidangInterface[]>;
 
-      console.log(response);
-
       total_item.value = response.total;
 
       return response;

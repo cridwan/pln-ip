@@ -10,14 +10,8 @@ import { mergeArrays } from "@/helpers/global";
 
 import type { LocationInterface } from "../types/LocationType";
 import type { UnitInterface } from "../types/UnitType";
-import type {
-  MachineInterface,
-  MachineTypeModelCreateInterface,
-} from "../types/MachineType";
-import type {
-  InspectionTypeInterface,
-  InspectionTypeModelCreateInterface,
-} from "../types/InspectionType";
+import type { MachineTypeModelCreateInterface } from "../types/MachineType";
+import type { InspectionTypeInterface } from "../types/InspectionType";
 import { useMasterStore } from "../stores/MasterStore";
 
 type OptionType = {
@@ -44,8 +38,6 @@ const is_loading_location = ref(false);
 const options_location = ref<OptionType[]>([]);
 const is_loading_unit = ref(false);
 const options_unit = ref<OptionType[]>([]);
-const is_loading_machine = ref(false);
-const options_machine = ref<OptionType[]>([]);
 
 const model = ref<MachineTypeModelCreateInterface>({
   name: "",
@@ -81,7 +73,7 @@ const {
   hasNextPage: hasNextPageLocation,
   isFetchingNextPage: isFetchingNextPageLocation,
 } = useInfiniteQuery({
-  queryKey: ["getLocationFilterInspection"],
+  queryKey: ["getLocationFilterMechine"],
   enabled: !props.selectedValue && !is_loading_location.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -122,7 +114,7 @@ const {
   hasNextPage: hasNextPageUnit,
   isFetchingNextPage: isFetchingNextPageUnit,
 } = useInfiniteQuery({
-  queryKey: ["getUnitFilterInspection"],
+  queryKey: ["getUnitFilterMechine"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -233,8 +225,7 @@ watch(modelValue, (value) => {
 });
 
 const selectLocation = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getUnitFilterInspection"] });
-  queryClient.removeQueries({ queryKey: ["getMachineFilterInspection"] });
+  queryClient.removeQueries({ queryKey: ["getUnitFilterMechine"] });
   model.value.unit_uuid = "";
 
   params_unit.filters = [
@@ -328,35 +319,37 @@ watch(
   >
     <span class="text-blue-950 font-semibold">Pilih Mesin</span>
     <form class="" @submit.prevent="handleSubmit">
-      <Select
-        v-model="model.location_uuid"
-        label="Lokasi"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_location.search"
-        :search="true"
-        :loading="is_loading_location"
-        :loading-next-page="isFetchingNextPageLocation"
-        :rules="rules.location_uuid"
-        :options="options_location"
-        @scroll="scrollLocation"
-        @search="searchLocation"
-        @select="selectLocation"
-      />
-      <Select
-        v-model="model.unit_uuid"
-        label="Unit"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_unit.search"
-        :search="true"
-        :loading="is_loading_unit"
-        :loading-next-page="isFetchingNextPageUnit"
-        :rules="rules.unit_uuid"
-        :options="options_unit"
-        @scroll="scrollUnit"
-        @search="searchUnit"
-      />
+      <div class="flex flex-col gap-2">
+        <Select
+          v-model="model.location_uuid"
+          label="Lokasi"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_location.search"
+          :search="true"
+          :loading="is_loading_location"
+          :loading-next-page="isFetchingNextPageLocation"
+          :rules="rules.location_uuid"
+          :options="options_location"
+          @scroll="scrollLocation"
+          @search="searchLocation"
+          @select="selectLocation"
+        />
+        <Select
+          v-model="model.unit_uuid"
+          label="Unit"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_unit.search"
+          :search="true"
+          :loading="is_loading_unit"
+          :loading-next-page="isFetchingNextPageUnit"
+          :rules="rules.unit_uuid"
+          :options="options_unit"
+          @scroll="scrollUnit"
+          @search="searchUnit"
+        />
+      </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button

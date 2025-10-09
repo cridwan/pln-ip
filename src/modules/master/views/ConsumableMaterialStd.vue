@@ -47,8 +47,9 @@ const selected_item = ref<ConsumableMaterialStdInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
-//--- GET SCOPE
+//--- GET CONSUMABLE MATERIAL STD
 const {
   data: dataConsMatStd,
   isFetching: isLoadingConsMatStd,
@@ -61,11 +62,14 @@ const {
       const response = data.data as IPagination<
         ConsumableMaterialStdInterface[]
       >;
+
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -107,7 +111,7 @@ const { mutate: downloadConsMatStd, isPending: isLoadingDownload } =
     mutationFn: async () => {
       return await masterStore.downloadConsumableMaterialStd(params);
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -120,7 +124,7 @@ const { mutate: templateConsMatStd, isPending: isLoadingTemplate } =
     mutationFn: async () => {
       return await masterStore.templateConsumableMaterialStd();
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -229,12 +233,14 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: ConsumableMaterialStdCreateModelInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchConsMatStd();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchConsMatStd();
 };
@@ -274,32 +280,65 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button v-if="dataForm?.activity_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
-        @click="handleCreate" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.activity_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
-          :loading="isLoadingConsMatStd" />
+        <FilterConsumableMaterialStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table label-create="User" :columns="ColumnConsumableMaterialStd" :entities="dataConsMatStd?.data || []"
-          :loading="isLoadingConsMatStd" :pagination="pagination" :is-create="false"
-          v-model:model-search="params.search" class="mt-6" @change-page="changePage" @change-limit="changeLimit"
-          @search="searchTable">
+        <Table
+          label-create="User"
+          :columns="ColumnConsumableMaterialStd"
+          :entities="dataConsMatStd?.data || []"
+          :loading="isLoadingConsMatStd"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          class="mt-6"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+              />
             </div>
           </template>
           <template #column_cons_mat="{ entity }">
-            <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+            <p
+              class="text-base text-neutral-50 text-left underline cursor-pointer"
+            >
               {{ entity.consmat?.name ?? "-" }}
             </p>
           </template>
@@ -307,10 +346,21 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormConsumableMaterialStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item"
-      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+    <FormConsumableMaterialStd
+      :data-form="dataForm"
+      v-model="open_form"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+    />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.uuid"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

@@ -47,6 +47,7 @@ const selected_item = ref<EquipmentInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET EQUIPMENT
 const {
@@ -61,10 +62,12 @@ const {
       const response = data.data as IPagination<EquipmentInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -235,12 +238,14 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: EquipmentCreateInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchEquipment();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchEquipment();
 };
@@ -303,7 +308,7 @@ onMounted(() => {
         <FilterEquipment
           @filter="handleOnFilter"
           @reset-filter="handleResetFilter"
-          :loading="isLoadingEquipment"
+          :loading="is_loading_filter"
         />
       </div>
       <div class="w-full">

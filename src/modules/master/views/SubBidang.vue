@@ -45,6 +45,7 @@ const dataForm = ref<BidangTypeModelCreateInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET SUBBIDANG
 const {
@@ -58,13 +59,13 @@ const {
       const { data } = await masterStore.getSubBidang(params);
       const response = data.data as IPagination<SubBidangInterface[]>;
 
-      console.log(response);
-
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -103,7 +104,7 @@ const { mutate: downloadSubBidang, isPending: isLoadingDownload } = useMutation(
     mutationFn: async () => {
       return await masterStore.downloadSubBidang(params);
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -117,7 +118,7 @@ const { mutate: templateSubBidang, isPending: isLoadingTemplate } = useMutation(
     mutationFn: async () => {
       return await masterStore.templateSubBidang();
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -227,6 +228,7 @@ const setFilter = () => {
 };
 
 const handleOnFilter = (data: BidangTypeModelCreateInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchSubBidang();
@@ -245,6 +247,7 @@ const resetFilter = () => {
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchSubBidang();
 };
@@ -277,24 +280,57 @@ onMounted(() => {
       <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
       <Button text="Export Template" rounded="full" color="blue" /> -->
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" v-if="dataForm?.uuid" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+        v-if="dataForm?.uuid"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterSubBidang @filter="handleOnFilter" @reset-filter="handleResetFilter" />
+        <FilterSubBidang
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="w-full">
-        <Table label-create="Sub Bidang" :columns="ColumnsSubBidang" :entities="dataSubBidang?.data || []"
-          :loading="isLoadingSubBidang" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
-          @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+        <Table
+          label-create="Sub Bidang"
+          :columns="ColumnsSubBidang"
+          :entities="dataSubBidang?.data || []"
+          :loading="isLoadingSubBidang"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+              />
             </div>
           </template>
           <template #column_bidang="{ entity }">
@@ -306,12 +342,22 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormSubBidang :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" />
+    <FormSubBidang
+      :data-form="dataForm"
+      v-model="open_form"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+    />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>
 
 <style lang="sass"></style>

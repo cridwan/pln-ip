@@ -47,6 +47,7 @@ const selected_item = ref<ActivityInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET ACTIVITY
 const {
@@ -61,10 +62,12 @@ const {
       const response = data.data as IPagination<ActivityInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -231,12 +234,14 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: ActivityModelCreateInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchActivity();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchActivity();
 };

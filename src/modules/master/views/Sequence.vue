@@ -52,7 +52,7 @@ const {
   isFetching: isLoadingSequence,
   refetch: refetchSequence,
 } = useQuery({
-  queryKey: ["getSequence"],
+  queryKey: ["getSequenceMaster"],
   queryFn: async () => {
     try {
       const { data } = await masterStore.getSequence(params);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import type { AxiosError } from "axios";
 
 import {
@@ -14,9 +14,9 @@ import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
-import { ColumnsGlobalUnit } from "../constants/GlobalUnitConstant";
+// import { ColumnsGlobalUnit } from "../constants/GlobalUnitConstant";
 import { useMasterStore } from "../stores/MasterStore";
-import FormGlobalUnit from "../components/FormGlobalUnit.vue";
+// import FormGlobalUnit from "../components/FormGlobalUnit.vue";
 import ButtonGroup from "../components/ButtonGroup.vue";
 import { ColumnsQcPlan } from "../constants/QcPlanConstant";
 import type { QCPlanInterface } from "../types/QcPlanType";
@@ -43,7 +43,7 @@ const {
   isFetching: isLoadingQcPlan,
   refetch: refetchQcPlan,
 } = useQuery({
-  queryKey: ["getQcPlan"],
+  queryKey: ["getQcPlanMaster"],
   queryFn: async () => {
     try {
       const { data } = await masterStore.getQcPlan(params);

@@ -6,17 +6,13 @@ import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/vue-query";
 import type { IPagination, IParams } from "@/types/GlobalType";
-import { mergeArrays } from "@/helpers/global";
 
+import { useMasterStore } from "../stores/MasterStore";
 import type { LocationInterface } from "../types/LocationType";
 import type { UnitInterface } from "../types/UnitType";
 import type { MachineInterface } from "../types/MachineType";
 import type { InspectionTypeInterface } from "../types/InspectionType";
-import { useMasterStore } from "../stores/MasterStore";
-import type {
-  ScopeCreateModelInterface,
-  ScopeInterface,
-} from "../types/ScopeType";
+import type { ScopeInterface } from "../types/ScopeType";
 import type { SubBidangInterface } from "../types/SubBidangType";
 import type { BidangInterface } from "../types/BidangType";
 import type { EquipmentInterface } from "../types/EquipmentType";
@@ -116,7 +112,7 @@ const {
   hasNextPage: hasNextPageLocation,
   isFetchingNextPage: isFetchingNextPageLocation,
 } = useInfiniteQuery({
-  queryKey: ["getLocationManpower"],
+  queryKey: ["getLocationFilterActivityMaster"],
   enabled: !props.selectedValue && !is_loading_location.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -157,7 +153,7 @@ const {
   hasNextPage: hasNextPageUnit,
   isFetchingNextPage: isFetchingNextPageUnit,
 } = useInfiniteQuery({
-  queryKey: ["getUnitManpower"],
+  queryKey: ["getUnitFilterActivityMaster"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -198,7 +194,7 @@ const {
   hasNextPage: hasNextPageMachine,
   isFetchingNextPage: isFetchingNextPageMachine,
 } = useInfiniteQuery({
-  queryKey: ["getMachineManpower"],
+  queryKey: ["getMachineFilterActivityMaster"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -228,7 +224,7 @@ const {
 //--- GET INSPECTION
 const params_inspection = reactive<IParams>({
   search: "",
-  filters: [],
+  filters: "",
   currentPage: 1,
   perPage: 10,
 });
@@ -239,7 +235,7 @@ const {
   hasNextPage: hasNextPageInspection,
   isFetchingNextPage: isFetchingNextPageInspection,
 } = useInfiniteQuery({
-  queryKey: ["getInspectionManpower"],
+  queryKey: ["getInspectionFilterActivityMaster"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -280,7 +276,7 @@ const {
   hasNextPage: hasNextPageBidang,
   isFetchingNextPage: isFetchingNextPageBidang,
 } = useInfiniteQuery({
-  queryKey: ["getBidangScope"],
+  queryKey: ["getBidangFilterActivityMaster"],
   enabled: !props.selectedValue && !is_loading_bidang.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -328,7 +324,7 @@ const {
   hasNextPage: hasNextPageSubBidang,
   isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
-  queryKey: ["getSubBidangScope"],
+  queryKey: ["getSubBidangFilterActivityMaster"],
   enabled: !props.selectedValue && !is_loading_sub_bidang.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -358,7 +354,15 @@ const {
 //--- GET SCOPE
 const params_scope = reactive<IParams>({
   search: "",
-  filters: [],
+  filter: "",
+  filters: [
+    {
+      group: "AND",
+      operator: "NOT_NULL",
+      column: "inspection_type_uuid",
+      value: "",
+    },
+  ],
   currentPage: 1,
   perPage: 10,
 });
@@ -369,7 +373,7 @@ const {
   hasNextPage: hasNextPageScope,
   isFetchingNextPage: isFetchingNextPageScope,
 } = useInfiniteQuery({
-  queryKey: ["getScopeFilterPartStd"],
+  queryKey: ["getScopeFilterActivityMaster"],
   enabled: !props.selectedValue && !is_loading_scope.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -410,7 +414,7 @@ const {
   hasNextPage: hasNextPageEquipment,
   isFetchingNextPage: isFetchingNextPageEquipment,
 } = useInfiniteQuery({
-  queryKey: ["getEquipmentFIlterPartStd"],
+  queryKey: ["getEquipmentFilterActivityMaster"],
   enabled: !props.selectedValue && !is_loading_equipment.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -489,7 +493,6 @@ const resetValue = () => {
   emit("resetFilter");
 };
 
-// LOCATION
 const timeout_location = ref(0);
 const searchLocation = () => {
   clearTimeout(timeout_location.value);
@@ -509,9 +512,7 @@ const scrollLocation = (e: Event) => {
     fetchNextPageLocation();
   }
 };
-// END
 
-// UNIT
 const timeout_unit = ref(0);
 const searchUnit = () => {
   clearTimeout(timeout_unit.value);
@@ -531,9 +532,7 @@ const scrollUnit = (e: Event) => {
     fetchNextPageUnit();
   }
 };
-// END
 
-// MACHINE
 const timeout_machine = ref(0);
 const searchMachine = () => {
   clearTimeout(timeout_machine.value);
@@ -553,9 +552,7 @@ const scrollMachine = (e: Event) => {
     fetchNextPageMachine();
   }
 };
-// END
 
-// INSPECTION
 const timeout_inspection = ref(0);
 const searchInspection = () => {
   clearTimeout(timeout_inspection.value);
@@ -575,9 +572,7 @@ const scrollInspection = (e: Event) => {
     fetchNextPageInspection();
   }
 };
-// END
 
-// BIDANG
 const timeout_bidang = ref(0);
 const searchBidang = () => {
   clearTimeout(timeout_bidang.value);
@@ -597,9 +592,7 @@ const scrollBidang = (e: Event) => {
     fetchNextPageBidang();
   }
 };
-// END
 
-// SUB BIDANG
 const timeout_sub_bidang = ref(0);
 const searchSubBidang = () => {
   clearTimeout(timeout_sub_bidang.value);
@@ -619,9 +612,7 @@ const scrollSubBidang = (e: Event) => {
     fetchNextPageSubBidang();
   }
 };
-// END
 
-// SCOPE
 const timeout_scope = ref(0);
 const searchScope = () => {
   clearTimeout(timeout_scope.value);
@@ -641,9 +632,7 @@ const scrollScope = (e: Event) => {
     fetchNextPageScope();
   }
 };
-// END
 
-// EQUIPMENT
 const timeout_equipment = ref(0);
 const searchEquipment = () => {
   clearTimeout(timeout_equipment.value);
@@ -663,7 +652,6 @@ const scrollEquipment = (e: Event) => {
     fetchNextPageEquipment();
   }
 };
-// END
 
 // watch(modelValue, (value) => {
 //   if (!value) {
@@ -680,10 +668,22 @@ const scrollEquipment = (e: Event) => {
 // });
 
 const selectLocation = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getMachineManpower"] });
-  queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
+  queryClient.removeQueries({ queryKey: ["getMachineFilterActivityMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getInspectionFilterActivityMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getBidangFilterActivityMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getSubBidangFilterActivityMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterActivityMaster"] });
+  queryClient.removeQueries({ queryKey: ["getEquipmentFilterActivityMaster"] });
   options_machine.value = [];
   options_inspection.value = [];
+  options_bidang.value = [];
+  options_sub_bidang.value = [];
+  options_scope.value = [];
+  options_equipment.value = [];
   model.value.unit_uuid = "";
   model.value.machine_uuid = "";
   model.value.inspection_type_uuid = "";
@@ -703,8 +703,20 @@ const selectLocation = (e: OptionType) => {
 };
 
 const selectUnit = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
+  queryClient.removeQueries({
+    queryKey: ["getInspectionFilterActivityMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getBidangFilterActivityMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getSubBidangFilterActivityMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterActivityMaster"] });
+  queryClient.removeQueries({ queryKey: ["getEquipmentFilterActivityMaster"] });
   options_inspection.value = [];
+  options_bidang.value = [];
+  options_sub_bidang.value = [];
+  options_scope.value = [];
+  options_equipment.value = [];
   model.value.machine_uuid = "";
   model.value.inspection_type_uuid = "";
   model.value.bidang_uuid = "";
@@ -719,14 +731,25 @@ const selectUnit = (e: OptionType) => {
       value: e.value,
     },
   ];
+
   refetchMachine();
 };
 
 const selectMachine = (e: OptionType) => {
+  queryClient.removeQueries({ queryKey: ["getBidangFilterActivityMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getSubBidangFilterActivityMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterActivityMaster"] });
+  queryClient.removeQueries({ queryKey: ["getEquipmentFilterActivityMaster"] });
+  options_bidang.value = [];
+  options_sub_bidang.value = [];
+  options_scope.value = [];
+  options_equipment.value = [];
   model.value.inspection_type_uuid = "";
-  model.value.scope_standart_uuid = "";
   model.value.bidang_uuid = "";
   model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
   model.value.equipment_uuid = "";
   params_inspection.filters = [
     {
@@ -736,30 +759,35 @@ const selectMachine = (e: OptionType) => {
       value: e.value,
     },
   ];
+
   refetchInspection();
 };
 
 const selectInspection = (e: OptionType) => {
-  model.value.scope_standart_uuid = "";
+  queryClient.removeQueries({
+    queryKey: ["getSubBidangFilterActivityMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterActivityMaster"] });
+  queryClient.removeQueries({ queryKey: ["getEquipmentFilterActivityMaster"] });
+  options_sub_bidang.value = [];
+  options_scope.value = [];
+  options_equipment.value = [];
   model.value.bidang_uuid = "";
   model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
   model.value.equipment_uuid = "";
-  params_inspection.filters = [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "inspection_type_uuid",
-      value: e.value,
-    },
-  ];
-  refetchScope();
+
+  refetchBidang();
 };
 
 const selectBidang = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getSubBidangScope"] });
-  model.value.scope_standart_uuid = "";
+  queryClient.removeQueries({ queryKey: ["getScopeFilterActivityMaster"] });
+  queryClient.removeQueries({ queryKey: ["getEquipmentFilterActivityMaster"] });
+  options_scope.value = [];
+  options_equipment.value = [];
   model.value.sub_bidang_uuid = "";
   model.value.equipment_uuid = "";
+  model.value.scope_standart_uuid = "";
   params_sub_bidang.filters = [
     {
       group: "AND",
@@ -768,10 +796,13 @@ const selectBidang = (e: OptionType) => {
       value: e.value,
     },
   ];
+
   refetchSubBidang();
 };
 
 const selectSubBidang = (e: OptionType) => {
+  queryClient.removeQueries({ queryKey: ["getEquipmentFilterActivityMaster"] });
+  options_equipment.value = [];
   model.value.scope_standart_uuid = "";
   model.value.equipment_uuid = "";
   params_scope.filters = [
@@ -1198,125 +1229,127 @@ watch(
   >
     <span class="text-blue-950 font-semibold">Pilih Equipment</span>
     <form class="" @submit.prevent="handleSubmit">
-      <Select
-        v-model="model.location_uuid"
-        label="Lokasi"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_location.search"
-        :search="true"
-        :loading="is_loading_location"
-        :loading-next-page="isFetchingNextPageLocation"
-        :rules="rules.location_uuid"
-        :options="options_location"
-        @scroll="scrollLocation"
-        @search="searchLocation"
-        @select="selectLocation"
-      />
-      <Select
-        v-model="model.unit_uuid"
-        label="Unit"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_unit.search"
-        :search="true"
-        :loading="is_loading_unit"
-        :loading-next-page="isFetchingNextPageUnit"
-        :rules="rules.unit_uuid"
-        :options="options_unit"
-        @scroll="scrollUnit"
-        @search="searchUnit"
-        @select="selectUnit"
-      />
-      <Select
-        v-model="model.machine_uuid"
-        label="Mesin"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_machine.search"
-        :search="true"
-        :loading="is_loading_machine"
-        :loading-next-page="isFetchingNextPageMachine"
-        :rules="rules.machine_uuid"
-        :options="options_machine"
-        @scroll="scrollMachine"
-        @search="searchMachine"
-        @select="selectMachine"
-      />
-      <Select
-        v-model="model.inspection_type_uuid"
-        label="Tipe Inspeksi"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_inspection.search"
-        :search="true"
-        :loading="is_loading_inspection"
-        :loading-next-page="isFetchingNextPageInspection"
-        :rules="rules.inspection_type_uuid"
-        :options="options_inspection"
-        @scroll="scrollInspection"
-        @search="searchInspection"
-        @select="selectInspection"
-      />
-      <Select
-        v-model="model.bidang_uuid"
-        label="Bidang"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_bidang.search"
-        :search="true"
-        :loading="is_loading_bidang"
-        :loading-next-page="isFetchingNextPageBidang"
-        :rules="rules.bidang_uuid"
-        :options="options_bidang"
-        @scroll="scrollBidang"
-        @search="searchBidang"
-        @select="selectBidang"
-      />
-      <Select
-        v-model="model.sub_bidang_uuid"
-        label="Sub Bidang"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_sub_bidang.search"
-        :search="true"
-        :loading="is_loading_sub_bidang"
-        :loading-next-page="isFetchingNextPageSubBidang"
-        :rules="rules.sub_bidang_uuid"
-        :options="options_sub_bidang"
-        @scroll="scrollSubBidang"
-        @search="searchSubBidang"
-        @select="selectSubBidang"
-      />
-      <Select
-        v-model="model.scope_standart_uuid"
-        label="Scope Standart"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_scope.search"
-        :search="true"
-        :loading="is_loading_scope"
-        :loading-next-page="isFetchingNextPageScope"
-        :rules="rules.scope_standart_uuid"
-        :options="options_scope"
-        @scroll="scrollScope"
-        @search="searchScope"
-        @select="selectScope"
-      />
-      <Select
-        v-model="model.equipment_uuid"
-        label="Equipment"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_equipment.search"
-        :search="true"
-        :loading="is_loading_equipment"
-        :loading-next-page="isFetchingNextPageEquipment"
-        :rules="rules.equipment_uuid"
-        :options="options_equipment"
-        @scroll="scrollEquipment"
-        @search="searchEquipment"
-      />
+      <div class="flex flex-col gap-2">
+        <Select
+          v-model="model.location_uuid"
+          label="Lokasi"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_location.search"
+          :search="true"
+          :loading="is_loading_location"
+          :loading-next-page="isFetchingNextPageLocation"
+          :rules="rules.location_uuid"
+          :options="options_location"
+          @scroll="scrollLocation"
+          @search="searchLocation"
+          @select="selectLocation"
+        />
+        <Select
+          v-model="model.unit_uuid"
+          label="Unit"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_unit.search"
+          :search="true"
+          :loading="is_loading_unit"
+          :loading-next-page="isFetchingNextPageUnit"
+          :rules="rules.unit_uuid"
+          :options="options_unit"
+          @scroll="scrollUnit"
+          @search="searchUnit"
+          @select="selectUnit"
+        />
+        <Select
+          v-model="model.machine_uuid"
+          label="Mesin"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_machine.search"
+          :search="true"
+          :loading="is_loading_machine"
+          :loading-next-page="isFetchingNextPageMachine"
+          :rules="rules.machine_uuid"
+          :options="options_machine"
+          @scroll="scrollMachine"
+          @search="searchMachine"
+          @select="selectMachine"
+        />
+        <Select
+          v-model="model.inspection_type_uuid"
+          label="Tipe Inspeksi"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_inspection.search"
+          :search="true"
+          :loading="is_loading_inspection"
+          :loading-next-page="isFetchingNextPageInspection"
+          :rules="rules.inspection_type_uuid"
+          :options="options_inspection"
+          @scroll="scrollInspection"
+          @search="searchInspection"
+          @select="selectInspection"
+        />
+        <Select
+          v-model="model.bidang_uuid"
+          label="Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_bidang.search"
+          :search="true"
+          :loading="is_loading_bidang"
+          :loading-next-page="isFetchingNextPageBidang"
+          :rules="rules.bidang_uuid"
+          :options="options_bidang"
+          @scroll="scrollBidang"
+          @search="searchBidang"
+          @select="selectBidang"
+        />
+        <Select
+          v-model="model.sub_bidang_uuid"
+          label="Sub Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_sub_bidang.search"
+          :search="true"
+          :loading="is_loading_sub_bidang"
+          :loading-next-page="isFetchingNextPageSubBidang"
+          :rules="rules.sub_bidang_uuid"
+          :options="options_sub_bidang"
+          @scroll="scrollSubBidang"
+          @search="searchSubBidang"
+          @select="selectSubBidang"
+        />
+        <Select
+          v-model="model.scope_standart_uuid"
+          label="Scope Standart"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_scope.search"
+          :search="true"
+          :loading="is_loading_scope"
+          :loading-next-page="isFetchingNextPageScope"
+          :rules="rules.scope_standart_uuid"
+          :options="options_scope"
+          @scroll="scrollScope"
+          @search="searchScope"
+          @select="selectScope"
+        />
+        <Select
+          v-model="model.equipment_uuid"
+          label="Equipment"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_equipment.search"
+          :search="true"
+          :loading="is_loading_equipment"
+          :loading-next-page="isFetchingNextPageEquipment"
+          :rules="rules.equipment_uuid"
+          :options="options_equipment"
+          @scroll="scrollEquipment"
+          @search="searchEquipment"
+        />
+      </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button

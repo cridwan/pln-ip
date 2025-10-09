@@ -40,6 +40,7 @@ const selected_item = ref<InspectionTypeInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET INSPECTION TYPE
 const {
@@ -55,10 +56,12 @@ const {
       const response = data.data as IPagination<InspectionTypeInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -216,12 +219,14 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: InspectionTypeModelCreateInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchInspectionType();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchInspectionType();
 };
@@ -280,7 +285,7 @@ onMounted(() => {
         <FilterInspectionType
           @filter="handleOnFilter"
           @reset-filter="handleResetFilter"
-          :loading="isLoadingInspectionType"
+          :loading="is_loading_filter"
         />
       </div>
       <div class="w-full">

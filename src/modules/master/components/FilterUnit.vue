@@ -4,16 +4,12 @@ import { reactive, ref, computed, type PropType, watch } from "vue";
 import { Button, Select } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/vue-query";
+import { useInfiniteQuery } from "@tanstack/vue-query";
 import type { IPagination, IParams } from "@/types/GlobalType";
 import { mergeArrays } from "@/helpers/global";
 
 import type { LocationInterface } from "../types/LocationType";
-
-import type {
-  InspectionTypeInterface,
-  InspectionTypeModelCreateInterface,
-} from "../types/InspectionType";
+import type { InspectionTypeInterface } from "../types/InspectionType";
 import { useMasterStore } from "../stores/MasterStore";
 import type { UnitTypeModelCreateInterface } from "../types/UnitType";
 
@@ -35,7 +31,7 @@ const emit = defineEmits(["success", "error", "filter", "resetFilter"]);
 
 const masterStore = useMasterStore();
 
-const queryClient = useQueryClient();
+// const queryClient = useQueryClient();
 const modelValue = defineModel<boolean>({ default: false });
 const is_loading_location = ref(false);
 const options_location = ref<OptionType[]>([]);
@@ -72,7 +68,7 @@ const {
   hasNextPage: hasNextPageLocation,
   isFetchingNextPage: isFetchingNextPageLocation,
 } = useInfiniteQuery({
-  queryKey: ["getLocationFilterInspection"],
+  queryKey: ["getLocationFilterUnit"],
   enabled: !props.selectedValue && !is_loading_location.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -156,8 +152,6 @@ watch(modelValue, (value) => {
 });
 
 const selectLocation = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getUnitFilterInspection"] });
-  queryClient.removeQueries({ queryKey: ["getMachineFilterInspection"] });
   model.value.location_uuid = e.value;
 };
 

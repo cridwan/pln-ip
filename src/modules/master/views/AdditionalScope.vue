@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import type { AxiosError } from "axios";
 import { useRouter } from "vue-router";
 
@@ -11,7 +11,7 @@ import {
   Table,
   Toast,
 } from "@/components";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination, IParams } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
@@ -42,6 +42,7 @@ const timeout = ref(0);
 const router = useRouter();
 const dataForm = ref<AdditionalScopeFilterInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET ADDITIONAL SCOPE
 const {
@@ -56,10 +57,12 @@ const {
       const response = data as IPagination<AdditionalScopeInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
@@ -226,12 +229,14 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: AdditionalScopeFilterInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchAdditionalScope();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchAdditionalScope();
 };
