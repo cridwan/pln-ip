@@ -27,6 +27,8 @@ import { useTransactionStore } from "../stores/TransactionStore";
 import FormConsumableMaterialStd from "../components/FormConsumableMaterialStd.vue";
 import FilterConsumableMaterialStd from "../components/FilterConsumableMaterialStd.vue";
 import type { ProjectInterface } from "../types/ProjectType";
+import FormQuantity from "../components/FormQuantity.vue";
+import type { UpdateConsMatInterface } from "../types/ConsumableMaterialType";
 
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
@@ -55,6 +57,7 @@ const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
 const is_loading_filter = ref(false);
+const quantity = ref<any>(null);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
@@ -122,6 +125,37 @@ const { mutate: deleteConsMatStd, isPending: isLoadingDelete } = useMutation({
     });
   },
   retry: 0,
+});
+//--- END
+
+//--- UPDATE CONSUMABLE MATERIAL
+const { mutate: updateConsMat, isPending: isLoadingUpdate } = useMutation({
+  mutationFn: async ({
+    payload,
+    id,
+  }: {
+    payload: UpdateConsMatInterface;
+    id: string;
+  }) => {
+    return await transactionStore.updateConsMat(payload, id);
+  },
+  onSuccess: async () => {
+    refetchConsMat();
+    quantity.value.modelOpenInputData = false;
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Saved successfully",
+      type: "success",
+    });
+  },
+  onError: (error: any) => {
+    console.log(error);
+    toastRef.value?.showToast({
+      title: "Error",
+      description: error?.response?.data?.message || "Something went wrong",
+      type: "error",
+    });
+  },
 });
 //--- END
 
@@ -235,6 +269,20 @@ const handleRemoveSuccess = () => {
   refetchConsMat();
 };
 
+const saveQuantity = (
+  e: { quantity: string },
+  entity: ConsumableMaterialStdInterface
+) => {
+  updateConsMat({
+    id: entity.uuid,
+    payload: {
+      name: entity.consmat.name,
+      qty: parseFloat(e.quantity),
+      global_unit_uuid: entity.consmat.global_unit_uuid,
+    },
+  });
+};
+
 onMounted(() => {
   breadcrumb.value = [
     {
@@ -248,54 +296,107 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button v-if="
-      dataForm?.activity_uuid &&
-      dataApproval?.status !== 'approve' &&
-      access_token
-    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <Button
+      v-if="
+        dataForm?.activity_uuid &&
+        dataApproval?.status !== 'approve' &&
+        access_token
+      "
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
-          :loading="is_loading_filter" />
+        <FilterConsumableMaterialStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Material" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
-            " :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []" :loading="isLoadingConsMat"
-            :pagination="pagination" :is-create="false" class="mt-6" v-model:model-search="params.search"
-            @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+          <Table
+            label-create="Material"
+            :is-action="
+              dataApproval?.status !== 'approve' && access_token !== ''
+            "
+            :columns="ColumnsConsumableMaterial"
+            :entities="dataConsMat?.data || []"
+            :loading="isLoadingConsMat"
+            :pagination="pagination"
+            :is-create="false"
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
-                  v-if="dataForm?.activity_uuid" />
-                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                  v-if="dataForm?.activity_uuid" />
+                <Icon
+                  name="pencil"
+                  class="icon-action-table"
+                  @click="handleUpdate(entity)"
+                  v-if="dataForm?.activity_uuid"
+                />
+                <Icon
+                  name="trash"
+                  class="icon-action-table"
+                  @click="handleDelete(entity)"
+                  v-if="dataForm?.activity_uuid"
+                />
               </div>
             </template>
             <template #column_material="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p class="text-base text-neutral-50 text-left min-w-[100px]">
                 {{ entity.consmat?.name ?? "-" }}
               </p>
             </template>
             <template #column_merk="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p class="text-base text-neutral-50 text-left">
                 {{ entity.consmat?.merk ?? "-" }}
               </p>
             </template>
             <template #column_total_qty="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
-                {{ Number(entity.total_qty).toLocaleString("id") ?? "-" }}
+              <p
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.total_qty) ||
+                  (!access_token && !entity.total_qty)
+                "
+              >
+                -
               </p>
+              <FormQuantity
+                v-else
+                ref="quantity"
+                :value="entity.total_qty?.toString() || ''"
+                :label="entity.consmat?.name"
+                :loading="isLoadingUpdate"
+                :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveQuantity(e, entity)"
+              />
             </template>
             <template #column_price="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p v-if="!entity.consmat?.price">-</p>
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p v-if="!entity.total_qty && !entity.consmat?.price">-</p>
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
                 Rp.
                 {{
                   numberFormat(
@@ -305,7 +406,7 @@ onMounted(() => {
               </p>
             </template>
             <template #column_unit="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p class="text-base text-neutral-50 text-left">
                 {{ entity.consmat?.global_unit?.name ?? "-" }}
               </p>
             </template>
@@ -316,8 +417,18 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormConsumableMaterialStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
-    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <FormConsumableMaterialStd
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.consmat?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

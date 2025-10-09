@@ -24,7 +24,7 @@ export interface UpdateManPowerInterface {
   name: string;
   qty: number;
   type: string;
-  note: string | null;
-  project_uuid: string | null;
-  additional_scope_uuid: string | null;
+  note?: string | null;
+  project_uuid?: string | null;
+  additional_scope_uuid?: string | null;
 }

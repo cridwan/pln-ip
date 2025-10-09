@@ -10,21 +10,21 @@ export const ColumnsPart: TableColumnType[] = [
   {
     key: "total_qty",
     label: "Quantity",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },
   {
     key: "price",
     label: "Harga",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },
   {
     key: "total",
     label: "Total Harga",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },
@@ -43,7 +43,6 @@ export const ColumnsPart: TableColumnType[] = [
     width: "150",
   },
 ];
-
 
 export const ColumnsPartFilter: TableColumnType[] = [
   {

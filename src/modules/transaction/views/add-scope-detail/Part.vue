@@ -26,6 +26,8 @@ import FilterPartStd from "@/modules/transaction/components/add-scope/FilterPart
 import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import type { ProjectInterface } from "../../types/ProjectType";
+import type { UpdatePartInterface } from "../../types/PartType";
+import FormQuantity from "../../components/FormQuantity.vue";
 // import FormAdPart from "../../components/add-scope/FormAdPart.vue";
 
 const authStore = useAuthStore();
@@ -55,10 +57,11 @@ const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
 const is_loading_filter = ref(false);
+const quantity = ref<any>(null);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
-  queryKey: ["getApprovalAtManpowerPart"],
+  queryKey: ["getApprovalAtPartDetailAddScope"],
   queryFn: async () => {
     const { data } = await transactionStore.getProject(
       route.params.id_project as string
@@ -78,7 +81,7 @@ const {
   isFetching: isLoadingPart,
   refetch: refetchPart,
 } = useQuery({
-  queryKey: ["getPart"],
+  queryKey: ["getPartAtPartDetailAddScope"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getPart(params);
@@ -111,6 +114,37 @@ const { mutate: deletePartStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchPart();
+  },
+  onError: (error: any) => {
+    console.log(error);
+    toastRef.value?.showToast({
+      title: "Error",
+      description: error?.response?.data?.message || "Something went wrong",
+      type: "error",
+    });
+  },
+});
+//--- END
+
+//--- UPDATE PART
+const { mutate: updatePart, isPending: isLoadingUpdate } = useMutation({
+  mutationFn: async ({
+    payload,
+    id,
+  }: {
+    payload: UpdatePartInterface;
+    id: string;
+  }) => {
+    return await transactionStore.updatePart(payload, id);
+  },
+  onSuccess: async () => {
+    refetchPart();
+    quantity.value.modelOpenInputData = false;
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Saved successfully",
+      type: "success",
+    });
   },
   onError: (error: any) => {
     console.log(error);
@@ -239,6 +273,17 @@ const handleRemoveSuccess = () => {
   refetchPart();
 };
 
+const saveQuantity = (e: { quantity: string }, entity: PartStdInterface) => {
+  updatePart({
+    id: entity.uuid,
+    payload: {
+      qty: parseFloat(e.quantity),
+      global_unit_uuid: entity.part.global_unit_uuid,
+      name: entity.part.name,
+    },
+  });
+};
+
 onMounted(() => {
   breadcrumb.value = [
     {
@@ -252,45 +297,105 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button v-if="
-      dataForm?.activity_uuid &&
-      dataApproval?.status !== 'approve' &&
-      access_token
-    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <Button
+      v-if="
+        dataForm?.activity_uuid &&
+        dataApproval?.status !== 'approve' &&
+        access_token
+      "
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
+        <FilterPartStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
-            :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
-              " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
+          <Table
+            label-create="Part"
+            :columns="ColumnsPart"
+            :entities="dataPart?.data || []"
+            :loading="isLoadingPart"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="
+              dataApproval?.status !== 'approve' && access_token !== ''
+            "
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
-                  v-if="dataForm?.activity_uuid" />
-                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                  v-if="dataForm?.activity_uuid" />
+                <Icon
+                  name="pencil"
+                  class="icon-action-table"
+                  @click="handleUpdate(entity)"
+                  v-if="dataForm?.activity_uuid"
+                />
+                <Icon
+                  name="trash"
+                  class="icon-action-table"
+                  @click="handleDelete(entity)"
+                  v-if="dataForm?.activity_uuid"
+                />
               </div>
             </template>
             <template #column_part="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p class="text-base text-neutral-50 text-left">
                 {{ entity.part?.name ?? "-" }}
               </p>
             </template>
 
+            <template #column_total_qty="{ entity, index }">
+              <p
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.total_qty) ||
+                  (!access_token && !entity.total_qty)
+                "
+              >
+                -
+              </p>
+              <FormQuantity
+                v-else
+                ref="quantity"
+                :value="entity.total_qty?.toString() || ''"
+                :label="entity.part?.name"
+                :loading="isLoadingUpdate"
+                :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveQuantity(e, entity)"
+              />
+            </template>
+
             <template #column_price="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p v-if="!entity.part?.price">-</p>
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
                 Rp. {{ Number(entity.part.price).toLocaleString("id") }}
               </p>
             </template>
 
             <template #column_total="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p v-if="!entity.total_qty && !entity.part?.price">-</p>
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
                 Rp.
                 {{
                   (
@@ -301,13 +406,13 @@ onMounted(() => {
             </template>
 
             <template #column_unit="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p class="text-base text-neutral-50 text-left">
                 {{ entity.part?.global_unit?.name ?? "-" }}
               </p>
             </template>
 
             <template #column_number_drawing="{ entity }">
-              <p class="text-base text-neutral-50 text-left underline cursor-pointer">
+              <p class="text-base text-neutral-50 text-left">
                 {{ entity.part?.no_drawing ?? "-" }}
               </p>
             </template>
@@ -318,9 +423,21 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <FormPartStd :is-additional="true" v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
-    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <FormPartStd
+    :is-additional="true"
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
   <!-- <FormAdPart v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
     @error="handleError" @removeSucess="handleRemoveSuccess" /> -->
-  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.part?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

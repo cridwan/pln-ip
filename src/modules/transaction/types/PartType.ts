@@ -41,9 +41,9 @@ export interface ResponsePartInterface {
 export interface UpdatePartInterface {
   name: string;
   qty: number;
-  noDrawing: string | null;
-  note: string | null;
+  noDrawing?: string | null;
+  note?: string | null;
   global_unit_uuid: string;
-  project_uuid: string | null;
-  additional_scope_uuid: string | null;
+  project_uuid?: string | null;
+  additional_scope_uuid?: string | null;
 }

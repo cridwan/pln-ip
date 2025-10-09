@@ -70,7 +70,7 @@ const is_loading_filter = ref(false);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
-  queryKey: ["getApprovalAtScopeAddScope"],
+  queryKey: ["getApprovalAtScopeDetailAddScope"],
   queryFn: async () => {
     const { data } = await transactionStore.getProject(
       route.params.id_project as string
@@ -90,7 +90,7 @@ const {
   isFetching: isLoadingScope,
   refetch: refetchScope,
 } = useQuery({
-  queryKey: ["getScopeTransaction"],
+  queryKey: ["getScopeAtScopeDetailAddScope"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getScopeStandar(params);
@@ -227,7 +227,7 @@ const {
   isFetching: isLoadingDuration,
   refetch: refetchDuration,
 } = useQuery({
-  queryKey: ["getTotalDurationScope"],
+  queryKey: ["getTotalDurationAtScopeDetailAddScope"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getTotalDurationScope(

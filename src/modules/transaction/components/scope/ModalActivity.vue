@@ -82,7 +82,7 @@ const {
   isFetching: isLoading,
   refetch: refetchActivity,
 } = useQuery({
-  queryKey: [`getActivityTransaction${props.id}`],
+  queryKey: [`getActivityTransactionDetail${props.id}`],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getActivity(params);

@@ -2,10 +2,6 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-
-import { useGlobalStore } from "@/stores/GlobalStore";
-import { Icon, Loading } from "@/components";
-import eventBus from "@/utils/eventBus";
 import {
   DialogContent,
   DialogDescription,
@@ -14,6 +10,10 @@ import {
   DialogTitle,
   VisuallyHidden,
 } from "radix-vue";
+
+import { useGlobalStore } from "@/stores/GlobalStore";
+import { Icon, Loading } from "@/components";
+import eventBus from "@/utils/eventBus";
 import Sidebar from "@/components/layouts/Sidebar.vue";
 
 const videosData = ref({

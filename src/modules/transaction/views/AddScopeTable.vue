@@ -205,7 +205,7 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
 });
 //--- END
 
-// delete scope
+//--- DELETE
 const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
     return await transactionStore.deleteAdScope(id);
@@ -228,7 +228,7 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
     });
   },
 });
-// end
+//--- END
 
 //--- CREATE ADD SCOPE
 const { mutate: createAddScope } = useMutation({

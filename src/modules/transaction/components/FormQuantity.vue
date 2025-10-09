@@ -29,6 +29,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["save"]);
@@ -71,7 +75,8 @@ defineExpose({
 </script>
 
 <template>
-  <PopoverRoot v-model:open="modelOpenInputData">
+  <p v-if="disabled" class="text-base text-neutral-50 text-left">{{ value }}</p>
+  <PopoverRoot v-else v-model:open="modelOpenInputData">
     <PopoverTrigger>
       <button
         class="button-trigger"

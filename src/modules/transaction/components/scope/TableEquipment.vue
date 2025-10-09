@@ -78,7 +78,7 @@ const open_detail = ref(false);
 
 //--- GET EQUIPMENT
 const { refetch: refetchEquipment, isFetching: isLoading } = useQuery({
-  queryKey: [`getEquipmentTransactionAtScope${props.id}`],
+  queryKey: [`getEquipmentTransactionDetail${props.id}`],
   queryFn: async () => {
     try {
       const { data, config } = await transactionStore.getEquipment(params);

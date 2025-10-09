@@ -84,7 +84,7 @@ const { data: dataApproval } = useQuery({
 
 //--- GET SCOPE
 const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
-  queryKey: ["getScopeTransaction"],
+  queryKey: ["getScopeTransactionAtScope"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getScopeStandar(params);
@@ -215,7 +215,7 @@ const {
   isFetching: isLoadingDuration,
   refetch: refetchDuration,
 } = useQuery({
-  queryKey: ["getTotalDurationScope"],
+  queryKey: ["getTotalDurationAtScope"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getTotalDurationScope(

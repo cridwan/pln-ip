@@ -61,9 +61,9 @@ const transactionStore = useTransactionStore();
 const route = useRoute();
 const is_loading = ref<string | null>(null);
 
-//--- DOWNLOAD SCOPE
+//--- DOWNLOAD BUDGET ACTIVITY
 const { refetch: refetchDownloadBudgetActivity } = useQuery({
-  queryKey: ["downloadResultScope"],
+  queryKey: ["downloadResultBudgetActivity"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultBudgetActivity(
@@ -84,6 +84,7 @@ const { refetch: refetchDownloadBudgetActivity } = useQuery({
   refetchOnWindowFocus: false,
 });
 //--- END
+
 //--- DOWNLOAD SCOPE
 const { refetch: refetchDownloadScope } = useQuery({
   queryKey: ["downloadResultScope"],
@@ -295,8 +296,14 @@ const handleDownload = (item: ResultsInterface) => {
   <p class="text-center w-full font-bold text-2xl text-blue-900 mb-10">
     REPORT
   </p>
-  <Table label-create="Manpower" :is-create="false" :is-search="false" :is-action="false" :columns="ColumnsResults"
-    :entities="Data" :is-pagination="false">
+  <Table
+    :is-create="false"
+    :is-search="false"
+    :is-action="false"
+    :columns="ColumnsResults"
+    :entities="Data"
+    :is-pagination="false"
+  >
     <template #column_download="{ entity }">
       <div class="flex justify-center">
         <button class="button-download" @click="handleDownload(entity)">
