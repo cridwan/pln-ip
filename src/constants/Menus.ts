@@ -216,6 +216,51 @@ export const Menus: MenuInterface[] = [
   // },
 ];
 
+export const MenusGuest: MenuInterface[] = [
+  {
+    id: 1,
+    name: "Home",
+    url: "/",
+    icon: "home",
+  },
+  {
+    id: 5,
+    name: "Scope",
+    url: "/scope",
+    icon: "document",
+  },
+  {
+    id: 11,
+    name: "Part Standart",
+    url: "/part-std",
+    icon: "part-std",
+  },
+  {
+    id: 11,
+    name: "Manpower Standart",
+    url: "/manpower-std",
+    icon: "manpower-std",
+  },
+  {
+    id: 11,
+    name: "Consumable Material Standart",
+    url: "/consumable-material-std",
+    icon: "consumable-material-std",
+  },
+  {
+    id: 13,
+    name: "Additional Scope",
+    url: "/additional-scope",
+    icon: "login",
+  },
+  {
+    id: 12,
+    name: "Results",
+    url: "/results",
+    icon: "document-clean",
+  },
+];
+
 export const MenusAddScope: MenuInterface[] = [
   {
     id: 1,

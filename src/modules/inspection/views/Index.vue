@@ -329,9 +329,8 @@ const onDelete = () => {
 };
 
 const selectInspection = (item: TInspection) => {
-  console.log("USER", authStore.users);
   if (!authStore.users) {
-    router.push(`/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${item.uuid}/undefined/public/scope`)
+    router.push(`/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.uuid}/undefined/public/scope`)
   } else {
     toScope(item);
   }
@@ -513,7 +512,7 @@ const toDelete = (item: ResponseProject) => {
               :key="key" class="px-4 hover:text-neutral-200 py-1 flex justify-between">
               <span class="cursor-pointer" @click="toTransaction(item.uuid)">{{
                 item.name
-                }}</span>
+              }}</span>
               <Icon v-if="item.status != 'approve'" name="trash" class="cursor-pointer" @click="toDelete(item)" />
             </p>
           </div>
