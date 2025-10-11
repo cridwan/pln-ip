@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import { Button } from "@/components";
+import { Button, Toast } from "@/components";
+const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 
 const props = defineProps({
   loadingImport: {
@@ -73,7 +74,14 @@ const handleInput = async (e: Event) => {
     );
   });
 
-  if (validTypeFiles.length !== files.length) return;
+  if (validTypeFiles.length !== files.length) {
+    toastRef.value?.showToast({
+      title: "Error",
+      description: `File harus berformat (${ALLOWED_EXTENSIONS.join(", ")})`,
+      type: "error",
+    });
+    return;
+  };
 
   for (const file of validTypeFiles) {
     // model_file.value.push({
@@ -90,33 +98,12 @@ const handleInput = async (e: Event) => {
 
 <template>
   <div class="flex items-center gap-2">
-    <Button
-      text="Import"
-      rounded="full"
-      color="blue"
-      :loading="loadingImport"
-      @click="clickUpload"
-    />
-    <Button
-      text="Download"
-      rounded="full"
-      color="blue"
-      :loading="loadingDownload"
-      @click="$emit('download')"
-    />
-    <Button
-      text="Export Template"
-      rounded="full"
-      color="blue"
-      :loading="loadingTemplate"
-      @click="$emit('template')"
-    />
+    <Button text="Import" rounded="full" color="blue" :loading="loadingImport" @click="clickUpload" />
+    <Button text="Download" rounded="full" color="blue" :loading="loadingDownload" @click="$emit('download')" />
+    <Button text="Export Template" rounded="full" color="blue" :loading="loadingTemplate" @click="$emit('template')" />
 
-    <input
-      ref="upload"
-      class="hidden"
-      type="file"
-      @change="(e) => handleInput(e as InputEvent)"
-    />
+    <input ref="upload" class="hidden" type="file" @change="(e) => handleInput(e as InputEvent)" />
+
+    <Toast ref="toastRef" />
   </div>
 </template>

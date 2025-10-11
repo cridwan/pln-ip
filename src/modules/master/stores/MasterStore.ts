@@ -993,6 +993,19 @@ export const useMasterStore = defineStore(
         });
     };
 
+    const getConsMatGrouping = async (payload: IParams) => {
+      return await api
+        .get(`/cons-mat-std/grouping`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const createConsMat = async (payload: ConsMatCreateInterface) => {
       return await api
         .post(`/consumble-material`, payload)
@@ -1116,6 +1129,19 @@ export const useMasterStore = defineStore(
     const getPart = async (payload: IParams) => {
       return await api
         .get(`/part`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getPartGrouping = async (payload: IParams) => {
+      return await api
+        .get(`/part-std/grouping`, {
           params: payload,
         })
         .then((resp) => {
@@ -1294,6 +1320,19 @@ export const useMasterStore = defineStore(
     const getManpower = async (payload: IParams) => {
       return await api
         .get(`/manpower`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getManpowerGrouping = async (payload: IParams) => {
+      return await api
+        .get(`/manpower-std/grouping`, {
           params: payload,
         })
         .then((resp) => {
@@ -3156,6 +3195,9 @@ export const useMasterStore = defineStore(
       downloadQcPlan,
       templateQcPlan,
       importQcPlan,
+      getPartGrouping,
+      getManpowerGrouping,
+      getConsMatGrouping,
     };
   },
   {

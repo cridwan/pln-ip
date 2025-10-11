@@ -8,6 +8,7 @@ import { routeLocation } from "@/modules/location/router/LocationRouter";
 import { routeUnit } from "@/modules/unit/router/UnitRouter";
 import { routeInspection } from "@/modules/inspection/router/InspectionRouter";
 import { routeTransaction } from "@/modules/transaction/router/TransactionRouter";
+import { routeTransaction as routeGuest } from "@/modules/guest/router/TransactionRouter";
 import { routeUser } from "@/modules/user/router/UserRouter";
 import { routeNotFound } from "@/modules/not-found/router/NotFoundRouter";
 import { UserEnum } from "@/modules/auth/types/AuthType";
@@ -21,6 +22,7 @@ const routes = [
   ...routeMaster,
   ...routeUser,
   ...routeNotFound,
+  ...routeGuest,
 ];
 
 const router = createRouter({
