@@ -4,7 +4,11 @@ import { reactive, ref, computed, type PropType, watch } from "vue";
 import { Button, Input, Modal, Select } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/vue-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/vue-query";
 import { all_characters, mergeArrays } from "@/helpers/global";
 import type { IPagination, IParams } from "@/types/GlobalType";
 
@@ -27,7 +31,7 @@ const props = defineProps({
   },
   dataForm: {
     type: Object as PropType<InspectionTypeModelCreateInterface | null>,
-  }
+  },
 });
 
 const emit = defineEmits(["success", "error"]);
@@ -159,7 +163,7 @@ const setValue = () => {
     machine_uuid: props.selectedValue?.machine_uuid || "",
     location_uuid: props?.selectedValue?.machine?.unit?.location_uuid || "",
     unit_uuid: props.selectedValue?.machine?.unit_uuid || "",
-    sequence_uuid: props.selectedValue?.sequence_uuid || ""
+    sequence_uuid: props.selectedValue?.sequence_uuid || "",
   };
 };
 
@@ -169,7 +173,7 @@ const resetValue = () => {
     machine_uuid: props.dataForm?.machine_uuid || "",
     location_uuid: props.dataForm?.location_uuid || "",
     unit_uuid: props.dataForm?.unit_uuid || "",
-    sequence_uuid: ""
+    sequence_uuid: "",
   };
 };
 // sequence
@@ -248,21 +252,56 @@ watch(
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Tipe Inspeksi' : 'Tambah Tipe Inspeksi'" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Select v-model="model.sequence_uuid" label="Sequence" options_label="label" options_value="value"
-        v-model:model-search="params_sequence.search" :search="true" :loading="is_loading_sequence"
-        :loading-next-page="isFetchingNextPageSequence" :rules="rules.sequence_uuid" :options="options_sequence"
-        @scroll="scrollSequence" @search="searchSequence" />
-      <Input v-model="model.name" :rules="rules.name" :custom_symbols="all_characters" label="Nama Inspeksi" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Tipe Inspeksi' : 'Tambah Tipe Inspeksi'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+        label="Nama Inspeksi"
+      />
+      <Select
+        v-model="model.sequence_uuid"
+        star
+        label="Sequence"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_sequence.search"
+        :search="true"
+        :loading="is_loading_sequence"
+        :loading-next-page="isFetchingNextPageSequence"
+        :rules="rules.sequence_uuid"
+        :options="options_sequence"
+        @scroll="scrollSequence"
+        @search="searchSequence"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate"
+        />
       </div>
     </form>
   </Modal>

@@ -3,7 +3,7 @@ import type { TableColumnType } from "@/components/tables/Table.vue";
 export const ColumnsLocation: TableColumnType[] = [
   {
     key: "name",
-    label: "Location",
+    label: "Lokasi",
     align: "left",
     sort: false,
   },
@@ -23,7 +23,7 @@ export const ColumnsLocation: TableColumnType[] = [
   },
   {
     key: "description",
-    label: "Description",
+    label: "Deskripsi",
     align: "center",
     sort: false,
   },

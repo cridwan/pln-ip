@@ -20,18 +20,17 @@ const isActive = (item: { id: number; name: string; url: string }) => {
 };
 
 const isMenuActive = (item: { url: string }) => {
-  const paths = route.path.split('/').filter((el) => el != "");
+  const paths = route.path.split("/").filter((el) => el != "");
   paths[2] = ":id";
   paths[3] = ":name";
 
-  const path = `/${paths.join('/')}`
+  const path = `/${paths.join("/")}`;
   return path.includes(item.url);
-}
+};
 
 const handleBack = () => {
-  router.push({ name: 'master additional scope' });
-}
-
+  router.push({ name: "master location" });
+};
 </script>
 
 <template>
@@ -41,10 +40,29 @@ const handleBack = () => {
       ADDITIONAL MENU
     </p>
     <div class="sidebar-master--menus">
-      <div v-for="(item, key) in MenuAdditional" :key="key" class="flex flex-col gap-2">
-        <RouterLink v-if="!item.children" :to="{
-          path: `${item.url.replace(':id', String(route.params?.id)).replace(':name', String(route.params?.name))}`,
-        }" replace :class="isMenuActive(item) ? 'menu-active' : ''" class="menu-item" @click="selected_menu = null">
+      <div
+        v-for="(item, key) in MenuAdditional"
+        :key="key"
+        class="flex flex-col gap-2"
+      >
+        <RouterLink
+          v-if="!item.children"
+          :to="{
+            path: `${
+              item.url === '/'
+                ? '/master/additional-scope'
+                : item.url
+                    .replace(':id', String(route.params?.id))
+                    .replace(':name', String(route.params?.name))
+            }`,
+          }"
+          replace
+          :class="
+            item.url === '/' ? '' : isMenuActive(item) ? 'menu-active' : ''
+          "
+          class="menu-item"
+          @click="selected_menu = null"
+        >
           <Icon :name="item.icon" class="menu-icon" />
           <p class="menu-title">{{ item.name }}</p>
         </RouterLink>
@@ -54,9 +72,15 @@ const handleBack = () => {
             <p class="menu-title">{{ item.name }}</p>
           </div>
           <div v-if="isActive(item)" class="pl-5 flex flex-col gap-2">
-            <RouterLink v-for="(element, index) in item.children" :key="index"
-              :to="`${element.url.replace(':id', String(route.params?.id)).replace(':name', String(route.params.name))}`"
-              :class="route.path.includes(element?.url) ? 'menu-active' : ''" class="menu-item">
+            <RouterLink
+              v-for="(element, index) in item.children"
+              :key="index"
+              :to="`${element.url
+                .replace(':id', String(route.params?.id))
+                .replace(':name', String(route.params.name))}`"
+              :class="route.path.includes(element?.url) ? 'menu-active' : ''"
+              class="menu-item"
+            >
               <p class="menu-title">{{ element?.name }}</p>
             </RouterLink>
           </div>

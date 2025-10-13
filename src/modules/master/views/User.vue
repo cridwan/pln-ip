@@ -226,14 +226,14 @@ onMounted(() => {
       <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
       <Button text="Export Template" rounded="full" color="blue" /> -->
-      <ButtonGroup
+      <!-- <ButtonGroup
         :loading-import="isLoadingImport"
         :loading-download="isLoadingDownload"
         :loading-template="isLoadingTemplate"
         @download="handleDownload"
         @template="handleExportTemplate"
         @import="handleImport"
-      />
+      /> -->
       <Button
         icon_only="plus"
         size="sm"
@@ -274,10 +274,7 @@ onMounted(() => {
         <div v-else />
       </template>
       <template #column_role="{ entity }">
-        <p
-          class="text-base text-neutral-50 text-center"
-          v-for="role in entity.roles"
-        >
+        <p class="text-base text-neutral-50" v-for="role in entity.roles">
           {{ role?.display_name }}
         </p>
       </template>

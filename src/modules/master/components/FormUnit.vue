@@ -7,7 +7,11 @@ import { required, helpers } from "@vuelidate/validators";
 import { useMutation } from "@tanstack/vue-query";
 import { all_characters } from "@/helpers/global";
 
-import type { UnitCreateInterface, UnitInterface, UnitTypeModelCreateInterface } from "../types/UnitType";
+import type {
+  UnitCreateInterface,
+  UnitInterface,
+  UnitTypeModelCreateInterface,
+} from "../types/UnitType";
 import { useMasterStore } from "../stores/MasterStore";
 
 const props = defineProps({
@@ -16,7 +20,7 @@ const props = defineProps({
   },
   dataForm: {
     type: Object as PropType<UnitTypeModelCreateInterface | null>,
-  }
+  },
 });
 
 const emit = defineEmits(["success", "error"]);
@@ -124,17 +128,41 @@ watch(modelValue, (value) => {
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue ? 'Ubah Unit' : 'Tambah Unit'"
-    v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" :rules="rules.name" :custom_symbols="all_characters" label="Nama Unit" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Unit' : 'Tambah Unit'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+        label="Nama Unit"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate"
+        />
       </div>
     </form>
   </Modal>

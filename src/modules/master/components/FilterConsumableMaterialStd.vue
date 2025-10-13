@@ -1455,7 +1455,9 @@ watch(
   <div
     class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
   >
-    <span class="text-blue-950 font-semibold">Pilih Aktifitas</span>
+    <span class="text-blue-950 font-semibold"
+      >Filter Consumable Material Standart</span
+    >
     <form class="" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
         <Select

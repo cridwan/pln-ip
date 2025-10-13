@@ -80,7 +80,7 @@ const {
   hasNextPage: hasNextPageBidang,
   isFetchingNextPage: isFetchingNextPageBidang,
 } = useInfiniteQuery({
-  queryKey: ["getBidangScope"],
+  queryKey: ["getBidangFilterEquipmentAdditionalMaster"],
   enabled: !props.selectedValue && !is_loading_bidang.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -128,8 +128,8 @@ const {
   hasNextPage: hasNextPageSubBidang,
   isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
-  queryKey: ["getSubBidangScope"],
-  enabled: !props.selectedValue && !is_loading_sub_bidang.value,
+  queryKey: ["getSubBidangFilterEquipmentAdditionalMaster"],
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getSubBidang({
@@ -177,8 +177,8 @@ const {
   hasNextPage: hasNextPageScope,
   isFetchingNextPage: isFetchingNextPageScope,
 } = useInfiniteQuery({
-  queryKey: ["getScopeEquipment"],
-  enabled: !props.selectedValue && !is_loading_scope.value,
+  queryKey: ["getScopeFilterEquipmentAdditionalMaster"],
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getScope({
@@ -230,7 +230,6 @@ const resetValue = () => {
   emit("resetFilter");
 };
 
-// bidang
 const timeout_bidang = ref(0);
 const searchBidang = () => {
   clearTimeout(timeout_bidang.value);
@@ -250,9 +249,7 @@ const scrollBidang = (e: Event) => {
     fetchNextPageBidang();
   }
 };
-// end
 
-// sub bidang
 const timeout_sub_bidang = ref(0);
 const searchSubBidang = () => {
   clearTimeout(timeout_sub_bidang.value);
@@ -272,9 +269,7 @@ const scrollSubBidang = (e: Event) => {
     fetchNextPageSubBidang();
   }
 };
-// end
 
-// scope
 const timeout_scope = ref(0);
 const searchScope = () => {
   clearTimeout(timeout_scope.value);
@@ -294,7 +289,6 @@ const scrollScope = (e: Event) => {
     fetchNextPageScope();
   }
 };
-// end
 
 watch(modelValue, (value) => {
   if (!value) {
@@ -311,8 +305,12 @@ watch(modelValue, (value) => {
 });
 
 const selectBidang = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getSubBidangScope"] });
+  queryClient.removeQueries({
+    queryKey: ["getScopeFilterEquipmentAdditionalMaster"],
+  });
+  options_scope.value = [];
   model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
   params_sub_bidang.filters = [
     {
       group: "AND",
@@ -325,7 +323,6 @@ const selectBidang = (e: OptionType) => {
 };
 
 const selectSubBidang = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getScopeEquipment"] });
   model.value.scope_standart_uuid = "";
   params_scope.filters = [
     {
@@ -344,7 +341,6 @@ const selectSubBidang = (e: OptionType) => {
   refetchScope();
 };
 
-// bidang
 watch(
   dataBidang,
   (newBidang) => {
@@ -382,9 +378,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end bidang
 
-// sub bidang
 watch(
   dataSubBidang,
   (newSubBidang) => {
@@ -420,7 +414,6 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end sub bidang
 
 watch(
   [modelValue, dataScope],
@@ -461,52 +454,54 @@ watch(
   <div
     class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
   >
-    <span class="text-blue-950 font-semibold">Pilih Jenis Inspeksi</span>
+    <span class="text-blue-950 font-semibold">Filter Equipment</span>
     <form class="" @submit.prevent="handleSubmit">
-      <Select
-        v-model="model.bidang_uuid"
-        label="Bidang"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_bidang.search"
-        :search="true"
-        :loading="is_loading_bidang"
-        :loading-next-page="isFetchingNextPageBidang"
-        :rules="rules.bidang_uuid"
-        :options="options_bidang"
-        @scroll="scrollBidang"
-        @search="searchBidang"
-        @select="selectBidang"
-      />
-      <Select
-        v-model="model.sub_bidang_uuid"
-        label="Sub Bidang"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_sub_bidang.search"
-        :search="true"
-        :loading="is_loading_sub_bidang"
-        :loading-next-page="isFetchingNextPageSubBidang"
-        :rules="rules.sub_bidang_uuid"
-        :options="options_sub_bidang"
-        @scroll="scrollSubBidang"
-        @search="searchSubBidang"
-        @select="selectSubBidang"
-      />
-      <Select
-        v-model="model.scope_standart_uuid"
-        label="Scope"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_scope.search"
-        :search="true"
-        :loading="is_loading_scope"
-        :loading-next-page="isFetchingNextPageScope"
-        :rules="rules.scope_standart_uuid"
-        :options="options_scope"
-        @scroll="scrollScope"
-        @search="searchScope"
-      />
+      <div class="flex flex-col gap-2">
+        <Select
+          v-model="model.bidang_uuid"
+          label="Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_bidang.search"
+          :search="true"
+          :loading="is_loading_bidang"
+          :loading-next-page="isFetchingNextPageBidang"
+          :rules="rules.bidang_uuid"
+          :options="options_bidang"
+          @scroll="scrollBidang"
+          @search="searchBidang"
+          @select="selectBidang"
+        />
+        <Select
+          v-model="model.sub_bidang_uuid"
+          label="Sub Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_sub_bidang.search"
+          :search="true"
+          :loading="is_loading_sub_bidang"
+          :loading-next-page="isFetchingNextPageSubBidang"
+          :rules="rules.sub_bidang_uuid"
+          :options="options_sub_bidang"
+          @scroll="scrollSubBidang"
+          @search="searchSubBidang"
+          @select="selectSubBidang"
+        />
+        <Select
+          v-model="model.scope_standart_uuid"
+          label="Scope"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_scope.search"
+          :search="true"
+          :loading="is_loading_scope"
+          :loading-next-page="isFetchingNextPageScope"
+          :rules="rules.scope_standart_uuid"
+          :options="options_scope"
+          @scroll="scrollScope"
+          @search="searchScope"
+        />
+      </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button

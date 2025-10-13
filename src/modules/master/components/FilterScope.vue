@@ -109,7 +109,6 @@ const {
   enabled: !props.selectedValue && !is_loading_location.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      is_loading_location.value = true;
       const { data } = await masterStore.getLocation({
         ...params_location,
         currentPage: pageParam,
@@ -151,7 +150,6 @@ const {
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      is_loading_unit.value = true;
       const { data } = await masterStore.getUnit({
         ...params_unit,
         currentPage: pageParam,
@@ -193,7 +191,6 @@ const {
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      is_loading_machine.value = true;
       const { data } = await masterStore.getMachine({
         ...params_machine,
         currentPage: pageParam,
@@ -235,7 +232,6 @@ const {
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      is_loading_inspection.value = true;
       const { data } = await masterStore.getInspectionType({
         ...params_inspection,
         currentPage: pageParam,
@@ -906,7 +902,7 @@ watch(
   <div
     class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
   >
-    <span class="text-blue-950 font-semibold">Pilih Scope Standart</span>
+    <span class="text-blue-950 font-semibold">Filter Scope</span>
     <form class="" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
         <Select

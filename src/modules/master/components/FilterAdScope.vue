@@ -76,7 +76,7 @@ const {
   hasNextPage: hasNextPageBidang,
   isFetchingNextPage: isFetchingNextPageBidang,
 } = useInfiniteQuery({
-  queryKey: ["getBidangScope"],
+  queryKey: ["getBidangFilterScopeAdditionalMaster"],
   enabled: !props.selectedValue && !is_loading_bidang.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -124,8 +124,8 @@ const {
   hasNextPage: hasNextPageSubBidang,
   isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
-  queryKey: ["getSubBidangScope"],
-  enabled: !props.selectedValue && !is_loading_sub_bidang.value,
+  queryKey: ["getSubBidangFilterScopeAdditionalMaster"],
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getSubBidang({
@@ -172,7 +172,6 @@ const resetValue = () => {
   emit("resetFilter");
 };
 
-// bidang
 const timeout_bidang = ref(0);
 const searchBidang = () => {
   clearTimeout(timeout_bidang.value);
@@ -192,9 +191,7 @@ const scrollBidang = (e: Event) => {
     fetchNextPageBidang();
   }
 };
-// end
 
-// sub bidang
 const timeout_sub_bidang = ref(0);
 const searchSubBidang = () => {
   clearTimeout(timeout_sub_bidang.value);
@@ -214,7 +211,6 @@ const scrollSubBidang = (e: Event) => {
     fetchNextPageSubBidang();
   }
 };
-// end
 
 watch(modelValue, (value) => {
   if (!value) {
@@ -231,7 +227,6 @@ watch(modelValue, (value) => {
 });
 
 const selectBidang = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getSubBidangScope"] });
   model.value.sub_bidang_uuid = "";
   params_sub_bidang.filters = [
     {
@@ -244,7 +239,6 @@ const selectBidang = (e: OptionType) => {
   refetchSubBidang();
 };
 
-// bidang
 watch(
   dataBidang,
   (newBidang) => {
@@ -279,9 +273,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end bidang
 
-// sub bidang
 watch(
   dataSubBidang,
   (newSubBidang) => {
@@ -316,44 +308,45 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end sub bidang
 </script>
 
 <template>
   <div
     class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
   >
-    <span class="text-blue-950 font-semibold">Pilih Scope Standart</span>
+    <span class="text-blue-950 font-semibold">Filter Scope</span>
     <form class="" @submit.prevent="handleSubmit">
-      <Select
-        v-model="model.bidang_uuid"
-        label="Bidang"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_bidang.search"
-        :search="true"
-        :loading="is_loading_bidang"
-        :loading-next-page="isFetchingNextPageBidang"
-        :rules="rules.bidang_uuid"
-        :options="options_bidang"
-        @scroll="scrollBidang"
-        @search="searchBidang"
-        @select="selectBidang"
-      />
-      <Select
-        v-model="model.sub_bidang_uuid"
-        label="Sub Bidang"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_sub_bidang.search"
-        :search="true"
-        :loading="is_loading_sub_bidang"
-        :loading-next-page="isFetchingNextPageSubBidang"
-        :rules="rules.sub_bidang_uuid"
-        :options="options_sub_bidang"
-        @scroll="scrollSubBidang"
-        @search="searchSubBidang"
-      />
+      <div class="flex flex-col gap-2">
+        <Select
+          v-model="model.bidang_uuid"
+          label="Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_bidang.search"
+          :search="true"
+          :loading="is_loading_bidang"
+          :loading-next-page="isFetchingNextPageBidang"
+          :rules="rules.bidang_uuid"
+          :options="options_bidang"
+          @scroll="scrollBidang"
+          @search="searchBidang"
+          @select="selectBidang"
+        />
+        <Select
+          v-model="model.sub_bidang_uuid"
+          label="Sub Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_sub_bidang.search"
+          :search="true"
+          :loading="is_loading_sub_bidang"
+          :loading-next-page="isFetchingNextPageSubBidang"
+          :rules="rules.sub_bidang_uuid"
+          :options="options_sub_bidang"
+          @scroll="scrollSubBidang"
+          @search="searchSubBidang"
+        />
+      </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button

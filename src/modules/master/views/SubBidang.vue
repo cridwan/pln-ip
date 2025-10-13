@@ -334,7 +334,7 @@ onMounted(() => {
             </div>
           </template>
           <template #column_bidang="{ entity }">
-            <p class="text-base text-neutral-50 text-center">
+            <p class="text-base text-neutral-50">
               {{ entity.bidang?.name }}
             </p>
           </template>

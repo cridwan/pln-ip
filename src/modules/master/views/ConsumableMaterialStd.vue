@@ -336,9 +336,7 @@ onMounted(() => {
             </div>
           </template>
           <template #column_cons_mat="{ entity }">
-            <p
-              class="text-base text-neutral-50 text-left underline cursor-pointer"
-            >
+            <p class="text-base text-neutral-50 text-left">
               {{ entity.consmat?.name ?? "-" }}
             </p>
           </template>

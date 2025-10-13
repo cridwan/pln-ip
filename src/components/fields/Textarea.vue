@@ -95,6 +95,10 @@ const props = defineProps({
       );
     },
   },
+  star: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -181,9 +185,12 @@ watch(model, () => {
 <template>
   <div class="v-textarea">
     <div v-if="label !== undefined" class="v-textarea--label">
-      <label class="v-textarea--label--text" :class="classLabel" :for="id">
-        {{ label }}
-      </label>
+      <div class="flex gap-1">
+        <label class="v-textarea--label--text" :class="classLabel" :for="id">
+          {{ label }}
+        </label>
+        <div v-if="star" class="text-red-500">*</div>
+      </div>
       <div class="v-textarea--label--instruction">{{ instruction }}</div>
     </div>
     <div class="v-textarea--container">

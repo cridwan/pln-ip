@@ -272,7 +272,7 @@ onMounted(() => {
         </div>
       </template>
       <template #column_price="{ entity }">
-        <p class="text-base text-neutral-50 text-center">
+        <p class="text-base text-neutral-50 text-left">
           {{ numberFormat(entity.price, true) }}
         </p>
       </template>

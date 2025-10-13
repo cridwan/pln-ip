@@ -31,16 +31,28 @@ const isActive = (item: { id: number; name: string; url: string }) => {
   <div class="sidebar-main">
     <p class="sidebar-main--title">ADDITIONAL SCOPE</p>
     <div class="sidebar-main--menus">
-      <div v-for="(item, key) in MenusAddScope" :key="key" class="flex flex-col gap-2">
-        <RouterLink v-if="!item.children" :to="item.url === '/'
-          ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}/additional-scope?original_uuid=${route.query.original_uuid}`
-          : `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}/add-scope/${route?.params?.id_scope}${item.url}?original_uuid=${route.query.original_uuid}`
-          " :class="item.url === '/'
-            ? ''
-            : route.path.includes(item.url)
+      <div
+        v-for="(item, key) in MenusAddScope"
+        :key="key"
+        class="flex flex-col gap-2"
+      >
+        <RouterLink
+          v-if="!item.children"
+          :to="
+            item.url === '/'
+              ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}/additional-scope?original_uuid=${route.query.original_uuid}`
+              : `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}/add-scope/${route?.params?.id_scope}${item.url}?original_uuid=${route.query.original_uuid}`
+          "
+          :class="
+            item.url === '/'
+              ? ''
+              : route.path.includes(item.url)
               ? 'menu-active'
               : ''
-            " class="menu-item" @click="selected_menu = null">
+          "
+          class="menu-item"
+          @click="selected_menu = null"
+        >
           <Icon :name="item.icon" class="menu-icon" />
           <p class="menu-title">{{ item.name }}</p>
         </RouterLink>
@@ -50,14 +62,19 @@ const isActive = (item: { id: number; name: string; url: string }) => {
             <p class="menu-title">{{ item.name }}</p>
           </div>
           <div v-if="isActive(item)" class="pl-5 flex flex-col gap-2">
-            <RouterLink v-for="(element, index) in item.children" :key="index"
+            <RouterLink
+              v-for="(element, index) in item.children"
+              :key="index"
               :to="`/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}/add-scope/${route?.params?.id_scope}${element.url}?original_uuid=${route.query.original_uuid}`"
-              :class="item.url === '/'
-                ? ''
-                : route.path.includes(element.url)
+              :class="
+                item.url === '/'
+                  ? ''
+                  : route.path.includes(element.url)
                   ? 'menu-active'
                   : ''
-                " class="menu-item">
+              "
+              class="menu-item"
+            >
               <p class="menu-title">{{ element.name }}</p>
             </RouterLink>
           </div>

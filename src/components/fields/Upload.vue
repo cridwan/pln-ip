@@ -386,8 +386,9 @@ function clickUpload() {
     <span
       v-if="status !== 'default' || checkErrorUpload()"
       :class="classTextStatus"
-      >{{ statusMessage || checkErrorMessageUpload() }}</span
     >
+      {{ statusMessage || checkErrorMessageUpload() }}
+    </span>
   </div>
 </template>
 

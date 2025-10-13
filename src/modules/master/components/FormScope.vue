@@ -4,9 +4,7 @@ import { reactive, ref, computed, type PropType, watch } from "vue";
 import { Button, Input, Modal } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import {
-  useMutation,
-} from "@tanstack/vue-query";
+import { useMutation } from "@tanstack/vue-query";
 import { all_characters } from "@/helpers/global";
 
 import { useMasterStore } from "../stores/MasterStore";
@@ -17,7 +15,10 @@ import type {
   ScopeUpdateInterface,
 } from "../types/ScopeType";
 import UploadStream from "@/components/fields/UploadStream.vue";
-import type { CreateDocumentInterface, ResponseDocumentInterface } from "@/types/GlobalType";
+import type {
+  CreateDocumentInterface,
+  ResponseDocumentInterface,
+} from "@/types/GlobalType";
 import { useGlobalStore } from "@/stores/GlobalStore";
 
 const props = defineProps({
@@ -25,8 +26,8 @@ const props = defineProps({
     type: Object as PropType<ScopeInterface | null>,
   },
   dataForm: {
-    type: Object as PropType<ScopeCreateModelInterface | null>
-  }
+    type: Object as PropType<ScopeCreateModelInterface | null>,
+  },
 });
 
 const uploadProgress = ref<number>(0);
@@ -119,7 +120,7 @@ const { mutate: updateScope, isPending: isLoadingUpdate } = useMutation({
         document: modelUpload.value as File,
         document_type: "App\\Models\\ScopeStandart",
         document_uuid: props.selectedValue?.uuid as string,
-      })
+      });
     } else {
       modelValue.value = false;
       emit("success");
@@ -142,22 +143,22 @@ const handleSubmit = async () => {
       model_details.value.length === 1 && model_details.value?.[0]?.name === ""
         ? []
         : model_details.value.map((item) => {
-          const find_item = props.selectedValue?.details?.find(
-            (el) => el.uuid === item.id
-          );
+            const find_item = props.selectedValue?.details?.find(
+              (el) => el.uuid === item.id
+            );
 
-          if (find_item) {
-            return {
-              name: item.name,
-              uuid: find_item.uuid,
-            };
-          } else {
-            return {
-              name: item.name,
-              uuid: null,
-            };
-          }
-        });
+            if (find_item) {
+              return {
+                name: item.name,
+                uuid: find_item.uuid,
+              };
+            } else {
+              return {
+                name: item.name,
+                uuid: null,
+              };
+            }
+          });
 
     updateScope({
       id: props.selectedValue?.uuid,
@@ -181,11 +182,11 @@ const handleSubmit = async () => {
       sub_bidang_uuid: model.value.sub_bidang_uuid,
       details:
         model_details.value.length === 1 &&
-          model_details.value?.[0]?.name === ""
+        model_details.value?.[0]?.name === ""
           ? []
           : model_details.value
-            .map((item) => ({ name: item.name }))
-            .filter((item) => item.name !== ""),
+              .map((item) => ({ name: item.name }))
+              .filter((item) => item.name !== ""),
     });
   }
 };
@@ -209,9 +210,9 @@ const setValue = () => {
     props.selectedValue?.details?.length === 0
       ? [{ name: "", id: "0" }]
       : props.selectedValue?.details?.map((item) => ({
-        name: item.name,
-        id: item.uuid,
-      })) || [{ name: "", id: "0" }];
+          name: item.name,
+          id: item.uuid,
+        })) || [{ name: "", id: "0" }];
 };
 
 const resetValue = () => {
@@ -230,7 +231,6 @@ const resetValue = () => {
   uploadProgress.value = 0;
 };
 
-
 watch(modelValue, (value) => {
   if (!value) {
     setTimeout(() => {
@@ -245,39 +245,73 @@ watch(modelValue, (value) => {
   }
 });
 
-watch(() => props.selectedValue, (newValue) => {
-  if (newValue) {
-    documentValues.value = newValue.document as ResponseDocumentInterface;
+watch(
+  () => props.selectedValue,
+  (newValue) => {
+    if (newValue) {
+      documentValues.value = newValue.document as ResponseDocumentInterface;
+    }
   }
-});
+);
 
 const handleChangeFile = (e: File) => {
   modelUpload.value = e;
-}
+};
 
 const removeSuccess = () => {
   documentValues.value = null;
-  emit('removeSucess');
-}
-
+  emit("removeSucess");
+};
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue ? 'Ubah Scope' : 'Tambah Scope'"
-    v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" label="Nama Scope Standart" :rules="rules.name" :custom_symbols="all_characters" />
-      <Input v-model="model.link" label="Link Online ex. (http://google.com)" :custom_symbols="all_characters" />
-      <UploadStream @changes="handleChangeFile" :progress="uploadProgress" :selectedValues="documentValues"
-        @removeSuccess="removeSuccess" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Scope' : 'Tambah Scope'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        label="Nama Scope Standart"
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+      />
+      <Input
+        v-model="model.link"
+        label="IK Online ex. (http://google.com)"
+        :custom_symbols="all_characters"
+      />
+      <UploadStream
+        label="File IK"
+        :progress="uploadProgress"
+        :selectedValues="documentValues"
+        @changes="handleChangeFile"
+        @removeSuccess="removeSuccess"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument" @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue"
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
           :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument" />
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
+          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
+        />
       </div>
     </form>
   </Modal>

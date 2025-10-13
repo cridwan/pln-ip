@@ -10,7 +10,7 @@ export const ColumnsManpower: TableColumnType[] = [
   {
     key: "price",
     label: "Harga",
-    align: "center",
+    align: "left",
     sort: false,
   },
 ];

@@ -10,13 +10,13 @@ export const ColumnsUser: TableColumnType[] = [
   {
     key: "email",
     label: "Email",
-    align: "center",
+    align: "left",
     sort: false,
   },
   {
     key: "role",
     label: "Role",
-    align: "center",
+    align: "left",
     sort: false,
   },
 ];

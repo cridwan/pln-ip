@@ -72,7 +72,7 @@ const rules = computed(() => {
   };
 });
 
-//--- GET part
+//--- GET PART
 const params_part = reactive<IParams>({
   search: "",
   filters: [],
@@ -301,7 +301,7 @@ watch(
     width="440"
     height="200"
     :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Part' : 'Tambah Part'"
+    :title="props.selectedValue ? 'Ubah Part Standart' : 'Tambah Part Standart'"
     v-model="modelValue"
   >
     <form
@@ -310,6 +310,7 @@ watch(
     >
       <Select
         v-model="model.part_uuid"
+        star
         label="Part"
         options_label="label"
         options_value="value"
@@ -324,6 +325,7 @@ watch(
       />
       <Input
         v-model="model.qty"
+        star
         label="Qty"
         :rules="rules.qty"
         :custom_symbols="numbers_positive"

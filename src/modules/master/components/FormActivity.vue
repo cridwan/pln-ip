@@ -59,7 +59,7 @@ const rules = computed(() => {
   };
 });
 
-// create documnet
+//--- CREATE DOCUMENT
 const { mutate: createDocument, isPending: isLoadingDocument } = useMutation({
   mutationFn: async (payload: CreateDocumentInterface) => {
     return globalStore.createStreamDocument(payload, (percent) => {
@@ -75,6 +75,7 @@ const { mutate: createDocument, isPending: isLoadingDocument } = useMutation({
     emit("error", error);
   },
 });
+//--- END
 
 //--- CREATE ACTIVITY
 const { mutate: createActivity, isPending: isLoadingCreate } = useMutation({
@@ -219,25 +220,28 @@ const removeSuccess = () => {
     >
       <Input
         v-model="model.name"
+        star
         label="Nama"
         :rules="rules.name"
         :custom_symbols="all_characters"
       />
       <Input
         v-model="model.duration"
+        star
         label="Durasi"
         :rules="rules.duration"
         :custom_symbols="all_characters"
       />
       <Input
         v-model="model.link_ik1"
-        label="Link Online ex. (http://google.com)"
+        label="IK Online ex. (http://google.com)"
         :custom_symbols="all_characters"
       />
       <UploadStream
-        @changes="handleChangeFile"
+        label="File IK"
         :progress="uploadProgress"
         :selectedValues="documentValues"
+        @changes="handleChangeFile"
         @removeSuccess="removeSuccess"
       />
 

@@ -78,7 +78,6 @@ const {
   enabled: !props.selectedValue && !is_loading_bidang.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      is_loading_bidang.value = true;
       const { data } = await masterStore.getBidang({
         ...params_bidang,
         currentPage: pageParam,

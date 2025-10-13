@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed, type PropType, watch } from "vue";
 
-import { Button, Icon, Input, Modal, Select } from "@/components";
+import { Button, Input, Modal, Select } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import {
@@ -13,13 +13,13 @@ import type { IPagination, IParams } from "@/types/GlobalType";
 import {
   all_characters,
   mergeArrays,
-  numbers_positive_negative,
+  // numbers_positive_negative,
 } from "@/helpers/global";
 
-import type { LocationInterface } from "../types/LocationType";
-import type { UnitInterface } from "../types/UnitType";
-import type { MachineInterface } from "../types/MachineType";
-import type { InspectionTypeInterface } from "../types/InspectionType";
+// import type { LocationInterface } from "../types/LocationType";
+// import type { UnitInterface } from "../types/UnitType";
+// import type { MachineInterface } from "../types/MachineType";
+// import type { InspectionTypeInterface } from "../types/InspectionType";
 import { useMasterStore } from "../stores/MasterStore";
 import type {
   AdditionalScopeCreateInterface,
@@ -275,12 +275,14 @@ watch(
     >
       <Input
         v-model="model.name"
+        star
         label="Nama"
         :rules="rules.name"
         :custom_symbols="all_characters"
       />
       <Select
         v-model="model.sequence_uuid"
+        star
         label="Sequence"
         options_label="label"
         options_value="value"

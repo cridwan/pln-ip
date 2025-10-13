@@ -391,7 +391,7 @@ const timeout_scope = ref(0);
 const searchScope = () => {
   clearTimeout(timeout_scope.value);
   timeout_scope.value = window.setTimeout(() => {
-    is_loading_bidang.value = true;
+    is_loading_scope.value = true;
     params_scope.currentPage = 1;
     refetchScope();
   }, 1000);

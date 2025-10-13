@@ -48,57 +48,103 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const { access_token, users } = storeToRefs(authStore);
   const token = access_token.value;
+  const userRole = users.value?.role;
 
   if (token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   }
 
-  const handleNavigation = () => {
-    if (token) {
-      if (to.matched.some((record) => record.meta.onlyGuest)) {
-        if (users.value?.role === "superuser") {
-          next({ path: "/master/location" });
-        } else {
-          next({ path: "/" });
-        }
-      } else if (to.matched.some((record) => record.meta.requireAuth)) {
-        // if (to.path === "/") {
-        //   if (users.value?.role === "superuser") {
-        //     next({ path: "/master/location" });
-        //   } else {
-        //     next({ path: "/" });
-        //   }
-        // } else {
-        if (users.value?.role === to.meta?.role) {
-          next();
-        } else {
-          next({ path: "/not-found" });
-        }
-        // }
-      } else {
-        if (to.name === "transaction approval") {
-          if (users.value?.role === UserEnum.APPROVAL) {
-            next();
-          } else {
-            next({ path: "/not-found" });
-          }
-        } else {
-          next();
-        }
-      }
-    } else if (to.matched.some((record) => record.meta.requireAuth)) {
-      if (!token) {
-        next({ path: "/login" });
-      } else {
-        next();
-      }
-    } else {
-      console.log("III", to);
-      next();
-    }
+  const redirectMap: Record<string, string> = {
+    superuser: "/master/location",
+    approval: "/",
+    planner: "/",
   };
 
-  return handleNavigation();
+  const redirectToDefault = () => {
+    const redirectPath =
+      redirectMap[userRole as keyof typeof redirectMap] || "/";
+    next({ path: redirectPath });
+  };
+
+  if (token) {
+    if (to.matched.some((r) => r.meta.onlyGuest)) {
+      return redirectToDefault();
+    }
+
+    if (to.matched.some((r) => r.meta.requireAuth)) {
+      if ((to.meta.except || ([] as any))?.includes(userRole)) {
+        return redirectToDefault();
+      }
+
+      if (!to.meta.role || userRole === to.meta.role) {
+        return next();
+      } else {
+        return next({ path: "/not-found" });
+      }
+    }
+
+    if (to.name === "transaction approval" && userRole !== UserEnum.APPROVAL) {
+      return next({ path: "/not-found" });
+    }
+
+    if ((to.meta.except || ([] as any))?.includes(userRole)) {
+      return redirectToDefault();
+    }
+
+    return next();
+  } else {
+    if (to.matched.some((r) => r.meta.requireAuth)) {
+      return next({ path: "/login" });
+    }
+
+    return next();
+  }
+
+  // const handleNavigation = () => {
+  //   if (token) {
+  //     if (to.matched.some((record) => record.meta.onlyGuest)) {
+  //       if (users.value?.role === "superuser") {
+  //         next({ path: "/master/location" });
+  //       } else {
+  //         next({ path: "/" });
+  //       }
+  //     } else if (to.matched.some((record) => record.meta.requireAuth)) {
+  //       // if (to.path === "/") {
+  //       //   if (users.value?.role === "superuser") {
+  //       //     next({ path: "/master/location" });
+  //       //   } else {
+  //       //     next({ path: "/" });
+  //       //   }
+  //       // } else {
+  //       if (users.value?.role === to.meta?.role) {
+  //         next();
+  //       } else {
+  //         next({ path: "/not-found" });
+  //       }
+  //       // }
+  //     } else {
+  //       if (to.name === "transaction approval") {
+  //         if (users.value?.role === UserEnum.APPROVAL) {
+  //           next();
+  //         } else {
+  //           next({ path: "/not-found" });
+  //         }
+  //       } else {
+  //         next();
+  //       }
+  //     }
+  //   } else if (to.matched.some((record) => record.meta.requireAuth)) {
+  //     if (!token) {
+  //       next({ path: "/login" });
+  //     } else {
+  //       next();
+  //     }
+  //   } else {
+  //     next();
+  //   }
+  // };
+
+  // return handleNavigation();
 });
 
 export default router;

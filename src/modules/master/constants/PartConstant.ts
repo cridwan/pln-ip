@@ -10,25 +10,25 @@ export const ColumnsPart: TableColumnType[] = [
   {
     key: "merk",
     label: "Merk",
-    align: "center",
+    align: "left",
     sort: false,
   },
   {
     key: "no_drawing",
     label: "No Drawing",
-    align: "center",
+    align: "left",
     sort: false,
   },
   {
     key: "price",
     label: "Harga",
-    align: "center",
+    align: "left",
     sort: false,
   },
   {
     key: "global_unit",
     label: "Unit",
-    align: "center",
+    align: "left",
     sort: false,
   },
 ];

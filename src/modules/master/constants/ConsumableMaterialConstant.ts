@@ -10,19 +10,19 @@ export const ColumnsConsMat: TableColumnType[] = [
   {
     key: "price",
     label: "Harga",
-    align: "center",
+    align: "left",
     sort: false,
   },
   {
     key: "merk",
     label: "Merk",
-    align: "center",
+    align: "left",
     sort: false,
   },
   {
     key: "global_unit",
     label: "Satuan",
-    align: "center",
+    align: "left",
     sort: false,
   },
 ];

@@ -272,19 +272,21 @@ const removeSuccess = () => {
     >
       <Input
         v-model="model.name"
+        star
         label="Nama Scope Standart"
         :rules="rules.name"
         :custom_symbols="all_characters"
       />
       <Input
         v-model="model.link"
-        label="Link Online ex. (http://google.com)"
+        label="IK Online ex. (http://google.com)"
         :custom_symbols="all_characters"
       />
       <UploadStream
-        @changes="handleChangeFile"
+        label="File IK"
         :progress="uploadProgress"
         :selectedValues="documentValues"
+        @changes="handleChangeFile"
         @removeSuccess="removeSuccess"
       />
 

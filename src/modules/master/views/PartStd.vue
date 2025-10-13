@@ -353,9 +353,7 @@ onMounted(() => {
             </div>
           </template>
           <template #column_part="{ entity }">
-            <p
-              class="text-base text-neutral-50 text-left underline cursor-pointer"
-            >
+            <p class="text-base text-neutral-50 text-left">
               {{ entity.part?.name ?? "-" }}
             </p>
           </template>

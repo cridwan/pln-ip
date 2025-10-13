@@ -158,6 +158,10 @@ const props = defineProps({
     type: String,
     default: "off",
   },
+  star: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -613,9 +617,12 @@ onMounted(() => {
 <template>
   <div class="pln-input">
     <div class="pln-input--label" v-if="label !== undefined">
-      <label :for="id" class="pln-input--label--text" :class="classLabel">
-        {{ label }}
-      </label>
+      <div class="flex gap-1">
+        <label :for="id" class="pln-input--label--text" :class="classLabel">
+          {{ label }}
+        </label>
+        <div v-if="star" class="text-red-500">*</div>
+      </div>
       <slot name="instruction">
         <div class="pln-input--label--instruction">{{ instruction }}</div>
       </slot>

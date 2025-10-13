@@ -258,24 +258,71 @@ watch(
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue ? 'Ubah User' : 'Tambah User'"
-    v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" :rules="rules.name" :custom_symbols="all_characters" label="Nama" />
-      <Input v-model="model.password" :rules="rules.password" :custom_symbols="all_characters" type="password"
-        label="Password" />
-      <Input v-model="model.email" :rules="rules.email" :custom_symbols="email" label="Email" />
-      <Select v-model="model.roles" label="Role" options_label="label" options_value="value"
-        v-model:model-search="params_roles.search" :search="true" :loading="is_loading_roles"
-        :loading-next-page="isFetchingNextPageRoles" :rules="rules.roles" :options="options_roles" @scroll="scrollRoles"
-        @search="searchRoles" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah User' : 'Tambah User'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+        label="Nama"
+      />
+      <Input
+        v-model="model.password"
+        star
+        :rules="rules.password"
+        :custom_symbols="all_characters"
+        type="password"
+        label="Password"
+      />
+      <Input
+        v-model="model.email"
+        star
+        :rules="rules.email"
+        :custom_symbols="email"
+        label="Email"
+      />
+      <Select
+        v-model="model.roles"
+        star
+        label="Role"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_roles.search"
+        :search="true"
+        :loading="is_loading_roles"
+        :loading-next-page="isFetchingNextPageRoles"
+        :rules="rules.roles"
+        :options="options_roles"
+        @scroll="scrollRoles"
+        @search="searchRoles"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate"
+        />
       </div>
     </form>
   </Modal>

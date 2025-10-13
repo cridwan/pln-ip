@@ -6,136 +6,244 @@ export const routeTransaction = [
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/scope",
     name: "transaction scope",
     component: () => import("@/modules/transaction/views/Scope.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/work-instruction",
     name: "transaction scope ika",
-    component: () => import("@/modules/transaction/views/work-instruction/Scope.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    component: () =>
+      import("@/modules/transaction/views/work-instruction/Scope.vue"),
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/part-std",
     name: "transaction part std",
     component: () => import("@/modules/transaction/views/PartStd.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/manpower-std",
     name: "transaction manpower std",
     component: () => import("@/modules/transaction/views/ManpowerStd.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "superuser" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "superuser",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/consumable-material-std",
     name: "transaction consumable material std",
     component: () =>
       import("@/modules/transaction/views/ConsumableMaterialStd.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/equipment",
     name: "transaction equipment",
     component: () => import("@/modules/transaction/views/Equipment.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/activity",
     name: "transaction activity",
     component: () => import("@/modules/transaction/views/Activity.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/part",
     name: "transaction part",
     component: () => import("@/modules/transaction/views/Part.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/manpower",
     name: "transaction manpower",
     component: () => import("@/modules/transaction/views/Manpower.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/approval",
     name: "transaction approval",
     component: () => import("@/modules/transaction/views/Approval.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/consumable-material",
     name: "transaction consumable-material",
     component: () =>
       import("@/modules/transaction/views/ConsumableMaterial.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/additional-scope",
     name: "transaction additional-scope",
     component: () => import("@/modules/transaction/views/AddScopeTable.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/scope",
     name: "add scope detail scope",
     component: () =>
       import("@/modules/transaction/views/add-scope-detail/Scope.vue"),
-    meta: { layout: AddScopeLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: AddScopeLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/equipment",
     name: "add scope detail equipment",
     component: () =>
       import("@/modules/transaction/views/add-scope-detail/Equipment.vue"),
-    meta: { layout: AddScopeLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: AddScopeLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/activity",
     name: "add scope detail activity",
     component: () =>
       import("@/modules/transaction/views/add-scope-detail/Activity.vue"),
-    meta: { layout: AddScopeLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: AddScopeLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/consumable-material",
     name: "add scope detail consumable material",
     component: () =>
-      import("@/modules/transaction/views/add-scope-detail/ConsumableMaterial.vue"),
-    meta: { layout: AddScopeLayout, requireAuth: false, role: "planner" },
+      import(
+        "@/modules/transaction/views/add-scope-detail/ConsumableMaterial.vue"
+      ),
+    meta: {
+      layout: AddScopeLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/manpower",
     name: "add scope detail manpower",
     component: () =>
       import("@/modules/transaction/views/add-scope-detail/Manpower.vue"),
-    meta: { layout: AddScopeLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: AddScopeLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/part",
     name: "add scope detail part",
     component: () =>
       import("@/modules/transaction/views/add-scope-detail/Part.vue"),
-    meta: { layout: AddScopeLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: AddScopeLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/hse-doc",
     name: "transaction hse doc",
     component: () => import("@/modules/transaction/views/HseDoc.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/qc-plan",
     name: "transaction qc plan",
     component: () => import("@/modules/transaction/views/QcPlan.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   //
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/results",
     name: "transaction results",
     component: () => import("@/modules/transaction/views/Results.vue"),
-    meta: { layout: MainLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
   },
   // {
   //   path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/squences",

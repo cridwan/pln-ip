@@ -385,12 +385,12 @@ export const MenusMaster: MenuInterface[] = [
         url: "/hse-doc",
         icon: "hse-doc",
       },
-      {
-        id: 17,
-        name: "QC Plan",
-        url: "/qc-plan",
-        icon: "tag",
-      },
+      // {
+      //   id: 17,
+      //   name: "QC Plan",
+      //   url: "/qc-plan",
+      //   icon: "tag",
+      // },
     ],
   },
   {
@@ -456,6 +456,12 @@ export const MenusMaster: MenuInterface[] = [
 ];
 
 export const MenuAdditional: MenuInterface[] = [
+  {
+    id: 1,
+    name: "Additional Scope",
+    url: "/",
+    icon: "out",
+  },
   {
     id: 5,
     name: "Scope",

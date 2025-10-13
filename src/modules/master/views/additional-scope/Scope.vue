@@ -104,7 +104,7 @@ const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
     return await masterStore.downloadScope(params);
   },
-  onSuccess: () => { },
+  onSuccess: () => {},
   onError: (error) => {
     console.log(error);
   },
@@ -116,7 +116,7 @@ const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
     return await masterStore.templateScope();
   },
-  onSuccess: () => { },
+  onSuccess: () => {},
   onError: (error) => {
     console.log(error);
   },
@@ -245,7 +245,7 @@ const handleResetFilter = () => {
 const previewDocument = (document: ResponseDocumentInterface) => {
   window.open(
     import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-    document.document_link,
+      document.document_link,
     "_blank"
   );
 };
@@ -269,41 +269,85 @@ const handleImport = (file: File) => {
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-0">
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button v-if="dataForm?.sub_bidang_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
-        @click="handleCreate" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.sub_bidang_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterAdScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingScope" />
+        <FilterAdScope
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="isLoadingScope"
+        />
       </div>
       <div class="w-full">
-        <Table label-create="User" :columns="ColumnsScope" :entities="dataScope?.data || []" :loading="isLoadingScope"
-          :pagination="pagination" :is-create="false" v-model:model-search="params.search" @change-page="changePage"
-          @change-limit="changeLimit" @search="searchTable">
+        <Table
+          label-create="User"
+          :columns="ColumnsScope"
+          :entities="dataScope?.data || []"
+          :loading="isLoadingScope"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+              />
             </div>
           </template>
           <template #column_document="{ entity }">
-            <p class="text-base text-neutral-50 text-left underline cursor-pointer" v-if="entity.document"
-              @click="previewDocument(entity.document)">
+            <p
+              class="text-base text-neutral-50 text-left underline cursor-pointer"
+              v-if="entity.document"
+              @click="previewDocument(entity.document)"
+            >
               {{ entity.document?.document_name ?? "-" }}
             </p>
             <p v-else>-</p>
           </template>
           <template #column_link="{ entity }">
-            <a :href="entity.link" target="_blank" class="text-base text-neutral-50 text-left underline cursor-pointer"
-              v-if="entity.link">
+            <a
+              :href="entity.link"
+              target="_blank"
+              class="text-base text-neutral-50 text-left underline cursor-pointer"
+              v-if="entity.link"
+            >
               {{ entity.link ?? "-" }}
             </a>
             <p v-else>-</p>
@@ -312,7 +356,13 @@ const handleImport = (file: File) => {
       </div>
     </div>
 
-    <FormAdScope v-model="open_form" :selected-value="selected_item" :data-form="dataForm" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+    <FormAdScope
+      v-model="open_form"
+      :selected-value="selected_item"
+      :data-form="dataForm"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+    />
   </div>
 </template>
