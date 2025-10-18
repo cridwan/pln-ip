@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -104,7 +104,7 @@ const { mutate: downloadSubBidang, isPending: isLoadingDownload } = useMutation(
     mutationFn: async () => {
       return await masterStore.downloadSubBidang(params);
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -118,7 +118,7 @@ const { mutate: templateSubBidang, isPending: isLoadingTemplate } = useMutation(
     mutationFn: async () => {
       return await masterStore.templateSubBidang();
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -135,7 +135,19 @@ const { mutate: importSubBidang, isPending: isLoadingImport } = useMutation({
     refetchSubBidang();
   },
   onError: (error) => {
-    console.log(error);
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchSubBidang();
   },
 });
 //--- END
@@ -280,57 +292,24 @@ onMounted(() => {
       <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
       <Button text="Export Template" rounded="full" color="blue" /> -->
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-        v-if="dataForm?.uuid"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" v-if="dataForm?.uuid" />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterSubBidang
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterSubBidang @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="w-full">
-        <Table
-          label-create="Sub Bidang"
-          :columns="ColumnsSubBidang"
-          :entities="dataSubBidang?.data || []"
-          :loading="isLoadingSubBidang"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="Sub Bidang" :columns="ColumnsSubBidang" :entities="dataSubBidang?.data || []"
+          :loading="isLoadingSubBidang" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+          @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-              />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>
           <template #column_bidang="{ entity }">
@@ -342,22 +321,12 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormSubBidang
-      :data-form="dataForm"
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-    />
+    <FormSubBidang :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
+      @error="handleError" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>
 
 <style lang="sass"></style>

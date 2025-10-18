@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -89,7 +89,7 @@ const { mutate: downloadBidang, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
     return await masterStore.downloadBidang();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -101,7 +101,7 @@ const { mutate: templateBidang, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
     return await masterStore.templateBidang();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -117,7 +117,19 @@ const { mutate: importBidang, isPending: isLoadingImport } = useMutation({
     refetchBidang();
   },
   onError: (error) => {
-    console.log(error);
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchBidang();
   },
 });
 //--- END
@@ -226,66 +238,28 @@ onMounted(() => {
       <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
       <Button text="Export Template" rounded="full" color="blue" /> -->
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
     </div>
 
-    <Table
-      label-create="Bidang"
-      :columns="ColumnsBidang"
-      :entities="dataBidang?.data || []"
-      :loading="isLoadingBidang"
-      :pagination="pagination"
-      :is-create="false"
-      v-model:model-search="params.search"
-      @change-page="changePage"
-      @change-limit="changeLimit"
-      @search="searchTable"
-    >
+    <Table label-create="Bidang" :columns="ColumnsBidang" :entities="dataBidang?.data || []" :loading="isLoadingBidang"
+      :pagination="pagination" :is-create="false" v-model:model-search="params.search" @change-page="changePage"
+      @change-limit="changeLimit" @search="searchTable">
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-4">
-          <Icon
-            name="pencil"
-            class="icon-action-table"
-            @click="handleUpdate(entity)"
-          />
-          <Icon
-            name="trash"
-            class="icon-action-table"
-            @click="handleDelete(entity)"
-          />
+          <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+          <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
         </div>
       </template>
     </Table>
 
-    <FormBidang
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-    />
+    <FormBidang v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>
 
 <style lang="sass"></style>

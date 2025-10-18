@@ -30,11 +30,17 @@ import type { ProjectInterface } from "../types/ProjectType";
 // import InputQty from "../components/InputQty.vue";
 import FormQuantity from "../components/FormQuantity.vue";
 import type { UpdatePartInterface } from "../types/PartType";
+import TableSummary from "@/components/tables/TableSummary.vue";
 
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
+const dataSummary = ref<{ total_price: Number, price: Number, total_qty: Number }>({
+  total_price: 0,
+  price: 0,
+  total_qty: 0
+});
 const params = reactive({
   search: "",
   filter: "",
@@ -89,6 +95,12 @@ const {
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getPart(params);
+      const summary = data.summary;
+      dataSummary.value = {
+        total_price: summary.total_price,
+        price: summary.price,
+        total_qty: summary.total_qty
+      }
       const response = data as IPagination<PartStdInterface[]>;
       total_item.value = response.total;
       is_loading_filter.value = false;
@@ -308,55 +320,27 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="
-        dataForm?.activity_uuid &&
-        dataApproval?.status !== 'approve' &&
-        access_token
-      "
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <Button v-if="
+      dataForm?.activity_uuid &&
+      dataApproval?.status !== 'approve' &&
+      access_token
+    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterPartStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table
-            label-create="Part"
-            :columns="ColumnsPart"
-            :entities="dataPart?.data || []"
-            :loading="isLoadingPart"
-            :pagination="pagination"
-            :is-create="false"
-            :is-action="
-              dataApproval?.status !== 'approve' && access_token !== ''
-            "
-            class="mt-6"
-            v-model:model-search="params.search"
-            @change-page="changePage"
-            @change-limit="changeLimit"
-            @search="searchTable"
-          >
+          <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
+            :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+              " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+            @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon
-                  v-if="dataForm?.activity_uuid"
-                  name="trash"
-                  class="icon-action-table"
-                  @click="handleDelete(entity)"
-                />
+                <Icon v-if="dataForm?.activity_uuid" name="trash" class="icon-action-table"
+                  @click="handleDelete(entity)" />
               </div>
             </template>
 
@@ -367,12 +351,10 @@ onMounted(() => {
             </template>
 
             <template #column_total_qty="{ entity, index }">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' && !entity.total_qty) ||
-                  (!access_token && !entity.total_qty)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' && !entity.total_qty) ||
+                (!access_token && !entity.total_qty)
+              ">
                 -
               </p>
               <!-- <InputQty
@@ -386,15 +368,9 @@ onMounted(() => {
               >
                 {{ Number(entity.total_qty)?.toLocaleString("id") ?? "-" }}
               </p> -->
-              <FormQuantity
-                v-else
-                ref="quantity"
-                :value="entity.total_qty?.toString() || ''"
-                :label="entity.part?.name"
-                :loading="isLoadingUpdate"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveQuantity(e, entity)"
-              />
+              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity.part?.name"
+                :loading="isLoadingUpdate" :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity, index }">
               <p v-if="!entity.part?.price">-</p>
@@ -403,10 +379,7 @@ onMounted(() => {
                 :qty="Number(entity.total_qty)"
                 @change="handleEdit"
               /> -->
-              <p
-                v-else
-                class="text-base text-neutral-50 text-left whitespace-nowrap"
-              >
+              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
                 Rp. {{ Number(entity.part.price)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
@@ -417,10 +390,7 @@ onMounted(() => {
                 :qty="Number(entity.total_qty)"
                 @change="handleEdit"
               /> -->
-              <p
-                v-else
-                class="text-base text-neutral-50 text-left whitespace-nowrap"
-              >
+              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
                 Rp.
                 {{
                   (
@@ -442,24 +412,15 @@ onMounted(() => {
               </p>
             </template>
           </Table>
+          <TableSummary :total_price="Number(dataSummary.total_price)" :price="Number(dataSummary.price)"
+            :total_qty="Number(dataSummary.total_qty)" />
         </div>
       </div>
     </div>
   </div>
 
   <Toast ref="toastRef" />
-  <FormPartStd
-    v-model="open_form"
-    :data-form="dataForm"
-    :selected-value="selected_item"
-    @success="handleSuccess"
-    @error="handleError"
-    @removeSucess="handleRemoveSuccess"
-  />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.part?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <FormPartStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
+    @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

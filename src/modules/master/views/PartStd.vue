@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -109,7 +109,7 @@ const { mutate: downloadPartStd, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
     return await masterStore.downloadPartStd(params);
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -121,7 +121,7 @@ const { mutate: templatePartStd, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
     return await masterStore.templatePartStd();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -137,7 +137,19 @@ const { mutate: importPartStd, isPending: isLoadingImport } = useMutation({
     refetchpartStd();
   },
   onError: (error) => {
-    console.log(error);
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchpartStd();
   },
 });
 //--- END
@@ -257,7 +269,7 @@ const handleResetFilter = () => {
 const previewDocument = (document: ResponseDocumentInterface) => {
   window.open(
     import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-      document.document_link,
+    document.document_link,
     "_blank"
   );
 };
@@ -297,59 +309,27 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        v-if="dataForm?.activity_uuid"
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button v-if="dataForm?.activity_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
+        @click="handleCreate" />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterPartStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table
-          label-create="User"
-          :columns="ColumnsPartStd"
-          :entities="dataPartStd?.data || []"
-          :loading="isLoadingPartStd"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          class="mt-6"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="User" :columns="ColumnsPartStd" :entities="dataPartStd?.data || []"
+          :loading="isLoadingPartStd" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+          class="mt-6" @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-              />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                v-if="!entity.use_transaction" />
             </div>
           </template>
           <template #column_part="{ entity }">
@@ -357,25 +337,19 @@ onMounted(() => {
               {{ entity.part?.name ?? "-" }}
             </p>
           </template>
+          <template #column_globalUnit="{ entity }">
+            <p class="text-base text-neutral-50 text-left">
+              {{ entity.part?.global_unit?.name ?? "-" }}
+            </p>
+          </template>
         </Table>
       </div>
     </div>
 
-    <FormPartStd
-      :data-form="dataForm"
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-      @removeSucess="handleRemoveSuccess"
-    />
+    <FormPartStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
+      @error="handleError" @removeSucess="handleRemoveSuccess" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.uuid"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

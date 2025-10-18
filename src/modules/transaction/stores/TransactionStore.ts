@@ -21,7 +21,7 @@ import type { FormActivityInterfaceClone } from "../types/ActivityType";
 import type { FormPartCloneInterface } from "../types/PartStdType";
 import type { FormConsMatCloneInterface } from "../types/ConsumableMaterialStdType";
 import type { FormManpowerCloneInterface } from "../types/ManpowerStdType";
-import type { FormApprovalInterface } from "../types/ApprovalType";
+import type { FormApprovalInterface, FormRequestApprovalInterface } from "../types/ApprovalType";
 
 export const useTransactionStore = defineStore(
   "transaction",
@@ -551,11 +551,12 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getDownloadResultScope = async (project_uuid: string) => {
+    const getDownloadResultScope = async (project_uuid: string, type: string = 'SCOPE STANDART') => {
       return await api
         .get(`/transaction/result/resource/export/scope-standart`, {
           params: {
             project_uuid,
+            type
           },
           responseType: "blob",
         })
@@ -584,11 +585,12 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getDownloadResultBudgetActivity = async (project_uuid: string) => {
+    const getDownloadResultBudgetActivity = async (project_uuid: string, type: string = 'SCOPE STANDART') => {
       return await api
         .get(`/transaction/result/resource/export/budget-activity`, {
           params: {
             project_uuid,
+            type
           },
           responseType: "blob",
         })
@@ -838,6 +840,17 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const requestApproveProject = async (uuid: string, payload: FormRequestApprovalInterface) => {
+      return await api
+        .put(`/transaction/project/${uuid}/request-approve`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     return {
       getScopeStandar,
       createScopeStandar,
@@ -893,6 +906,7 @@ export const useTransactionStore = defineStore(
       getConsMatSelect,
       getHseDoc,
       getDownloadResultBudgetActivity,
+      requestApproveProject,
     };
   },
   {

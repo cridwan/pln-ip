@@ -22,9 +22,9 @@ const logout = () => {
   <div class="pln-header-main">
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
-      <div class="menu-wrapper">
+      <div class="menu-wrapper" v-if="authStore.users">
         <div class="user-info">
-          <p>User : superadmin@gmail.com</p>
+          <p>User : {{ authStore.users?.email }}</p>
         </div>
         <button class="sign-out-button" @click="logout">Sign Out</button>
       </div>

@@ -27,6 +27,16 @@ export interface CreateDocumentInterface {
   document_uuid: string;
 }
 
+export interface NotificationInterface {
+  uuid: string;
+  uri: string;
+  title: string;
+  summary: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ResponseDocumentInterface {
   uuid: string;
   document_uuid: string;

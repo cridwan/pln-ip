@@ -74,14 +74,14 @@ export const Menus: MenuInterface[] = [
   },
   {
     id: 12,
-    name: "Results",
-    url: "/results",
-    icon: "document-clean",
+    name: "Approval",
+    url: "/approval",
+    icon: "check-list",
   },
   {
     id: 12,
-    name: "Approval",
-    url: "/approval",
+    name: "Request Approval",
+    url: "/request-approval",
     icon: "check-list",
   },
   {
@@ -89,6 +89,12 @@ export const Menus: MenuInterface[] = [
     name: "Additional Scope",
     url: "/additional-scope",
     icon: "login",
+  },
+  {
+    id: 12,
+    name: "Results",
+    url: "/results",
+    icon: "document-clean",
   },
   // {
   //   id: 11,
@@ -274,6 +280,12 @@ export const MenusAddScope: MenuInterface[] = [
     url: "/scope",
     icon: "document",
   },
+  {
+    id: 2,
+    name: "Instruksi Kerja",
+    url: "/work-instruction",
+    icon: "megaphone",
+  },
   // {
   //   id: 2,
   //   name: "Equipment",
@@ -385,12 +397,12 @@ export const MenusMaster: MenuInterface[] = [
         url: "/hse-doc",
         icon: "hse-doc",
       },
-      // {
-      //   id: 17,
-      //   name: "QC Plan",
-      //   url: "/qc-plan",
-      //   icon: "tag",
-      // },
+      {
+        id: 17,
+        name: "QC Plan",
+        url: "/qc-plan",
+        icon: "tag",
+      },
     ],
   },
   {
@@ -425,19 +437,19 @@ export const MenusMaster: MenuInterface[] = [
   },
   {
     id: 11,
-    name: "Part Standart",
+    name: "Part",
     url: "/part-std",
     icon: "part-std",
   },
   {
     id: 11,
-    name: "Manpower Standart",
+    name: "Manpower",
     url: "/manpower-std",
     icon: "manpower-std",
   },
   {
     id: 11,
-    name: "Consumable Material Standart",
+    name: "Consumable Material",
     url: "/consumable-material-std",
     icon: "consumable-material-std",
   },
@@ -482,19 +494,19 @@ export const MenuAdditional: MenuInterface[] = [
   },
   {
     id: 7,
-    name: "Consumable Material Standart",
+    name: "Consumable Material",
     url: "/master/additional-scope/:id/:name/consumable-material",
     icon: "consumable-material-std",
   },
   {
     id: 8,
-    name: "Manpower Standart",
+    name: "Manpower",
     url: "/master/additional-scope/:id/:name/manpower",
     icon: "manpower-std",
   },
   {
     id: 9,
-    name: "Part Standart",
+    name: "Part",
     url: "/master/additional-scope/:id/:name/part",
     icon: "part-std",
   },

@@ -7,6 +7,7 @@ export interface PartStdInterface {
   activity: ActivityInterface;
   part_uuid: string;
   part: PartInterface;
+  use_transaction?: boolean;
   qty: number;
   total_qty?: number;
   created_at: string;

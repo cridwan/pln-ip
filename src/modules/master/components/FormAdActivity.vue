@@ -166,7 +166,7 @@ const setValue = () => {
 const resetValue = () => {
   model.value = {
     name: "",
-    duration: "-",
+    duration: "",
     link_ik1: "",
     equipment_uuid: props.dataForm?.equipment_uuid || "",
   };
@@ -207,59 +207,22 @@ const removeSuccess = () => {
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Activity' : 'Tambah Activity'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Input
-        v-model="model.name"
-        star
-        label="Nama"
-        :rules="rules.name"
-        :custom_symbols="all_characters"
-      />
-      <Input
-        v-model="model.duration"
-        label="Durasi"
-        :rules="rules.duration"
-        :custom_symbols="all_characters"
-      />
-      <Input
-        v-model="model.link_ik1"
-        label="IK Online ex. (http://google.com)"
-        :custom_symbols="all_characters"
-      />
-      <UploadStream
-        label="File IK"
-        :progress="uploadProgress"
-        :selectedValues="documentValues"
-        @changes="handleChangeFile"
-        @removeSuccess="removeSuccess"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Activity' : 'Tambah Activity'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Input v-model="model.name" star label="Nama" :rules="rules.name" :custom_symbols="all_characters" />
+      <Input v-model="model.duration" star label="Durasi" :rules="rules.duration" :custom_symbols="all_characters" />
+      <Input v-model="model.link_ik1" label="IK Online ex. (http://google.com)" :custom_symbols="all_characters" />
+      <UploadStream label="File IK" :progress="uploadProgress" :selectedValues="documentValues"
+        @changes="handleChangeFile" @removeSuccess="removeSuccess" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
+        <Button text="Batal" class="w-full" variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument" @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue"
           :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-        />
+          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument" />
       </div>
     </form>
   </Modal>

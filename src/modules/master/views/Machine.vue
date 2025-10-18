@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -112,7 +112,7 @@ const { mutate: downloadMachine, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
     return await masterStore.downloadMachine(params);
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -124,7 +124,7 @@ const { mutate: templateMachine, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
     return await masterStore.templateMachine();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -140,7 +140,19 @@ const { mutate: importMachine, isPending: isLoadingImport } = useMutation({
     refetchMachine();
   },
   onError: (error) => {
-    console.log(error);
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchMachine();
   },
 });
 //--- END
@@ -294,66 +306,33 @@ onMounted(() => {
   <Breadcrumb :items="breadcrumb" />
   <div class="relative w-full mt-6">
     <div class="flex items-center gap-2 absolute right-0">
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-        v-if="dataForm?.unit_uuid"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" v-if="dataForm?.unit_uuid" />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterMechine
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterMechine @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="w-full">
-        <Table
-          label-create="Machine"
-          :columns="ColumnsMachine"
-          :entities="dataMachine?.data || []"
-          :loading="isLoadingMachine"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="Machine" :columns="ColumnsMachine" :entities="dataMachine?.data || []"
+          :loading="isLoadingMachine" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+          @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-              />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>
           <template #column_unit="{ entity }">
-            <p class="text-base text-neutral-50 text-center">
+            <p class="text-base text-neutral-50 text-left">
               {{ entity.unit?.name }}
             </p>
           </template>
           <template #column_location="{ entity }">
-            <p class="text-base text-neutral-50 text-center">
+            <p class="text-base text-neutral-50 text-left">
               {{ entity.unit?.location?.name ?? "-" }}
             </p>
           </template>
@@ -361,20 +340,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormMachine
-      :data-form="dataForm"
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-    />
+    <FormMachine :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
+      @error="handleError" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

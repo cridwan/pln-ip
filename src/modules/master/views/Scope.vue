@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -111,7 +111,7 @@ const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
     return await masterStore.downloadScope(params);
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -123,7 +123,7 @@ const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
     return await masterStore.templateScope();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -139,7 +139,19 @@ const { mutate: importScope, isPending: isLoadingImport } = useMutation({
     refetchScope();
   },
   onError: (error) => {
-    console.log(error);
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchScope();
   },
 });
 //--- END
@@ -263,7 +275,7 @@ const handleResetFilter = () => {
 const previewDocument = (document: ResponseDocumentInterface) => {
   window.open(
     import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-      document.document_link,
+    document.document_link,
     "_blank"
   );
 };
@@ -303,78 +315,38 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        v-if="dataForm?.inspection_type_uuid && dataForm.sub_bidang_uuid"
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button v-if="dataForm?.inspection_type_uuid && dataForm.sub_bidang_uuid" icon_only="plus" size="sm"
+        rounded="full" color="blue" @click="handleCreate" />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterScope
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table
-          label-create="User"
-          :columns="ColumnsScope"
-          :entities="dataScope?.data || []"
-          :loading="isLoadingScope"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          class="mt-6"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="User" :columns="ColumnsScope" :entities="dataScope?.data || []" :loading="isLoadingScope"
+          :pagination="pagination" :is-create="false" v-model:model-search="params.search" class="mt-6"
+          @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-              />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>
           <template #column_document="{ entity }">
-            <p
-              class="text-base text-neutral-50 text-left underline cursor-pointer"
-              v-if="entity.document"
-              @click="previewDocument(entity.document)"
-            >
+            <p class="text-base text-neutral-50 text-left underline cursor-pointer" v-if="entity.document"
+              @click="previewDocument(entity.document)">
               {{ entity.document?.document_name ?? "-" }}
             </p>
             <p v-else>-</p>
           </template>
           <template #column_link="{ entity }">
-            <a
-              :href="entity.link"
-              target="_blank"
-              class="text-base text-neutral-50 text-left underline cursor-pointer"
-              v-if="entity.link"
-            >
+            <a :href="entity.link" target="_blank" class="text-base text-neutral-50 text-left underline cursor-pointer"
+              v-if="entity.link">
               {{ entity.link ?? "-" }}
             </a>
             <p v-else>-</p>
@@ -383,21 +355,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormScope
-      :data-form="dataForm"
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-      @removeSucess="handleRemoveSuccess"
-    />
+    <FormScope :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
+      @error="handleError" @removeSucess="handleRemoveSuccess" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

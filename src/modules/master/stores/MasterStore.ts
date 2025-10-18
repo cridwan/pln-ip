@@ -567,7 +567,7 @@ export const useMasterStore = defineStore(
       formData.append("file", payload);
 
       return await api
-        .post(`/isnpection-type/import`, formData)
+        .post(`/inspection-type/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -1469,6 +1469,30 @@ export const useMasterStore = defineStore(
         .get(`/user`, {
           params: payload,
         })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getNotificationLatest = async (payload: any) => {
+      return await api
+        .get(`/notification/latest/lists`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const notificationMarkAsRead = async (uuid: string) => {
+      return await api
+        .get(`/notification/mark-as-read/${uuid}`)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -3198,6 +3222,8 @@ export const useMasterStore = defineStore(
       getPartGrouping,
       getManpowerGrouping,
       getConsMatGrouping,
+      getNotificationLatest,
+      notificationMarkAsRead
     };
   },
   {
