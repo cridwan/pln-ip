@@ -10,21 +10,21 @@ export const ColumnsLocation: TableColumnType[] = [
   {
     key: "lat",
     label: "Latitude",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },
   {
     key: "lon",
     label: "Longitude",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },
   {
     key: "description",
     label: "Deskripsi",
-    align: "center",
+    align: "left",
     sort: false,
   },
 ];

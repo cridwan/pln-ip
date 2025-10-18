@@ -115,6 +115,17 @@ export const routeTransaction = [
     },
   },
   {
+    path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/request-approval",
+    name: "transaction request approval",
+    component: () => import("@/modules/transaction/views/RequestApproval.vue"),
+    meta: {
+      layout: MainLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
+  },
+  {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/consumable-material",
     name: "transaction consumable-material",
     component: () =>
@@ -142,6 +153,18 @@ export const routeTransaction = [
     name: "add scope detail scope",
     component: () =>
       import("@/modules/transaction/views/add-scope-detail/Scope.vue"),
+    meta: {
+      layout: AddScopeLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
+  },
+  {
+    path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/work-instruction",
+    name: "add scope detail work instruction",
+    component: () =>
+      import("@/modules/transaction/views/add-scope-detail/WorkInstruction.vue"),
     meta: {
       layout: AddScopeLayout,
       requireAuth: false,

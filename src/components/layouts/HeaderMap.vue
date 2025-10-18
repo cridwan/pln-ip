@@ -1,11 +1,35 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/modules/auth/stores/AuthStore";
+import { Icon } from "..";
+import NotificationMap from "./NotificationMap.vue";
+import { useQuery } from "@tanstack/vue-query";
+import { useMasterStore } from "@/modules/master/stores/MasterStore";
+import type { NotificationInterface } from "@/types/GlobalType";
 
 const imgUrl = new URL("@/assets/images/logo.png", import.meta.url).href;
 
 const authStore = useAuthStore();
 const router = useRouter();
+const masterStore = useMasterStore();
+
+
+
+// get notification
+const {
+  data: dataNotification,
+  refetch: refetchNotification,
+} = useQuery({
+  queryKey: ["getNotificationLists"],
+  queryFn: async () => {
+    const { data } = await masterStore.getNotificationLatest({
+      receiver_id: authStore.users?.id || ""
+    });
+    return data as NotificationInterface[];
+  },
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
 
 const toHome = () => {
   router.push("/");
@@ -26,6 +50,17 @@ const login = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
+        <div class="notification-map text-blue-950 flex items-center justify-center cursor-pointer mr-8 mt-1"
+          v-show="authStore.users">
+          <NotificationMap :data-notification="dataNotification">
+            <div class="relative">
+              <Icon name="bell-alert" size="40" />
+              <span v-if="dataNotification && dataNotification?.length > 0"
+                class="rounded-full size-4 text-[9px] flex items-center justify-center text-white bg-red-500 absolute top-0 right-0">{{
+                dataNotification.length }}</span>
+            </div>
+          </NotificationMap>
+        </div>
         <div class="user-info" v-if="authStore.users">
           <p>User : {{ authStore.users?.email }}</p>
         </div>
@@ -42,7 +77,7 @@ const login = () => {
   </div>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .pln-header-maps
   @apply w-full h-full flex justify-between
   img
@@ -66,4 +101,11 @@ const login = () => {
         clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%)
         &:hover
           @apply bg-red-700
+:deep(.notification-map)
+  .pln-icon
+    svg
+      width: 2em !important
+      height: 2em !important
+      font-size: 1em !important
+
 </style>

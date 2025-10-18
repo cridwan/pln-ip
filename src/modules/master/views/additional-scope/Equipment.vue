@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { useRoute } from "vue-router";
 
 import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
@@ -100,7 +100,7 @@ const { mutate: downloadEquipment, isPending: isLoadingDownload } = useMutation(
     mutationFn: async () => {
       return await masterStore.downloadEquipment(params);
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -114,7 +114,7 @@ const { mutate: templateEquipment, isPending: isLoadingTemplate } = useMutation(
     mutationFn: async () => {
       return await masterStore.templateEquipment();
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -131,7 +131,19 @@ const { mutate: importEquipment, isPending: isLoadingImport } = useMutation({
     refetchEquipment();
   },
   onError: (error) => {
-    console.log(error);
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchEquipment();
   },
 });
 //--- END
@@ -259,66 +271,29 @@ const handleRemoveSuccess = () => {
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-0">
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        v-if="dataForm?.scope_standart_uuid"
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button v-if="dataForm?.scope_standart_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
+        @click="handleCreate" />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterAdEquipment
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="isLoadingEquipment"
-        />
+        <FilterAdEquipment @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingEquipment" />
       </div>
       <div class="w-full">
-        <Table
-          label-create="Sub Bidang"
-          :columns="ColumnsEquipment"
-          :entities="dataEquipment?.data || []"
-          :loading="isLoadingEquipment"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="Sub Bidang" :columns="ColumnsEquipment" :entities="dataEquipment?.data || []"
+          :loading="isLoadingEquipment" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+          @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-              />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>
           <template #column_scope_standart="{ entity }">
@@ -330,14 +305,8 @@ const handleRemoveSuccess = () => {
       </div>
     </div>
 
-    <FormAdEquipment
-      v-model="open_form"
-      :selected-value="selected_item"
-      :data-form="dataForm"
-      @success="handleSuccess"
-      @error="handleError"
-      @removeSucess="handleRemoveSuccess"
-    />
+    <FormAdEquipment v-model="open_form" :selected-value="selected_item" :data-form="dataForm" @success="handleSuccess"
+      @error="handleError" @removeSucess="handleRemoveSuccess" />
   </div>
 </template>
 

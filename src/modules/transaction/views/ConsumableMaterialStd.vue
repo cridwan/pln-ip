@@ -29,7 +29,13 @@ import FilterConsumableMaterialStd from "../components/FilterConsumableMaterialS
 import type { ProjectInterface } from "../types/ProjectType";
 import FormQuantity from "../components/FormQuantity.vue";
 import type { UpdateConsMatInterface } from "../types/ConsumableMaterialType";
+import TableSummary from "@/components/tables/TableSummary.vue";
 
+const dataSummary = ref<{ total_price: Number, price: Number, total_qty: Number }>({
+  total_price: 0,
+  price: 0,
+  total_qty: 0
+});
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
@@ -85,6 +91,12 @@ const {
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getConsMat(params);
+      const summary = data.summary;
+      dataSummary.value = {
+        total_price: summary.total_price,
+        price: summary.price,
+        total_qty: summary.total_qty
+      }
       const response = data as IPagination<ConsumableMaterialStdInterface[]>;
 
       total_item.value = response.total;
@@ -296,61 +308,30 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="
-        dataForm?.activity_uuid &&
-        dataApproval?.status !== 'approve' &&
-        access_token
-      "
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <Button v-if="
+      dataForm?.activity_uuid &&
+      dataApproval?.status !== 'approve' &&
+      access_token
+    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterConsumableMaterialStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
+          :loading="is_loading_filter" />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table
-            label-create="Material"
-            :is-action="
-              dataApproval?.status !== 'approve' && access_token !== ''
-            "
-            :columns="ColumnsConsumableMaterial"
-            :entities="dataConsMat?.data || []"
-            :loading="isLoadingConsMat"
-            :pagination="pagination"
-            :is-create="false"
-            class="mt-6"
-            v-model:model-search="params.search"
-            @change-page="changePage"
-            @change-limit="changeLimit"
-            @search="searchTable"
-          >
+          <Table label-create="Material" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+            " :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []" :loading="isLoadingConsMat"
+            :pagination="pagination" :is-create="false" class="mt-6" v-model:model-search="params.search"
+            @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon
-                  name="pencil"
-                  class="icon-action-table"
-                  @click="handleUpdate(entity)"
-                  v-if="dataForm?.activity_uuid"
-                />
-                <Icon
-                  name="trash"
-                  class="icon-action-table"
-                  @click="handleDelete(entity)"
-                  v-if="dataForm?.activity_uuid"
-                />
+                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
+                  v-if="dataForm?.activity_uuid" />
+                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                  v-if="dataForm?.activity_uuid" />
               </div>
             </template>
             <template #column_material="{ entity }">
@@ -364,39 +345,26 @@ onMounted(() => {
               </p>
             </template>
             <template #column_total_qty="{ entity }">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' && !entity.total_qty) ||
-                  (!access_token && !entity.total_qty)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' && !entity.total_qty) ||
+                (!access_token && !entity.total_qty)
+              ">
                 -
               </p>
-              <FormQuantity
-                v-else
-                ref="quantity"
-                :value="entity.total_qty?.toString() || ''"
-                :label="entity.consmat?.name"
-                :loading="isLoadingUpdate"
+              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''"
+                :label="entity.consmat?.name" :loading="isLoadingUpdate"
                 :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveQuantity(e, entity)"
-              />
+                @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity }">
               <p v-if="!entity.consmat?.price">-</p>
-              <p
-                v-else
-                class="text-base text-neutral-50 text-left whitespace-nowrap"
-              >
+              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity }">
               <p v-if="!entity.total_qty && !entity.consmat?.price">-</p>
-              <p
-                v-else
-                class="text-base text-neutral-50 text-left whitespace-nowrap"
-              >
+              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
                 Rp.
                 {{
                   numberFormat(
@@ -411,24 +379,16 @@ onMounted(() => {
               </p>
             </template>
           </Table>
+          <TableSummary :total_price="Number(dataSummary.total_price)" :price="Number(dataSummary.price)"
+            :total_qty="Number(dataSummary.total_qty)" />
         </div>
       </div>
     </div>
   </div>
 
   <Toast ref="toastRef" />
-  <FormConsumableMaterialStd
-    v-model="open_form"
-    :data-form="dataForm"
-    :selected-value="selected_item"
-    @success="handleSuccess"
-    @error="handleError"
-    @removeSucess="handleRemoveSuccess"
-  />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.consmat?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <FormConsumableMaterialStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
+    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
+    @delete="onDelete" />
 </template>

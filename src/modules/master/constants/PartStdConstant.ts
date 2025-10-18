@@ -13,4 +13,10 @@ export const ColumnsPartStd: TableColumnType[] = [
     align: "left",
     sort: false,
   },
+  {
+    key: "globalUnit",
+    label: "Satuan",
+    align: "left",
+    sort: false,
+  },
 ];

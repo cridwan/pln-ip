@@ -44,6 +44,17 @@ function numberFormat(inputNumber: number | string, isCurrency = false) {
   return data;
 }
 
+
+function dateFormatId(date: string) {
+  const instanceDate = new Date(date);
+
+  return instanceDate.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
 function convertToKebabCase(input: string): string {
   return input
     .toLowerCase()
@@ -105,4 +116,5 @@ export {
   phone,
   email,
   character_search,
+  dateFormatId
 };

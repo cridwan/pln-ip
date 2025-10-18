@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { useRouter } from "vue-router";
 
 import {
@@ -114,7 +114,7 @@ const { mutate: downloadAdditionalScope, isPending: isLoadingDownload } =
     mutationFn: async () => {
       return await masterStore.downloadAdditionalScope(params);
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -127,7 +127,7 @@ const { mutate: templateAdditionalScope, isPending: isLoadingTemplate } =
     mutationFn: async () => {
       return await masterStore.templateAdditionalScope();
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error) => {
       console.log(error);
     },
@@ -144,7 +144,19 @@ const { mutate: importAdditionalScope, isPending: isLoadingImport } =
       refetchAdditionalScope();
     },
     onError: (error) => {
-      console.log(error);
+      let message = "Something went wrong";
+
+      if (error instanceof AxiosError) {
+        message = error?.response?.data?.message || "Something went wrong";
+      }
+
+      toastRef.value?.showToast({
+        title: "Error",
+        description: message,
+        type: "error",
+      });
+
+      refetchAdditionalScope();
     },
   });
 //--- END
@@ -284,100 +296,53 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        v-if="dataForm?.inspection_type_uuid"
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button v-if="dataForm?.inspection_type_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
+        @click="handleCreate" />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterAdditionalScope
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="isLoadingAdditionalScope"
-        />
+        <FilterAdditionalScope @filter="handleOnFilter" @reset-filter="handleResetFilter"
+          :loading="isLoadingAdditionalScope" />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table
-          label-create="additional-scope"
-          :columns="ColumnsAdditionalScope"
-          :entities="dataAdditionalScope?.data || []"
-          :loading="isLoadingAdditionalScope"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          class="mt-6"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="additional-scope" :columns="ColumnsAdditionalScope"
+          :entities="dataAdditionalScope?.data || []" :loading="isLoadingAdditionalScope" :pagination="pagination"
+          :is-create="false" v-model:model-search="params.search" class="mt-6" @change-page="changePage"
+          @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <TooltipProvider>
                 <TooltipRoot>
                   <TooltipTrigger>
-                    <Icon
-                      name="eye"
-                      class="icon-action-table"
-                      @click="handleShow(entity)"
-                    />
+                    <Icon name="eye" class="icon-action-table" @click="handleShow(entity)" />
                   </TooltipTrigger>
                   <TooltipPortal>
                     <TooltipContent
                       class="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-neutral-950 select-none rounded-[4px] bg-white px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
-                      :side-offset="5"
-                    >
+                      :side-offset="5">
                       Detail
                       <TooltipArrow class="fill-white" :width="8" />
                     </TooltipContent>
                   </TooltipPortal>
                 </TooltipRoot>
               </TooltipProvider>
-              <Icon
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-              />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>
         </Table>
       </div>
     </div>
 
-    <FormAdditionalScope
-      v-model="open_form"
-      :data-form="dataForm"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-      @removeSucess="handleRemoveSuccess"
-    />
+    <FormAdditionalScope v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
+      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

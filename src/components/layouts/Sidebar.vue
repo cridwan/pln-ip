@@ -21,6 +21,12 @@ const ListMenu = computed(() => {
       } else {
         return false;
       }
+    } else if (item.name === "Request Approval") {
+      if (users.value?.role === UserEnum.PLANNER) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return true;
     }
@@ -51,34 +57,22 @@ const isActive = (item: { id: number; name: string; url: string }) => {
   <div class="sidebar-main">
     <p class="sidebar-main--title">MAIN MENU</p>
     <div class="sidebar-main--menus">
-      <div
-        v-for="(item, key) in ListMenu"
-        :key="key"
-        class="flex flex-col gap-2"
-      >
-        <RouterLink
-          v-if="!item.children"
-          :to="{
-            path:
-              item.url === '/'
-                ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}`
-                : `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}${item.url}`,
-            query:
-              item.url === '/'
-                ? { sequence: route?.params?.id_inspection }
-                : route.query,
-          }"
-          replace
-          :class="
+      <div v-for="(item, key) in ListMenu" :key="key" class="flex flex-col gap-2">
+        <RouterLink v-if="!item.children" :to="{
+          path:
             item.url === '/'
+              ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}`
+              : `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}${item.url}`,
+          query:
+            item.url === '/'
+              ? { sequence: route?.params?.id_inspection }
+              : route.query,
+        }" replace :class="item.url === '/'
               ? ''
               : route.path.includes(item.url)
-              ? 'menu-active'
-              : ''
-          "
-          class="menu-item"
-          @click="selected_menu = null"
-        >
+                ? 'menu-active'
+                : ''
+            " class="menu-item" @click="selected_menu = null">
           <Icon :name="item.icon" class="menu-icon" />
           <p class="menu-title">{{ item.name }}</p>
         </RouterLink>
@@ -89,23 +83,15 @@ const isActive = (item: { id: number; name: string; url: string }) => {
             <p class="menu-title">{{ item.name }}</p>
           </div>
           <div v-if="isActive(item)" class="pl-5 flex flex-col gap-2">
-            <RouterLink
-              v-for="(element, index) in item.children"
-              :key="index"
-              :to="
-                item.url === '/'
-                  ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}?sequence=${route?.params?.id_inspection}`
-                  : `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}${element.url}`
-              "
-              :class="
-                item.url === '/'
+            <RouterLink v-for="(element, index) in item.children" :key="index" :to="item.url === '/'
+                ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}?sequence=${route?.params?.id_inspection}`
+                : `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}${element.url}`
+              " :class="item.url === '/'
                   ? ''
                   : route.path.includes(element.url)
-                  ? 'menu-active'
-                  : ''
-              "
-              class="menu-item"
-            >
+                    ? 'menu-active'
+                    : ''
+                " class="menu-item">
               <p class="menu-title">{{ element.name }}</p>
             </RouterLink>
           </div>

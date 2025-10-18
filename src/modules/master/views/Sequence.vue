@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -100,7 +100,7 @@ const { mutate: downloadSequence, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
     return await masterStore.downloadSequence();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -112,7 +112,7 @@ const { mutate: templateSequence, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
     return await masterStore.templateSequence();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -128,7 +128,19 @@ const { mutate: importSequence, isPending: isLoadingImport } = useMutation({
     refetchSequence();
   },
   onError: (error) => {
-    console.log(error);
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchSequence();
   },
 });
 //--- END
@@ -204,7 +216,7 @@ const handleRemoveSuccess = () => {
 const redirectDocument = (document: ResponseDocumentInterface) => {
   window.open(
     import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-      document.document_link,
+    document.document_link,
     "_blank"
   );
 };
@@ -249,77 +261,36 @@ onMounted(() => {
       <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
       <Button text="Export Template" rounded="full" color="blue" /> -->
-      <ButtonGroup
-        :loading-import="isLoadingImport"
-        :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate"
-        @download="handleDownload"
-        @template="handleExportTemplate"
-        @import="handleImport"
-      />
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
     </div>
 
-    <Table
-      label-create="Sub Bidang"
-      :columns="ColumnSequence"
-      :entities="dataSequence?.data || []"
-      :loading="isLoadingSequence"
-      :pagination="pagination"
-      :is-create="false"
-      v-model:model-search="params.search"
-      @change-page="changePage"
-      @change-limit="changeLimit"
-      @search="searchTable"
-    >
+    <Table label-create="Sub Bidang" :columns="ColumnSequence" :entities="dataSequence?.data || []"
+      :loading="isLoadingSequence" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+      @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-4">
-          <Icon
-            name="pencil"
-            class="icon-action-table"
-            @click="handleUpdate(entity)"
-          />
-          <Icon
-            name="trash"
-            class="icon-action-table"
-            @click="handleDelete(entity)"
-          />
+          <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+          <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
         </div>
       </template>
       <template #column_document="{ entity }">
-        <p
-          @click="redirectDocument(entity.document)"
-          class="text-base text-neutral-50 text-center underline cursor-pointer"
-          v-if="entity.document"
-        >
+        <p @click="redirectDocument(entity.document)"
+          class="text-base text-neutral-50 text-left underline cursor-pointer" v-if="entity.document">
           {{ entity.document?.document_name }}
         </p>
         <p v-else class="text-base text-neutral-50 text-center">-</p>
       </template>
     </Table>
 
-    <FormSequence
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-      @removeSucess="handleRemoveSuccess"
-    />
+    <FormSequence v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError"
+      @removeSucess="handleRemoveSuccess" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>
 
 <style lang="sass"></style>

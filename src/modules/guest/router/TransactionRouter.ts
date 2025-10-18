@@ -136,7 +136,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/scope",
-    name: "add scope detail scope",
+    name: "add scope detail scope guest",
     component: () => import("@/modules/guest/views/add-scope-detail/Scope.vue"),
     meta: {
       layout: GuestAddScopeLayout,
@@ -147,7 +147,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/equipment",
-    name: "add scope detail equipment",
+    name: "add scope detail equipment guest",
     component: () =>
       import("@/modules/guest/views/add-scope-detail/Equipment.vue"),
     meta: {
@@ -159,7 +159,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/activity",
-    name: "add scope detail activity",
+    name: "add scope detail activity guest",
     component: () =>
       import("@/modules/guest/views/add-scope-detail/Activity.vue"),
     meta: {
@@ -171,7 +171,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/consumable-material",
-    name: "add scope detail consumable material",
+    name: "add scope detail consumable material guest",
     component: () =>
       import("@/modules/guest/views/add-scope-detail/ConsumableMaterial.vue"),
     meta: {
@@ -183,7 +183,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/manpower",
-    name: "add scope detail manpower",
+    name: "add scope detail manpower guest",
     component: () =>
       import("@/modules/guest/views/add-scope-detail/Manpower.vue"),
     meta: {
@@ -195,7 +195,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/part",
-    name: "add scope detail part",
+    name: "add scope detail part guest",
     component: () => import("@/modules/guest/views/add-scope-detail/Part.vue"),
     meta: {
       layout: GuestAddScopeLayout,
@@ -206,7 +206,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/hse-doc",
-    name: "guest hse doc",
+    name: "guest hse doc guest",
     component: () => import("@/modules/guest/views/HseDoc.vue"),
     meta: {
       layout: GuestLayout,
@@ -217,7 +217,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/qc-plan",
-    name: "guest qc plan",
+    name: "guest qc plan guest",
     component: () => import("@/modules/guest/views/QcPlan.vue"),
     meta: {
       layout: GuestLayout,
@@ -228,7 +228,7 @@ export const routeTransaction = [
   },
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/results",
-    name: "guest results",
+    name: "guest results guest",
     component: () => import("@/modules/guest/views/Results.vue"),
     meta: {
       layout: GuestLayout,

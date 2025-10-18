@@ -11,6 +11,7 @@ import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 import type { ResultsInterface } from "../types/ResultsType";
 import { ColumnsResults } from "../constants/ResultsConstant";
 import { useTransactionStore } from "../stores/TransactionStore";
+const params_type = ref<string>("SCOPE STANDART");
 
 const Data = ref<ResultsInterface[]>([
   {
@@ -19,9 +20,19 @@ const Data = ref<ResultsInterface[]>([
     manpower: "Budget Activity",
   },
   {
+    id: 1,
+    uuid: "budget_activity_add",
+    manpower: "Budget Activity Additional",
+  },
+  {
     id: 2,
     uuid: "scope",
     manpower: "Scope",
+  },
+  {
+    id: 2,
+    uuid: "scope_add",
+    manpower: "Additional Scope",
   },
   {
     id: 3,
@@ -67,7 +78,8 @@ const { refetch: refetchDownloadBudgetActivity } = useQuery({
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultBudgetActivity(
-        route.params.id_project as string
+        route.params.id_project as string,
+        params_type.value
       );
       is_loading.value = null;
 
@@ -91,7 +103,8 @@ const { refetch: refetchDownloadScope } = useQuery({
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultScope(
-        route.params.id_project as string
+        route.params.id_project as string,
+        params_type.value
       );
       is_loading.value = null;
 
@@ -258,10 +271,22 @@ const handleDownload = (item: ResultsInterface) => {
 
   switch (item.uuid) {
     case "budget_activity":
+      params_type.value = "SCOPE STANDART";
+      refetchDownloadBudgetActivity();
+      break;
+
+    case "budget_activity_add":
+      params_type.value = "ADDITONAL SCOPE";
       refetchDownloadBudgetActivity();
       break;
 
     case "scope":
+      params_type.value = "SCOPE STANDART";
+      refetchDownloadScope();
+      break;
+
+    case "scope_add":
+      params_type.value = "ADDITIONAL SCOPE";
       refetchDownloadScope();
       break;
 
@@ -296,14 +321,8 @@ const handleDownload = (item: ResultsInterface) => {
   <p class="text-center w-full font-bold text-2xl text-blue-900 mb-10">
     REPORT
   </p>
-  <Table
-    :is-create="false"
-    :is-search="false"
-    :is-action="false"
-    :columns="ColumnsResults"
-    :entities="Data"
-    :is-pagination="false"
-  >
+  <Table :is-create="false" :is-search="false" :is-action="false" :columns="ColumnsResults" :entities="Data"
+    :is-pagination="false">
     <template #column_download="{ entity }">
       <div class="flex justify-center">
         <button class="button-download" @click="handleDownload(entity)">
