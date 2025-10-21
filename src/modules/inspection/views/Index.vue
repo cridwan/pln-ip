@@ -330,7 +330,7 @@ const onDelete = () => {
 
 const selectInspection = (item: TInspection) => {
   if (!authStore.users) {
-    router.push(`/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.uuid}/undefined/public/scope`)
+    router.push(`/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.name}/undefined/${item.uuid}/scope`)
   } else {
     toScope(item);
   }

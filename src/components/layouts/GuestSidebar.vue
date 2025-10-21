@@ -55,7 +55,7 @@ const isActive = (item: { id: number; name: string; url: string }) => {
                 <RouterLink v-if="!item.children" :to="{
                     path:
                         item.url === '/'
-                            ? `/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}`
+                            ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}`
                             : `/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}${item.url}`,
                     query:
                         item.url === '/'

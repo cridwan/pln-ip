@@ -54,10 +54,10 @@ const login = () => {
           v-show="authStore.users">
           <NotificationMap :data-notification="dataNotification">
             <div class="relative">
-              <Icon name="bell-alert" size="40" />
+              <Icon name="bell-alert" size="10" />
               <span v-if="dataNotification && dataNotification?.length > 0"
-                class="rounded-full size-4 text-[9px] flex items-center justify-center text-white bg-red-500 absolute top-0 right-0">{{
-                dataNotification.length }}</span>
+                class="rounded-full size-3 text-[9px] flex items-center justify-center text-white bg-red-500 absolute top-0 right-0">{{
+                  dataNotification.length }}</span>
             </div>
           </NotificationMap>
         </div>
@@ -104,8 +104,8 @@ const login = () => {
 :deep(.notification-map)
   .pln-icon
     svg
-      width: 2em !important
-      height: 2em !important
+      width: 1.4em !important
+      height: 1.4em !important
       font-size: 1em !important
 
 </style>

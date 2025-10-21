@@ -26,6 +26,10 @@ const login = () => {
 const toCreate = () => {
   router.push(`/${locationId}/create/unit`);
 };
+
+const toMonitoring = () => {
+  window.location.href = `/${locationId}/project-monitoring`;
+}
 </script>
 
 <template>
@@ -39,6 +43,10 @@ const toCreate = () => {
         <button class="menu-button" @click="router.push('/')">Location</button>
         <button class="menu-button" :class="{ active: route.path.includes('create') }" @click="toCreate">
           Generate Scope
+        </button>
+        <button class="menu-button" :class="{ active: route.path.includes('project-monitoring') }"
+          v-show="authStore.users" @click="toMonitoring">
+          Monitoring
         </button>
         <!-- <button class="menu-button">Preview</button>
         <button class="menu-button">Expert</button> -->

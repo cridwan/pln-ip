@@ -12,4 +12,15 @@ export const routeInspection = [
       except: ["superuser"],
     },
   },
+  {
+    path: "/:id/project-monitoring",
+    name: "project monitoring inspection",
+    component: () => import("@/modules/inspection/views/ProjectMonitoring.vue"),
+    meta: {
+      layout: ScopeLayout,
+      requireAuth: false,
+      role: "planner",
+      except: ["superuser"],
+    },
+  },
 ];
