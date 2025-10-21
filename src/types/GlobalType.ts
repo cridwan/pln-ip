@@ -13,6 +13,13 @@ export interface IPagination<T> {
   total: number;
 }
 
+export interface ProjectCardInterface {
+  name: string,
+  status: "Completed" | "In Progress" | "Pending" | "Cancelled", // 'Completed', 'In Progress', 'Pending', 'Cancelled'
+  createdBy: string,
+  dateCreated: string, // Format ISO
+}
+
 export interface IParams {
   search: string;
   filter?: string;

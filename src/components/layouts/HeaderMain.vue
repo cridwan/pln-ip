@@ -24,6 +24,7 @@ const login = () => {
 }
 
 const getMenuActive = computed(() => {
+  console.log(route.params)
   if (route.params.menu === "ci") {
     return "Combustion Inspection";
   } else if (route.params.menu === "ti") {
@@ -31,7 +32,7 @@ const getMenuActive = computed(() => {
   } else if (route.params.menu === "mi") {
     return "Major Inspection";
   } else {
-    return "Guest";
+    return route.params.menu;
   }
 });
 </script>

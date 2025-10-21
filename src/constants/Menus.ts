@@ -465,6 +465,12 @@ export const MenusMaster: MenuInterface[] = [
     url: "/additional-scope",
     icon: "login",
   },
+  {
+    id: 13,
+    name: "Monitoring Project",
+    url: "/monitoring-project",
+    icon: "chart",
+  },
 ];
 
 export const MenuAdditional: MenuInterface[] = [
