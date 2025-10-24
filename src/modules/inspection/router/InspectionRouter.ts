@@ -8,7 +8,7 @@ export const routeInspection = [
     meta: {
       layout: ScopeLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },

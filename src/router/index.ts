@@ -12,6 +12,7 @@ import { routeTransaction as routeGuest } from "@/modules/guest/router/Transacti
 import { routeUser } from "@/modules/user/router/UserRouter";
 import { routeNotFound } from "@/modules/not-found/router/NotFoundRouter";
 import { UserEnum } from "@/modules/auth/types/AuthType";
+import { routeProfile } from "@/modules/profile/router/ProfileRouter";
 
 const routes = [
   ...routeAuth,
@@ -23,6 +24,7 @@ const routes = [
   ...routeUser,
   ...routeNotFound,
   ...routeGuest,
+  ...routeProfile,
 ];
 
 const router = createRouter({
@@ -76,7 +78,12 @@ router.beforeEach(async (to, from, next) => {
         return redirectToDefault();
       }
 
-      if (!to.meta.role || userRole === to.meta.role) {
+      if (to.meta.role === undefined) {
+        return next();
+      } else if (
+        userRole !== undefined &&
+        (to.meta.role as string[])?.includes(userRole)
+      ) {
         return next();
       } else {
         return next({ path: "/not-found" });

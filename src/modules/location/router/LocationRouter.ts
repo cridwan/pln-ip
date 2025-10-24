@@ -9,7 +9,7 @@ export const routeLocation = [
     meta: {
       layout: MapLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -20,7 +20,7 @@ export const routeLocation = [
     meta: {
       layout: DefaultLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },

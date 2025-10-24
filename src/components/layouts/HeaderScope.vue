@@ -20,8 +20,8 @@ const logout = () => {
 };
 
 const login = () => {
-  router.push({ name: 'login' });
-}
+  router.push({ name: "login" });
+};
 
 const toCreate = () => {
   router.push(`/${locationId}/create/unit`);
@@ -29,7 +29,7 @@ const toCreate = () => {
 
 const toMonitoring = () => {
   window.location.href = `/${locationId}/project-monitoring`;
-}
+};
 </script>
 
 <template>
@@ -37,21 +37,42 @@ const toMonitoring = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <div class="user-info" v-if="authStore.users">
+        <button
+          v-if="authStore.users"
+          class="user-info"
+          @click="router.push('/profile')"
+        >
           <p>User : {{ authStore.users?.email }}</p>
-        </div>
+        </button>
         <button class="menu-button" @click="router.push('/')">Location</button>
-        <button class="menu-button" :class="{ active: route.path.includes('create') }" @click="toCreate">
+        <button
+          class="menu-button"
+          :class="{ active: route.path.includes('create') }"
+          @click="toCreate"
+        >
           Generate Scope
         </button>
-        <button class="menu-button" :class="{ active: route.path.includes('project-monitoring') }"
-          v-show="authStore.users" @click="toMonitoring">
+        <button
+          class="menu-button"
+          :class="{ active: route.path.includes('project-monitoring') }"
+          v-show="authStore.users"
+          @click="toMonitoring"
+        >
           Monitoring
+        </button>
+        <button
+          v-if="authStore.users?.role === 'planner'"
+          class="menu-button"
+          @click="router.push('/master/location')"
+        >
+          Master
         </button>
         <!-- <button class="menu-button">Preview</button>
         <button class="menu-button">Expert</button> -->
         <!-- <button class="menu-button" @click="toReport">Report</button> -->
-        <button class="sign-out-button" @click="logout" v-if="authStore.users">Sign Out</button>
+        <button class="sign-out-button" @click="logout" v-if="authStore.users">
+          Sign Out
+        </button>
         <button class="sign-out-button" @click="login" v-else>Login</button>
       </div>
     </div>
@@ -70,6 +91,8 @@ const toMonitoring = () => {
       .user-info
         @apply w-[300px] py-2 bg-buttonGray mr-[-22px] text-center
         clip-path: polygon(7.5% 0, 100% 0, 92.5% 100%, 0% 100%)
+        &:hover
+          @apply bg-cyan-500
       .menu-button
         @apply px-6 py-2 bg-buttonGray w-[150px] mr-[-22px]
         clip-path: polygon(15% 0, 100% 0, 85% 100%, 0% 100%)

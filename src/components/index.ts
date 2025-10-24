@@ -16,6 +16,7 @@ import HeaderMain from "@/components/layouts/HeaderMain.vue";
 import HeaderUserHistory from "@/components/layouts/HeaderUserHistory.vue";
 import HeaderMaster from "@/components/layouts/HeaderMaster.vue";
 import HeaderMasterAdditional from "@/components/layouts/HeaderMasterAdditional.vue";
+import HeaderEmpty from "@/components/layouts/HeaderEmpty.vue";
 import Footer from "@/components/layouts/Footer.vue";
 import Template from "@/components/structures/Template.vue";
 import Table from "@/components/tables/Table.vue";
@@ -44,6 +45,7 @@ export {
   HeaderMain,
   HeaderUserHistory,
   HeaderMaster,
+  HeaderEmpty,
   Footer,
   Template,
   Table,

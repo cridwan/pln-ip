@@ -8,7 +8,7 @@ export const routeUnit = [
     meta: {
       layout: DefaultLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },

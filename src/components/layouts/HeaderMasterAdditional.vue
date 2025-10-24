@@ -27,9 +27,16 @@ const logout = () => {
         <div class="user-info">
           <p>{{ route.params.name }}</p>
         </div>
-        <div class="user-info">
+        <button class="user-info" @click="router.push('/profile')">
           <p>User : superadmin@gmail.com</p>
-        </div>
+        </button>
+        <button
+          v-if="authStore.users?.role === 'planner'"
+          class="menu-button"
+          @click="router.push('/')"
+        >
+          Location
+        </button>
         <button class="sign-out-button" @click="logout">Sign Out</button>
       </div>
     </div>
@@ -48,6 +55,8 @@ const logout = () => {
       .user-info
         @apply w-[300px] py-2 bg-buttonGray mr-[-22px] text-center
         clip-path: polygon(7.5% 0, 100% 0, 92.5% 100%, 0% 100%)
+        &:hover
+          @apply bg-cyan-500
       .menu-button
         @apply px-6 py-2 bg-buttonGray w-[300px] mr-[-22px]
         clip-path: polygon(7.5% 0, 100% 0, 92.5% 100%, 0% 100%)

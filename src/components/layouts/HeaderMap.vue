@@ -13,17 +13,12 @@ const authStore = useAuthStore();
 const router = useRouter();
 const masterStore = useMasterStore();
 
-
-
 // get notification
-const {
-  data: dataNotification,
-  refetch: refetchNotification,
-} = useQuery({
+const { data: dataNotification, refetch: refetchNotification } = useQuery({
   queryKey: ["getNotificationLists"],
   queryFn: async () => {
     const { data } = await masterStore.getNotificationLatest({
-      receiver_id: authStore.users?.id || ""
+      receiver_id: authStore.users?.id || "",
     });
     return data as NotificationInterface[];
   },
@@ -41,8 +36,8 @@ const logout = () => {
 };
 
 const login = () => {
-  router.push({ name: 'login' });
-}
+  router.push({ name: "login" });
+};
 </script>
 
 <template>
@@ -50,27 +45,44 @@ const login = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <div class="notification-map text-blue-950 flex items-center justify-center cursor-pointer mr-8 mt-1"
-          v-show="authStore.users">
+        <div
+          class="notification-map text-blue-950 flex items-center justify-center cursor-pointer mr-8 mt-1"
+          v-show="authStore.users"
+        >
           <NotificationMap :data-notification="dataNotification">
             <div class="relative">
               <Icon name="bell-alert" size="10" />
-              <span v-if="dataNotification && dataNotification?.length > 0"
-                class="rounded-full size-3 text-[9px] flex items-center justify-center text-white bg-red-500 absolute top-0 right-0">{{
-                  dataNotification.length }}</span>
+              <span
+                v-if="dataNotification && dataNotification?.length > 0"
+                class="rounded-full size-3 text-[9px] flex items-center justify-center text-white bg-red-500 absolute top-0 right-0"
+                >{{ dataNotification.length }}</span
+              >
             </div>
           </NotificationMap>
         </div>
-        <div class="user-info" v-if="authStore.users">
+        <button
+          v-if="authStore.users"
+          class="user-info"
+          @click="router.push('/profile')"
+        >
           <p>User : {{ authStore.users?.email }}</p>
-        </div>
+        </button>
         <!-- <button class="menu-button">UBH</button> -->
         <button class="menu-button active">Location</button>
+        <button
+          v-if="authStore.users?.role === 'planner'"
+          class="menu-button"
+          @click="router.push('/master/location')"
+        >
+          Master
+        </button>
         <!-- <button class="menu-button" @click="router.push('/user-history')">
           User History
         </button> -->
         <!-- <button class="menu-button">Report</button> -->
-        <button class="sign-out-button" @click="logout" v-if="authStore.users">Sign Out</button>
+        <button class="sign-out-button" @click="logout" v-if="authStore.users">
+          Sign Out
+        </button>
         <button class="sign-out-button" @click="login" v-else>Login</button>
       </div>
     </div>
@@ -89,6 +101,8 @@ const login = () => {
       .user-info
         @apply w-[300px] py-2 bg-buttonGray mr-[-22px] text-center
         clip-path: polygon(7.5% 0, 100% 0, 92.5% 100%, 0% 100%)
+        &:hover
+          @apply bg-cyan-500
       .menu-button
         @apply px-6 py-2 bg-buttonGray w-[150px] mr-[-22px]
         clip-path: polygon(15% 0, 100% 0, 85% 100%, 0% 100%)
@@ -107,5 +121,4 @@ const login = () => {
       width: 1.4em !important
       height: 1.4em !important
       font-size: 1em !important
-
 </style>

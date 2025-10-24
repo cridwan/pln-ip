@@ -55,8 +55,8 @@ const logout = () => {
 };
 
 const login = () => {
-  router.push({ name: 'login' })
-}
+  router.push({ name: "login" });
+};
 
 const toCreate = () => {
   router.push(`/${locationId}/create/unit`);
@@ -83,17 +83,34 @@ const toReport = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <div class="user-info" v-if="authStore.users">
+        <button
+          v-if="authStore.users"
+          class="user-info"
+          @click="router.push('/profile')"
+        >
           <p>User : {{ authStore.users?.email }}</p>
-        </div>
+        </button>
         <button class="menu-button" @click="router.push('/')">Location</button>
-        <button class="menu-button" :class="{ active: route.path.includes('create') }" @click="toCreate">
+        <button
+          class="menu-button"
+          :class="{ active: route.path.includes('create') }"
+          @click="toCreate"
+        >
           Generate Scope
+        </button>
+        <button
+          v-if="authStore.users?.role === 'planner'"
+          class="menu-button"
+          @click="router.push('/master/location')"
+        >
+          Master
         </button>
         <!-- <button class="menu-button">Preview</button>
         <button class="menu-button">Expert</button> -->
         <!-- <button class="menu-button" @click="toReport">Report</button> -->
-        <button class="sign-out-button" @click="logout" v-if="authStore.users">Sign Out</button>
+        <button class="sign-out-button" @click="logout" v-if="authStore.users">
+          Sign Out
+        </button>
         <button class="sign-out-button" @click="login" v-else>Login</button>
       </div>
       <div class="navigation">
@@ -104,22 +121,37 @@ const toReport = () => {
           <Icon name="home" class="text-white text-xl" />
         </div> -->
         <div class="arrow-buttons">
-          <button class="arrow-button back" :disabled="disabledBack" @click="handleBack">
+          <button
+            class="arrow-button back"
+            :disabled="disabledBack"
+            @click="handleBack"
+          >
             Back
           </button>
-          <button v-if="!isFinish && !isRemoveNext" class="arrow-button next" :disabled="disabledNext"
-            @click="handleNext">
+          <button
+            v-if="!isFinish && !isRemoveNext"
+            class="arrow-button next"
+            :disabled="disabledNext"
+            @click="handleNext"
+          >
             Next
           </button>
-          <button v-if="isFinish && !isRemoveNext" class="arrow-button next" :disabled="disabledNext"
-            @click="handleSave">
+          <button
+            v-if="isFinish && !isRemoveNext"
+            class="arrow-button next"
+            :disabled="disabledNext"
+            @click="handleSave"
+          >
             Save
           </button>
         </div>
       </div>
       <div v-if="isStepNavigation" class="step-navigation">
-        <Icon name="double-arrow-left" class="text-[24px] text-buttonGray cursor-pointer hover:text-cyan-500"
-          @click="handleStepNavigation" />
+        <Icon
+          name="double-arrow-left"
+          class="text-[24px] text-buttonGray cursor-pointer hover:text-cyan-500"
+          @click="handleStepNavigation"
+        />
       </div>
       <div v-if="isAddScope" class="add-scope">
         <button :disabled="disabledNext" @click="handleAddScope">
@@ -136,12 +168,14 @@ const toReport = () => {
   img
     @apply h-[50px] pl-4 pt-4
   .menu-bar
-    @apply h-full flex flex-col gap-2
+    @apply h-full flex flex-col gap-2 items-end
     .menu-wrapper
       @apply flex text-sm text-neutral-50
       .user-info
         @apply w-[300px] py-2 bg-buttonGray mr-[-22px] text-center
         clip-path: polygon(7.5% 0, 100% 0, 92.5% 100%, 0% 100%)
+        &:hover
+          @apply bg-cyan-500
       .menu-button
         @apply px-6 py-2 bg-buttonGray w-[150px] mr-[-22px]
         clip-path: polygon(15% 0, 100% 0, 85% 100%, 0% 100%)

@@ -9,7 +9,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -20,7 +20,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -31,7 +31,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -53,7 +53,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -64,7 +64,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -75,7 +75,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -86,7 +86,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -97,7 +97,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -108,7 +108,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -119,7 +119,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -130,7 +130,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -141,7 +141,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestAddScopeLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -153,7 +153,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestAddScopeLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -165,7 +165,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestAddScopeLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -177,7 +177,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestAddScopeLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -189,7 +189,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestAddScopeLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -200,7 +200,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestAddScopeLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -211,7 +211,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -222,7 +222,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },
@@ -233,7 +233,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: false,
-      role: "planner",
+      role: ["planner"],
       except: ["superuser"],
     },
   },

@@ -7,11 +7,11 @@ export interface ManpowerStdInterface {
   activity: ActivityInterface;
   manpower_uuid: string;
   manpower: ManpowerInterface;
-  use_transaction?: boolean;
   qty: number;
   total_qty?: number;
   created_at: string;
   updated_at: string;
+  use_transaction?: boolean;
 }
 
 export interface ManpowerStdCreateInterface {
