@@ -64,7 +64,7 @@ router.beforeEach(async (to, from, next) => {
 
   const redirectToDefault = () => {
     const redirectPath =
-      redirectMap[userRole as keyof typeof redirectMap] || "/";
+      redirectMap[userRole as keyof typeof redirectMap] || "/login";
     next({ path: redirectPath });
   };
 
