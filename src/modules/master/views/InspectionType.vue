@@ -30,7 +30,14 @@ const total_item = ref(0);
 const params = reactive({
   search: "",
   filter: "",
-  filters: [],
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "machine_uuid",
+      value: "",
+    },
+  ],
   currentPage: 1,
   perPage: 10,
 });

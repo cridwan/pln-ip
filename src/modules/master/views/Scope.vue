@@ -41,6 +41,18 @@ const params = reactive({
       column: "inspection_type_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "inspection_type_uuid",
+      value: "",
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "sub_bidang_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,

@@ -40,6 +40,12 @@ const params = reactive({
       column: "activity.equipment.scopeStandart.inspection_type_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -110,7 +116,7 @@ const { mutate: deleteManpowerStd, isPending: isLoadingDelete } = useMutation({
 const { mutate: downloadManpowerStd, isPending: isLoadingDownload } =
   useMutation({
     mutationFn: async () => {
-      return await masterStore.downloadManpowerStd();
+      return await masterStore.downloadManpowerStd(params);
     },
     onSuccess: () => { },
     onError: (error) => {

@@ -37,6 +37,12 @@ const params = reactive({
       column: "activity.equipment.scopeStandart.inspection_type_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,
