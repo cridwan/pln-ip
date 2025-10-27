@@ -114,6 +114,11 @@ const { mutate: importLocation, isPending: isLoadingImport } = useMutation({
     return await masterStore.importLocation(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchLocation();
   },
   onError: (error) => {
@@ -207,7 +212,6 @@ const handleExportTemplate = () => {
 };
 
 const handleImport = (file: File) => {
-  console.log("import");
   importLocation(file);
 };
 
@@ -253,6 +257,9 @@ onMounted(() => {
           <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
           <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
         </div>
+      </template>
+      <template #column_sub_area="{ entity }">
+        <span class="text-white">{{ entity?.sub_area?.name }}</span>
       </template>
     </Table>
 

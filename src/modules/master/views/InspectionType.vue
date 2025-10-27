@@ -30,7 +30,14 @@ const total_item = ref(0);
 const params = reactive({
   search: "",
   filter: "",
-  filters: [],
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "machine_uuid",
+      value: "",
+    },
+  ],
   currentPage: 1,
   perPage: 10,
 });
@@ -130,6 +137,11 @@ const { mutate: importInspectionType, isPending: isLoadingImport } =
       return await masterStore.importInspectionType(payload);
     },
     onSuccess: () => {
+      toastRef.value?.showToast({
+        title: "Success",
+        description: "Import successfully",
+        type: "success",
+      });
       refetchInspectionType();
     },
     onError: (error) => {

@@ -116,6 +116,11 @@ const { mutate: importConsMat, isPending: isLoadingImport } = useMutation({
     return await masterStore.importConsMat(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchConsMat();
   },
   onError: (error) => {

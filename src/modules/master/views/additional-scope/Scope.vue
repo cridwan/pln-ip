@@ -35,6 +35,12 @@ const params = reactive<IParams>({
       column: "additional_scope_uuid",
       value: route.params?.id,
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "sub_bidang_uuid",
+      value: '',
+    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -55,7 +61,7 @@ const {
   queryKey: ["getScopeMaster"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getScope(params);
+      const { data } = await masterStore.getScope(params, '/add-scope/detail');
       const response = data as IPagination<ScopeInterface[]>;
 
       total_item.value = response.total;
@@ -102,7 +108,7 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
 //--- DOWNLOAD
 const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
-    return await masterStore.downloadScope(params);
+    return await masterStore.downloadScope(params, '/add-scope/detail');
   },
   onSuccess: () => { },
   onError: (error) => {
@@ -114,7 +120,7 @@ const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
 //--- DOWNLOAD TEMPLATE
 const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
-    return await masterStore.templateScope();
+    return await masterStore.templateScope('/add-scope/detail');
   },
   onSuccess: () => { },
   onError: (error) => {
@@ -126,7 +132,7 @@ const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
 //--- IMPORT
 const { mutate: importScope, isPending: isLoadingImport } = useMutation({
   mutationFn: async (payload: File) => {
-    return await masterStore.importScope(payload);
+    return await masterStore.importScope(payload, '/add-scope/detail');
   },
   onSuccess: () => {
     refetchScope();
@@ -240,6 +246,12 @@ const resetFilter = () => {
       column: "additional_scope_uuid",
       value: route.params?.id,
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "sub_bidang_uuid",
+      value: '',
+    },
   ];
 };
 
@@ -275,6 +287,11 @@ const handleExportTemplate = () => {
 };
 
 const handleImport = (file: File) => {
+  toastRef.value?.showToast({
+    title: "Success",
+    description: "Import successfully",
+    type: "success",
+  });
   importScope(file);
 };
 </script>

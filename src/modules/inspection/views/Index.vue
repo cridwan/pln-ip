@@ -32,6 +32,7 @@ import type {
   TInspection,
 } from "../types/InspectionType";
 import { useAuthStore } from "@/modules/auth/stores/AuthStore";
+import { UserEnum } from "@/modules/auth/types/AuthType";
 
 const videos = [Home0, Home1, Home2];
 
@@ -329,7 +330,7 @@ const onDelete = () => {
 };
 
 const selectInspection = (item: TInspection) => {
-  if (!authStore.users) {
+  if (authStore.users && authStore.users.role === UserEnum.GUEST) {
     router.push(`/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.name}/undefined/${item.uuid}/scope`)
   } else {
     toScope(item);

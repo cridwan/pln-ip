@@ -32,8 +32,8 @@ const params = reactive({
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additional_scope_uuid",
-      value: route.params?.id,
+      column: "activity_uuid",
+      value: "",
     },
   ],
   currentPage: 1,
@@ -54,7 +54,7 @@ const {
   queryKey: ["getPartStd"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getPartStd(params);
+      const { data } = await masterStore.getPartStd(params, '/add-scope/detail');
       const response = data.data as IPagination<PartStdInterface[]>;
       total_item.value = response.total;
 
@@ -75,7 +75,7 @@ const {
 //--- DELETE SCOPE
 const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deletePartStd(id);
+    return await masterStore.deletePartStd(id, '/add-scope/detail');
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -99,7 +99,7 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
 //--- DOWNLOAD
 const { mutate: downloadPartStd, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
-    return await masterStore.downloadPartStd(params);
+    return await masterStore.downloadPartStd(params, '/add-scope/detail');
   },
   onSuccess: () => { },
   onError: (error) => {
@@ -111,7 +111,7 @@ const { mutate: downloadPartStd, isPending: isLoadingDownload } = useMutation({
 //--- DOWNLOAD TEMPLATE
 const { mutate: templatePartStd, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
-    return await masterStore.templatePartStd();
+    return await masterStore.templatePartStd('/add-scope/detail');
   },
   onSuccess: () => { },
   onError: (error) => {
@@ -123,9 +123,14 @@ const { mutate: templatePartStd, isPending: isLoadingTemplate } = useMutation({
 //--- IMPORT
 const { mutate: importPartStd, isPending: isLoadingImport } = useMutation({
   mutationFn: async (payload: File) => {
-    return await masterStore.importPartStd(payload);
+    return await masterStore.importPartStd(payload, '/add-scope/detail');
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchPartStd();
   },
   onError: (error) => {
@@ -238,8 +243,8 @@ const resetFilter = () => {
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additional_scope_uuid",
-      value: route.params?.id,
+      column: "activity_uuid",
+      value: "",
     },
   ];
 };

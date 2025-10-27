@@ -31,6 +31,12 @@ const params = reactive({
       column: "scopeStandart.additional_scope_uuid",
       value: route.params?.id,
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "scope_standart_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -50,7 +56,7 @@ const {
   queryKey: ["getEquipmentMaster"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getEquipment(params);
+      const { data } = await masterStore.getEquipment(params, '/add-scope/detail');
       const response = data.data as IPagination<EquipmentInterface[]>;
 
       total_item.value = response.total;
@@ -72,7 +78,7 @@ const {
 //--- DELETE EQUIPMENT
 const { mutate: deleteEquipment, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteEquipment(id);
+    return await masterStore.deleteEquipment(id, '/add-scope/detail');
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -98,7 +104,7 @@ const { mutate: deleteEquipment, isPending: isLoadingDelete } = useMutation({
 const { mutate: downloadEquipment, isPending: isLoadingDownload } = useMutation(
   {
     mutationFn: async () => {
-      return await masterStore.downloadEquipment(params);
+      return await masterStore.downloadEquipment(params, '/add-scope/detail');
     },
     onSuccess: () => { },
     onError: (error) => {
@@ -112,7 +118,7 @@ const { mutate: downloadEquipment, isPending: isLoadingDownload } = useMutation(
 const { mutate: templateEquipment, isPending: isLoadingTemplate } = useMutation(
   {
     mutationFn: async () => {
-      return await masterStore.templateEquipment();
+      return await masterStore.templateEquipment('/add-scope/detail');
     },
     onSuccess: () => { },
     onError: (error) => {
@@ -125,9 +131,14 @@ const { mutate: templateEquipment, isPending: isLoadingTemplate } = useMutation(
 //--- IMPORT
 const { mutate: importEquipment, isPending: isLoadingImport } = useMutation({
   mutationFn: async (payload: File) => {
-    return await masterStore.importEquipment(payload);
+    return await masterStore.importEquipment(payload, '/add-scope/detail');
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchEquipment();
   },
   onError: (error) => {
@@ -249,6 +260,12 @@ const resetFilter = () => {
       operator: "EQ",
       column: "scopeStandart.additional_scope_uuid",
       value: route.params?.id,
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "scope_standart_uuid",
+      value: "",
     },
   ];
 };

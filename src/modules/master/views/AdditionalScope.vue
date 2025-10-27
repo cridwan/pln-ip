@@ -40,7 +40,14 @@ const params = reactive<IParams>({
   filter: "",
   currentPage: 1,
   perPage: 10,
-  filters: [],
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "inspection_type_uuid",
+      value: "",
+    },
+  ],
 });
 const open_form = ref(false);
 const open_delete = ref(false);
@@ -141,6 +148,11 @@ const { mutate: importAdditionalScope, isPending: isLoadingImport } =
       return await masterStore.importAdditionalScope(payload);
     },
     onSuccess: () => {
+      toastRef.value?.showToast({
+        title: "Success",
+        description: "Import successfully",
+        type: "success",
+      });
       refetchAdditionalScope();
     },
     onError: (error) => {

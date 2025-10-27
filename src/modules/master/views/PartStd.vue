@@ -40,6 +40,12 @@ const params = reactive({
       column: "activity.equipment.scopeStandart.inspection_type_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -134,6 +140,11 @@ const { mutate: importPartStd, isPending: isLoadingImport } = useMutation({
     return await masterStore.importPartStd(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchpartStd();
   },
   onError: (error) => {

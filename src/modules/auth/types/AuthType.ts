@@ -2,6 +2,7 @@ export enum UserEnum {
   PLANNER = "planner",
   APPROVAL = "approval",
   SUPERUSER = "superuser",
+  GUEST = "guest"
 }
 
 export interface UserType {

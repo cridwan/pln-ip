@@ -27,4 +27,10 @@ export const ColumnsLocation: TableColumnType[] = [
     align: "left",
     sort: false,
   },
+  {
+    key: "sub_area",
+    label: "Sub Area",
+    align: "left",
+    sort: false,
+  },
 ];

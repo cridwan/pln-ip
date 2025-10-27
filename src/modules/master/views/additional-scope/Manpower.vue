@@ -31,8 +31,8 @@ const params = reactive({
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additional_scope_uuid",
-      value: route.params?.id,
+      column: "activity_uuid",
+      value: "",
     },
   ],
   currentPage: 1,
@@ -54,7 +54,7 @@ const {
   queryFn: async () => {
     try {
       console.log(params);
-      const { data } = await masterStore.getManpowerStd(params);
+      const { data } = await masterStore.getManpowerStd(params, '/add-scope/detail');
       const response = data.data as IPagination<ManpowerStdInterface[]>;
       total_item.value = response.total;
 
@@ -75,7 +75,7 @@ const {
 //--- DELETE SCOPE
 const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteManpowerStd(id);
+    return await masterStore.deleteManpowerStd(id, '/add-scope/detail');
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -100,7 +100,7 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
 const { mutate: downloadManpowerStd, isPending: isLoadingDownload } =
   useMutation({
     mutationFn: async () => {
-      return await masterStore.downloadManpowerStd(params);
+      return await masterStore.downloadManpowerStd(params, '/add-scope/detail');
     },
     onSuccess: () => { },
     onError: (error) => {
@@ -113,7 +113,7 @@ const { mutate: downloadManpowerStd, isPending: isLoadingDownload } =
 const { mutate: templateManpowerStd, isPending: isLoadingTemplate } =
   useMutation({
     mutationFn: async () => {
-      return await masterStore.templateManpowerStd();
+      return await masterStore.templateManpowerStd('/add-scope/detail');
     },
     onSuccess: () => { },
     onError: (error) => {
@@ -125,9 +125,14 @@ const { mutate: templateManpowerStd, isPending: isLoadingTemplate } =
 //--- IMPORT
 const { mutate: importManpowerStd, isPending: isLoadingImport } = useMutation({
   mutationFn: async (payload: File) => {
-    return await masterStore.importManpowerStd(payload);
+    return await masterStore.importManpowerStd(payload, '/add-scope/detail');
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchManpowerStd();
   },
   onError: (error) => {
@@ -229,8 +234,8 @@ const resetFilter = () => {
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additional_scope_uuid",
-      value: route.params?.id,
+      column: "activity_uuid",
+      value: "",
     },
   ];
 };

@@ -37,6 +37,8 @@ import type {
   AxiosRequestConfig,
 } from "axios";
 import type { QCPlanCreateInterface } from "../types/QcPlanType";
+import type { AreaCreateInterface } from "../types/AreaType";
+import type { SubAreaCreateInterface } from "../types/SubAreaType";
 
 export const useMasterStore = defineStore(
   "master",
@@ -711,9 +713,9 @@ export const useMasterStore = defineStore(
     // --- END
 
     // --- SCOPE
-    const getScope = async (payload: IParams) => {
+    const getScope = async (payload: IParams, prefix: string = "") => {
       return await api
-        .get(`/scope-standart`, {
+        .get(`${prefix}/scope-standart`, {
           params: payload,
         })
         .then((resp) => {
@@ -746,9 +748,9 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const deleteScope = async (id: string) => {
+    const deleteScope = async (id: string, prefix: string = "") => {
       return await api
-        .delete(`/scope-standart/${id}`)
+        .delete(`${prefix}/scope-standart/${id}`)
         .then((res) => {
           return Promise.resolve(res);
         })
@@ -757,10 +759,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const downloadScope = async (params?: AxiosRequestConfig["params"]) => {
+    const downloadScope = async (params?: AxiosRequestConfig["params"], prefix: string = "") => {
       return await api
         .post(
-          `/scope-standart/export`,
+          `${prefix}/scope-standart/export`,
           {},
           {
             responseType: "blob",
@@ -792,10 +794,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateScope = async () => {
+    const templateScope = async (prefix: string = "") => {
       return await api
         .post(
-          `/scope-standart/template`,
+          `${prefix}/scope-standart/template`,
           {},
           {
             responseType: "blob",
@@ -826,12 +828,12 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const importScope = async (payload: File) => {
+    const importScope = async (payload: File, prefix: string = "") => {
       const formData = new FormData();
       formData.append("file", payload);
 
       return await api
-        .post(`/scope-standart/import`, formData)
+        .post(`${prefix}/scope-standart/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -1806,6 +1808,136 @@ export const useMasterStore = defineStore(
     };
     // --- END
 
+    // --- area
+    const getArea = async (payload: IParams) => {
+      return await api
+        .get(`/area`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const createArea = async (payload: AreaCreateInterface) => {
+      return await api
+        .post(`/area`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const updateArea = async (id: string, payload: AreaCreateInterface) => {
+      return await api
+        .put(`/area/${id}`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteArea = async (id: string) => {
+      return await api
+        .delete(`/area/${id}`)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const downloadArea = async () => {
+      return await api
+        .post(
+          `/area/export`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Area.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const templateArea = async () => {
+      return await api
+        .post(
+          `/area/template`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Area Template.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const importArea = async (payload: File) => {
+      const formData = new FormData();
+      formData.append("file", payload);
+
+      return await api
+        .post(`/area/import`, formData)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+    // --- END
+
     // --- SUBBIDANG
     const getSubBidang = async (payload: IParams) => {
       return await api
@@ -1931,6 +2063,140 @@ export const useMasterStore = defineStore(
 
       return await api
         .post(`/sub-bidang/import`, formData)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+    // --- END
+
+    // --- SUB AREA
+    const getSubArea = async (payload: IParams) => {
+      return await api
+        .get(`/sub-area`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const createSubArea = async (payload: SubAreaCreateInterface) => {
+      return await api
+        .post(`/sub-area`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const updateSubArea = async (
+      id: string,
+      payload: SubAreaCreateInterface
+    ) => {
+      return await api
+        .put(`/sub-area/${id}`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteSubArea = async (id: string) => {
+      return await api
+        .delete(`/sub-area/${id}`)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const downloadSubArea = async (params?: AxiosRequestConfig["params"]) => {
+      return await api
+        .post(
+          `/sub-area/export`,
+          {},
+          {
+            responseType: "blob",
+            params,
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Sub Area.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const templateSubArea = async () => {
+      return await api
+        .post(
+          `/sub-area/template`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Sub Area Template.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const importSubArea = async (payload: File) => {
+      const formData = new FormData();
+      formData.append("file", payload);
+
+      return await api
+        .post(`/sub-area/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -2252,9 +2518,9 @@ export const useMasterStore = defineStore(
     // --- END
 
     // ACTIVITY
-    const getActivity = async (payload: IParams) => {
+    const getActivity = async (payload: IParams, prefix: string = "") => {
       return await api
-        .get(`/activity`, {
+        .get(`${prefix}/activity`, {
           params: payload,
         })
         .then((resp) => {
@@ -2290,9 +2556,9 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const deleteActivity = async (id: string) => {
+    const deleteActivity = async (id: string, prefix: string = "") => {
       return await api
-        .delete(`/activity/${id}`)
+        .delete(`${prefix}/activity/${id}`)
         .then((res) => {
           return Promise.resolve(res);
         })
@@ -2301,10 +2567,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const downloadActivity = async (params?: AxiosRequestConfig["params"]) => {
+    const downloadActivity = async (params?: AxiosRequestConfig["params"], prefix: string = "") => {
       return await api
         .post(
-          `/activity/export`,
+          `${prefix}/activity/export`,
           {},
           {
             responseType: "blob",
@@ -2336,10 +2602,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateActivity = async () => {
+    const templateActivity = async (prefix: string = "") => {
       return await api
         .post(
-          `/activity/template`,
+          `${prefix}/activity/template`,
           {},
           {
             responseType: "blob",
@@ -2370,12 +2636,12 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const importActivity = async (payload: File) => {
+    const importActivity = async (payload: File, prefix: string = "") => {
       const formData = new FormData();
       formData.append("file", payload);
 
       return await api
-        .post(`/activity/import`, formData)
+        .post(`${prefix}/activity/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -2386,7 +2652,7 @@ export const useMasterStore = defineStore(
     // END
 
     // EQUIPMENT
-    const getEquipment = async (payload: IParams) => {
+    const getEquipment = async (payload: IParams, prefix: string = "") => {
       return await api
         .get(`/equipment`, {
           params: payload,
@@ -2424,9 +2690,9 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const deleteEquipment = async (id: string) => {
+    const deleteEquipment = async (id: string, prefix: string = "") => {
       return await api
-        .delete(`/equipment/${id}`)
+        .delete(`${prefix}/equipment/${id}`)
         .then((res) => {
           return Promise.resolve(res);
         })
@@ -2435,10 +2701,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const downloadEquipment = async (params?: AxiosRequestConfig["params"]) => {
+    const downloadEquipment = async (params?: AxiosRequestConfig["params"], prefix: string = "") => {
       return await api
         .post(
-          `/equipment/export`,
+          `${prefix}/equipment/export`,
           {},
           {
             responseType: "blob",
@@ -2470,10 +2736,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateEquipment = async () => {
+    const templateEquipment = async (prefix: string = "") => {
       return await api
         .post(
-          `/equipment/template`,
+          `${prefix}/equipment/template`,
           {},
           {
             responseType: "blob",
@@ -2504,12 +2770,12 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const importEquipment = async (payload: File) => {
+    const importEquipment = async (payload: File, prefix: string = "") => {
       const formData = new FormData();
       formData.append("file", payload);
 
       return await api
-        .post(`/equipment/import`, formData)
+        .post(`${prefix}/equipment/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -2520,9 +2786,9 @@ export const useMasterStore = defineStore(
     // END
 
     // PART STD
-    const getPartStd = async (payload: IParams) => {
+    const getPartStd = async (payload: IParams, prefix: string = "") => {
       return await api
-        .get(`/part-std`, {
+        .get(`${prefix}/part-std`, {
           params: payload,
         })
         .then((resp) => {
@@ -2558,9 +2824,9 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const deletePartStd = async (id: string) => {
+    const deletePartStd = async (id: string, prefix: string = "") => {
       return await api
-        .delete(`/part-std/${id}`)
+        .delete(`${prefix}/part-std/${id}`)
         .then((res) => {
           return Promise.resolve(res);
         })
@@ -2569,10 +2835,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const downloadPartStd = async (params?: AxiosRequestConfig["params"]) => {
+    const downloadPartStd = async (params?: AxiosRequestConfig["params"], prefix: string = "") => {
       return await api
         .post(
-          `/part-std/export`,
+          `${prefix}/part-std/export`,
           {},
           {
             responseType: "blob",
@@ -2604,10 +2870,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templatePartStd = async () => {
+    const templatePartStd = async (prefix: string = "") => {
       return await api
         .post(
-          `/part-std/template`,
+          `${prefix}/part-std/template`,
           {},
           {
             responseType: "blob",
@@ -2638,12 +2904,12 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const importPartStd = async (payload: File) => {
+    const importPartStd = async (payload: File, prefix: string = '') => {
       const formData = new FormData();
       formData.append("file", payload);
 
       return await api
-        .post(`/part-std/import`, formData)
+        .post(`${prefix}/part-std/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -2654,9 +2920,9 @@ export const useMasterStore = defineStore(
     // END
 
     // MANPOWER STD
-    const getManpowerStd = async (payload: IParams) => {
+    const getManpowerStd = async (payload: IParams, prefix: string = "") => {
       return await api
-        .get(`/manpower-std`, {
+        .get(`${prefix}/manpower-std`, {
           params: payload,
         })
         .then((resp) => {
@@ -2692,9 +2958,9 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const deleteManpowerStd = async (id: string) => {
+    const deleteManpowerStd = async (id: string, prefix: string = "") => {
       return await api
-        .delete(`/manpower-std/${id}`)
+        .delete(`${prefix}/manpower-std/${id}`)
         .then((res) => {
           return Promise.resolve(res);
         })
@@ -2704,11 +2970,12 @@ export const useMasterStore = defineStore(
     };
 
     const downloadManpowerStd = async (
-      params?: AxiosRequestConfig["params"]
+      params?: AxiosRequestConfig["params"],
+      prefix: string = ""
     ) => {
       return await api
         .post(
-          `/manpower-std/export`,
+          `${prefix}/manpower-std/export`,
           {},
           {
             params,
@@ -2740,10 +3007,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateManpowerStd = async () => {
+    const templateManpowerStd = async (prefix: string = "") => {
       return await api
         .post(
-          `/manpower-std/template`,
+          `${prefix}/manpower-std/template`,
           {},
           {
             responseType: "blob",
@@ -2774,12 +3041,12 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const importManpowerStd = async (payload: File) => {
+    const importManpowerStd = async (payload: File, prefix: string = "") => {
       const formData = new FormData();
       formData.append("file", payload);
 
       return await api
-        .post(`/manpower-std/import`, formData)
+        .post(`${prefix}/manpower-std/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -2790,9 +3057,9 @@ export const useMasterStore = defineStore(
     // END
 
     // CONSUMABLE MATERIAL STD
-    const getConsumableMaterialStd = async (payload: IParams) => {
+    const getConsumableMaterialStd = async (payload: IParams, prefix: string = "") => {
       return await api
-        .get(`/cons-mat-std`, {
+        .get(`${prefix}/cons-mat-std`, {
           params: payload,
         })
         .then((resp) => {
@@ -2842,11 +3109,12 @@ export const useMasterStore = defineStore(
     };
 
     const downloadConsumableMaterialStd = async (
-      params?: AxiosRequestConfig["params"]
+      params?: AxiosRequestConfig["params"],
+      prefix: string = ""
     ) => {
       return await api
         .post(
-          `/cons-mat-std/export`,
+          `${prefix}/cons-mat-std/export`,
           {},
           {
             responseType: "blob",
@@ -2878,10 +3146,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateConsumableMaterialStd = async () => {
+    const templateConsumableMaterialStd = async (prefix: string = "") => {
       return await api
         .post(
-          `/cons-mat-std/template`,
+          `${prefix}/cons-mat-std/template`,
           {},
           {
             responseType: "blob",
@@ -2912,12 +3180,12 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const importConsumableMaterialStd = async (payload: File) => {
+    const importConsumableMaterialStd = async (payload: File, prefix: string = "") => {
       const formData = new FormData();
       formData.append("file", payload);
 
       return await api
-        .post(`/cons-mat-std/import`, formData)
+        .post(`${prefix}/cons-mat-std/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -3223,7 +3491,21 @@ export const useMasterStore = defineStore(
       getManpowerGrouping,
       getConsMatGrouping,
       getNotificationLatest,
-      notificationMarkAsRead
+      notificationMarkAsRead,
+      getArea,
+      createArea,
+      updateArea,
+      deleteArea,
+      downloadArea,
+      templateArea,
+      importArea,
+      getSubArea,
+      createSubArea,
+      updateSubArea,
+      deleteSubArea,
+      downloadSubArea,
+      templateSubArea,
+      importSubArea,
     };
   },
   {

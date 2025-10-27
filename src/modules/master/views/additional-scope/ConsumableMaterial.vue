@@ -31,8 +31,8 @@ const params = reactive({
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additional_scope_uuid",
-      value: route.params?.id,
+      column: "activity_uuid",
+      value: "",
     },
   ],
   currentPage: 1,
@@ -53,7 +53,7 @@ const {
   queryKey: ["getConsumableMaterialStdAdditional"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getConsumableMaterialStd(params);
+      const { data } = await masterStore.getConsumableMaterialStd(params, '/add-scope/detail');
       const response = data.data as IPagination<
         ConsumableMaterialStdInterface[]
       >;
@@ -76,7 +76,7 @@ const {
 //--- DELETE SCOPE
 const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteManpowerStd(id);
+    return await masterStore.deleteManpowerStd(id, '/add-scope/detail');
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -101,7 +101,7 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
 const { mutate: downloadConsMatStd, isPending: isLoadingDownload } =
   useMutation({
     mutationFn: async () => {
-      return await masterStore.downloadConsumableMaterialStd(params);
+      return await masterStore.downloadConsumableMaterialStd(params, '/add-scope/detail');
     },
     onSuccess: () => { },
     onError: (error) => {
@@ -114,7 +114,7 @@ const { mutate: downloadConsMatStd, isPending: isLoadingDownload } =
 const { mutate: templateConsMatStd, isPending: isLoadingTemplate } =
   useMutation({
     mutationFn: async () => {
-      return await masterStore.templateConsumableMaterialStd();
+      return await masterStore.templateConsumableMaterialStd('/add-scope/detail');
     },
     onSuccess: () => { },
     onError: (error) => {
@@ -126,9 +126,14 @@ const { mutate: templateConsMatStd, isPending: isLoadingTemplate } =
 //--- IMPORT
 const { mutate: importConsMatStd, isPending: isLoadingImport } = useMutation({
   mutationFn: async (payload: File) => {
-    return await masterStore.importConsumableMaterialStd(payload);
+    return await masterStore.importConsumableMaterialStd(payload, '/add-scope/detail');
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchConsMatStd();
   },
   onError: (error) => {
@@ -230,8 +235,8 @@ const resetFilter = () => {
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additional_scope_uuid",
-      value: route.params?.id,
+      column: "activity_uuid",
+      value: "",
     },
   ];
 };
