@@ -137,6 +137,11 @@ const { mutate: importConsMatStd, isPending: isLoadingImport } = useMutation({
     return await masterStore.importConsumableMaterialStd(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchConsMatStd();
   },
   onError: (error) => {

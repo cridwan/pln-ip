@@ -116,6 +116,11 @@ const { mutate: importPart, isPending: isLoadingImport } = useMutation({
     return await masterStore.importPart(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchPart();
   },
   onError: (error) => {

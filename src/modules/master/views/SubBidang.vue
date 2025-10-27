@@ -132,6 +132,11 @@ const { mutate: importSubBidang, isPending: isLoadingImport } = useMutation({
     return await masterStore.importSubBidang(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchSubBidang();
   },
   onError: (error) => {

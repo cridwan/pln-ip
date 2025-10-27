@@ -116,6 +116,11 @@ const { mutate: importGlobalUnit, isPending: isLoadingImport } = useMutation({
     return await masterStore.importGlobalUnit(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchGlobalUnit();
   },
   onError: (error) => {

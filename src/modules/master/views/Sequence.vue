@@ -125,6 +125,11 @@ const { mutate: importSequence, isPending: isLoadingImport } = useMutation({
     return await masterStore.importSequence(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchSequence();
   },
   onError: (error) => {

@@ -136,6 +136,11 @@ const { mutate: importScope, isPending: isLoadingImport } = useMutation({
     return await masterStore.importScope(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchScope();
   },
   onError: (error) => {

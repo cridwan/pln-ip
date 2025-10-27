@@ -116,6 +116,11 @@ const { mutate: importQcPlan, isPending: isLoadingImport } = useMutation({
     return await masterStore.importQcPlan(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchQcPlan();
   },
   onError: (error) => {

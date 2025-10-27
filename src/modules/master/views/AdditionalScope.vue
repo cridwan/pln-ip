@@ -141,6 +141,11 @@ const { mutate: importAdditionalScope, isPending: isLoadingImport } =
       return await masterStore.importAdditionalScope(payload);
     },
     onSuccess: () => {
+      toastRef.value?.showToast({
+        title: "Success",
+        description: "Import successfully",
+        type: "success",
+      });
       refetchAdditionalScope();
     },
     onError: (error) => {

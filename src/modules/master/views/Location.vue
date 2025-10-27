@@ -114,6 +114,11 @@ const { mutate: importLocation, isPending: isLoadingImport } = useMutation({
     return await masterStore.importLocation(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchLocation();
   },
   onError: (error) => {
@@ -207,7 +212,6 @@ const handleExportTemplate = () => {
 };
 
 const handleImport = (file: File) => {
-  console.log("import");
   importLocation(file);
 };
 

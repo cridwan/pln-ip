@@ -130,6 +130,11 @@ const { mutate: importInspectionType, isPending: isLoadingImport } =
       return await masterStore.importInspectionType(payload);
     },
     onSuccess: () => {
+      toastRef.value?.showToast({
+        title: "Success",
+        description: "Import successfully",
+        type: "success",
+      });
       refetchInspectionType();
     },
     onError: (error) => {

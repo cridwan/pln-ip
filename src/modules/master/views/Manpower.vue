@@ -116,6 +116,11 @@ const { mutate: importManpower, isPending: isLoadingImport } = useMutation({
     return await masterStore.importManpower(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchManpower();
   },
   onError: (error) => {

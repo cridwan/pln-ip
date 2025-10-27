@@ -37,6 +37,12 @@ const params = reactive({
       column: "equipment.scopeStandart.inspection_type_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "equipment_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -132,6 +138,11 @@ const { mutate: importActivity, isPending: isLoadingImport } = useMutation({
     return await masterStore.importActivity(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchActivity();
   },
   onError: (error) => {
@@ -240,6 +251,12 @@ const resetFilter = () => {
       group: "AND",
       operator: "NOT_NULL",
       column: "equipment.scopeStandart.inspection_type_uuid",
+      value: "",
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "equipment_uuid",
       value: "",
     },
   ];

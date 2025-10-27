@@ -137,6 +137,11 @@ const { mutate: importMachine, isPending: isLoadingImport } = useMutation({
     return await masterStore.importMachine(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchMachine();
   },
   onError: (error) => {

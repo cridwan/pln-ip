@@ -114,6 +114,11 @@ const { mutate: importHseDoc, isPending: isLoadingImport } = useMutation({
     return await masterStore.importHseDoc(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchHseDoc();
   },
   onError: (error) => {

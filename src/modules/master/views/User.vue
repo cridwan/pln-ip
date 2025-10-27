@@ -89,7 +89,7 @@ const { mutate: downloadUser, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
     return await masterStore.downloadUser();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -101,7 +101,7 @@ const { mutate: templateUser, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
     return await masterStore.templateUser();
   },
-  onSuccess: () => {},
+  onSuccess: () => { },
   onError: (error) => {
     console.log(error);
   },
@@ -114,6 +114,11 @@ const { mutate: importUser, isPending: isLoadingImport } = useMutation({
     return await masterStore.importUser(payload);
   },
   onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
     refetchUser();
   },
   onError: (error) => {
@@ -234,42 +239,16 @@ onMounted(() => {
         @template="handleExportTemplate"
         @import="handleImport"
       /> -->
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
     </div>
 
-    <Table
-      label-create="User"
-      :columns="ColumnsUser"
-      :entities="dataUser?.data || []"
-      :loading="isLoadingUser"
-      :pagination="pagination"
-      :is-create="false"
-      v-model:model-search="params.search"
-      @change-page="changePage"
-      @change-limit="changeLimit"
-      @search="searchTable"
-    >
+    <Table label-create="User" :columns="ColumnsUser" :entities="dataUser?.data || []" :loading="isLoadingUser"
+      :pagination="pagination" :is-create="false" v-model:model-search="params.search" @change-page="changePage"
+      @change-limit="changeLimit" @search="searchTable">
       <template #column_action="{ entity }">
-        <div
-          v-if="entity.roles?.[0]?.name !== 'superuser'"
-          class="flex items-center justify-center gap-4"
-        >
-          <Icon
-            name="pencil"
-            class="icon-action-table"
-            @click="handleUpdate(entity)"
-          />
-          <Icon
-            name="trash"
-            class="icon-action-table"
-            @click="handleDelete(entity)"
-          />
+        <div v-if="entity.roles?.[0]?.name !== 'superuser'" class="flex items-center justify-center gap-4">
+          <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+          <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
         </div>
         <div v-else />
       </template>
@@ -280,19 +259,9 @@ onMounted(() => {
       </template>
     </Table>
 
-    <FormUser
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-    />
+    <FormUser v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>
