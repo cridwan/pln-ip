@@ -8,7 +8,7 @@ export const routeUser = [
     meta: {
       layout: UserHistoryLayout,
       requireAuth: true,
-      role: ["planner"],
+      role: ["planner", "approval", "guest"],
       except: ["superuser"],
     },
   },

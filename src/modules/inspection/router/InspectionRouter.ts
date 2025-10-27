@@ -7,8 +7,8 @@ export const routeInspection = [
     component: () => import("@/modules/inspection/views/Index.vue"),
     meta: {
       layout: ScopeLayout,
-      requireAuth: false,
-      role: ["planner"],
+      requireAuth: true,
+      role: ["planner", "approval", "guest"],
       except: ["superuser"],
     },
   },
@@ -18,8 +18,8 @@ export const routeInspection = [
     component: () => import("@/modules/inspection/views/ProjectMonitoring.vue"),
     meta: {
       layout: ScopeLayout,
-      requireAuth: false,
-      role: "planner",
+      requireAuth: true,
+      role: ["planner", "approval", "guest"],
       except: ["superuser"],
     },
   },

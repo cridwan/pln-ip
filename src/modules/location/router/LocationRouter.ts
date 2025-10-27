@@ -8,8 +8,8 @@ export const routeLocation = [
     component: () => import("@/modules/location/views/Index.vue"),
     meta: {
       layout: MapLayout,
-      requireAuth: false,
-      role: ["planner"],
+      requireAuth: true,
+      role: ["planner", "approval", "guest"],
       except: ["superuser"],
     },
   },
@@ -19,8 +19,8 @@ export const routeLocation = [
     component: () => import("@/modules/location/views/Detail.vue"),
     meta: {
       layout: DefaultLayout,
-      requireAuth: false,
-      role: ["planner"],
+      requireAuth: true,
+      role: ["planner", "approval", "guest"],
       except: ["superuser"],
     },
   },

@@ -7,8 +7,8 @@ export const routeUnit = [
     component: () => import("@/modules/unit/views/Index.vue"),
     meta: {
       layout: DefaultLayout,
-      requireAuth: false,
-      role: ["planner"],
+      requireAuth: true,
+      role: ["planner", "approval", "guest"],
       except: ["superuser"],
     },
   },
