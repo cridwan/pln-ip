@@ -247,9 +247,29 @@ export const routeMaster = [
     },
   },
   {
+    path: "/master/area",
+    name: "master area",
+    component: () => import("@/modules/master/views/Area.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
     path: "/master/sub-bidang",
     name: "master subbidang",
     component: () => import("@/modules/master/views/SubBidang.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
+    path: "/master/sub-area",
+    name: "master subarea",
+    component: () => import("@/modules/master/views/SubArea.vue"),
     meta: {
       layout: MasterLayout,
       requireAuth: true,

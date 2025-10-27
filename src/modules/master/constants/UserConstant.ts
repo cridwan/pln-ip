@@ -19,4 +19,10 @@ export const ColumnsUser: TableColumnType[] = [
     align: "left",
     sort: false,
   },
+  {
+    key: "area",
+    label: "Area",
+    align: "left",
+    sort: false,
+  },
 ];

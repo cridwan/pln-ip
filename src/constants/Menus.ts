@@ -392,6 +392,18 @@ export const MenusMaster: MenuInterface[] = [
         icon: "sub-bidang",
       },
       {
+        id: 14,
+        name: "Area",
+        url: "/area",
+        icon: "area",
+      },
+      {
+        id: 15,
+        name: "Sub Area",
+        url: "/sub-area",
+        icon: "sub-area",
+      },
+      {
         id: 15,
         name: "HSE DOC",
         url: "/hse-doc",

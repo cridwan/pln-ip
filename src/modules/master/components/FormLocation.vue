@@ -4,25 +4,30 @@ import { reactive, ref, computed, type PropType, watch } from "vue";
 import { Button, Input, Modal, Select, Textarea } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import { useMutation } from "@tanstack/vue-query";
-import { all_characters } from "@/helpers/global";
+import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
+import { all_characters, mergeArrays } from "@/helpers/global";
 
 import type {
   LocationCreateInterface,
   LocationInterface,
 } from "../types/LocationType";
 import { useMasterStore } from "../stores/MasterStore";
+import type { IPagination, IParams } from "@/types/GlobalType";
+import type { SubAreaInterface } from "../types/SubAreaType";
 
 const props = defineProps({
   selectedValue: {
     type: Object as PropType<LocationInterface | null>,
   },
 });
-
+type OptionType = {
+  value: string;
+  label: string;
+};
 const emit = defineEmits(["success", "error"]);
-
 const masterStore = useMasterStore();
-
+const is_loading_sub_area = ref<boolean>(false);
+const options_area = ref<OptionType[]>([]);
 const modelValue = defineModel<boolean>({ default: false });
 const OptionsType = [
   {
@@ -58,6 +63,7 @@ const model = ref<LocationCreateInterface>({
   slug: "",
   description: "",
   color: "",
+  sub_area_uuid: "",
 });
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
@@ -80,8 +86,52 @@ const rules = computed(() => {
     color: {
       required: helpers.withMessage(`This field is required`, required),
     },
+    sub_area_uuid: {
+      required: helpers.withMessage(`This field is required`, required),
+    },
   };
 });
+
+//--- GET SUB AREA
+const params_sub_area = reactive<IParams>({
+  search: "",
+  filters: "",
+  currentPage: 1,
+  perPage: 10,
+});
+const {
+  data: dataSubArea,
+  refetch: refetchSubArea,
+  fetchNextPage: fetchNextPageSubArea,
+  hasNextPage: hasNextPageSubArea,
+  isFetchingNextPage: isFetchingNextPageSubArea,
+} = useInfiniteQuery({
+  queryKey: ["getLocationFilterInspection"],
+  enabled: !props.selectedValue && !is_loading_sub_area.value,
+  queryFn: async ({ pageParam = 1 }) => {
+    try {
+      const { data } = await masterStore.getSubArea({
+        ...params_sub_area,
+        currentPage: pageParam,
+      });
+
+      const response = data as IPagination<SubAreaInterface[]>;
+
+      return response;
+    } catch (error: any) {
+      throw error.response;
+    } finally {
+      is_loading_sub_area.value = false;
+    }
+  },
+  refetchOnWindowFocus: false,
+  getNextPageParam: (lastPage) => {
+    if (!lastPage?.data?.length) return undefined;
+    return lastPage.current_page + 1;
+  },
+  initialPageParam: 1,
+});
+//--- END
 
 //--- CREATE LOCATION
 const { mutate: createLocation, isPending: isLoadingCreate } = useMutation({
@@ -141,6 +191,7 @@ const setValue = () => {
     slug: props.selectedValue?.slug || "",
     description: props.selectedValue?.description || "",
     color: props.selectedValue?.color || "",
+    sub_area_uuid: props.selectedValue?.sub_area_uuid || "",
   };
 };
 
@@ -152,7 +203,28 @@ const resetValue = () => {
     slug: "",
     description: "",
     color: "",
+    sub_area_uuid: ""
   };
+};
+
+const timeout_sub_area = ref(0);
+const searchSubArea = () => {
+  clearTimeout(timeout_sub_area.value);
+  timeout_sub_area.value = window.setTimeout(() => {
+    is_loading_sub_area.value = true;
+    params_sub_area.currentPage = 1;
+    refetchSubArea();
+  }, 1000);
+};
+const scrollSubArea = (e: Event) => {
+  const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLElement;
+  if (
+    scrollTop + clientHeight >= scrollHeight - 1 &&
+    hasNextPageSubArea.value &&
+    !isFetchingNextPageSubArea.value
+  ) {
+    fetchNextPageSubArea();
+  }
 };
 
 watch(modelValue, (value) => {
@@ -168,81 +240,67 @@ watch(modelValue, (value) => {
     }
   }
 });
+
+watch(
+  [modelValue, dataSubArea],
+  ([newModel, newSubArea]) => {
+    if (props.selectedValue) {
+      const new_data: OptionType[] =
+        newSubArea?.pages
+          .flatMap((page) => page?.data)
+          ?.map((item) => {
+            return { value: item.uuid, label: item.name };
+          }) || [];
+
+      options_area.value = mergeArrays(
+        [
+          {
+            value: props.selectedValue?.sub_area_uuid,
+            label: props.selectedValue?.sub_area?.name,
+          },
+        ],
+        new_data.filter(
+          (item) =>
+            item.value !== props.selectedValue?.sub_area_uuid
+        )
+      ).filter((item) => item.value !== "");
+    } else {
+      const new_data: OptionType[] =
+        newSubArea?.pages
+          .flatMap((page) => page?.data)
+          ?.map((item) => {
+            return { value: item.uuid, label: item.name };
+          }) || [];
+
+      options_area.value = new_data;
+    }
+  },
+  { deep: true, immediate: true }
+);
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Lokasi' : 'Tambah Lokasi'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Input
-        v-model="model.name"
-        star
-        :rules="rules.name"
-        :custom_symbols="all_characters"
-        label="Nama"
-      />
-      <Input
-        v-model="model.lat"
-        star
-        :rules="rules.lat"
-        :custom_symbols="all_characters"
-        label="Latitude"
-      />
-      <Input
-        v-model="model.lon"
-        star
-        :rules="rules.lon"
-        :custom_symbols="all_characters"
-        label="Longitude"
-      />
-      <Input
-        v-model="model.slug"
-        star
-        :rules="rules.slug"
-        :custom_symbols="all_characters"
-        label="Kode"
-      />
-      <Textarea
-        v-model="model.description"
-        star
-        label="Deskripsi"
-        :rules="rules.description"
-        :rows="3"
-      />
-      <Select
-        v-model="model.color"
-        label="Jenis Pembangkit"
-        options_label="label"
-        options_value="value"
-        star
-        :rules="rules.color"
-        :options="OptionsType"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Lokasi' : 'Tambah Lokasi'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Input v-model="model.name" star :rules="rules.name" :custom_symbols="all_characters" label="Nama" />
+      <Input v-model="model.lat" star :rules="rules.lat" :custom_symbols="all_characters" label="Latitude" />
+      <Input v-model="model.lon" star :rules="rules.lon" :custom_symbols="all_characters" label="Longitude" />
+      <Input v-model="model.slug" star :rules="rules.slug" :custom_symbols="all_characters" label="Kode" />
+      <Textarea v-model="model.description" star label="Deskripsi" :rules="rules.description" :rows="3" />
+      <Select v-model="model.color" label="Jenis Pembangkit" options_label="label" options_value="value" star
+        :rules="rules.color" :options="OptionsType" />
+      <Select v-model="model.sub_area_uuid" label="Sub Area" options_label="label" options_value="value"
+        v-model:model-search="params_sub_area.search" :search="true" :loading="is_loading_sub_area"
+        :loading-next-page="isFetchingNextPageSubArea" :rules="rules.sub_area_uuid" :options="options_area"
+        @scroll="scrollSubArea" @search="searchSubArea" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate" />
       </div>
     </form>
   </Modal>

@@ -18,7 +18,6 @@ import { ColumnsUser } from "../constants/UserConstant";
 import type { UserInterface } from "../types/UserType";
 import { useMasterStore } from "../stores/MasterStore";
 import FormUser from "../components/FormUser.vue";
-import ButtonGroup from "../components/ButtonGroup.vue";
 
 const masterStore = useMasterStore();
 const total_item = ref(0);
@@ -255,6 +254,11 @@ onMounted(() => {
       <template #column_role="{ entity }">
         <p class="text-base text-neutral-50" v-for="role in entity.roles">
           {{ role?.display_name }}
+        </p>
+      </template>
+      <template #column_area="{ entity }">
+        <p class="text-base text-neutral-50">
+          {{ entity?.area?.name }}
         </p>
       </template>
     </Table>

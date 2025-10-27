@@ -1,3 +1,5 @@
+import type { SubAreaInterface } from "./SubAreaType";
+
 export interface LocationInterface {
   color: string;
   created_at: string;
@@ -8,6 +10,8 @@ export interface LocationInterface {
   slug: string;
   uuid: string;
   description: string;
+  sub_area_uuid: string;
+  sub_area: SubAreaInterface;
 }
 
 export interface LocationCreateInterface {
@@ -17,4 +21,5 @@ export interface LocationCreateInterface {
   slug: string;
   description: string;
   color: string;
+  sub_area_uuid: string;
 }

@@ -37,6 +37,8 @@ import type {
   AxiosRequestConfig,
 } from "axios";
 import type { QCPlanCreateInterface } from "../types/QcPlanType";
+import type { AreaCreateInterface } from "../types/AreaType";
+import type { SubAreaCreateInterface } from "../types/SubAreaType";
 
 export const useMasterStore = defineStore(
   "master",
@@ -1806,6 +1808,136 @@ export const useMasterStore = defineStore(
     };
     // --- END
 
+    // --- area
+    const getArea = async (payload: IParams) => {
+      return await api
+        .get(`/area`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const createArea = async (payload: AreaCreateInterface) => {
+      return await api
+        .post(`/area`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const updateArea = async (id: string, payload: AreaCreateInterface) => {
+      return await api
+        .put(`/area/${id}`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteArea = async (id: string) => {
+      return await api
+        .delete(`/area/${id}`)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const downloadArea = async () => {
+      return await api
+        .post(
+          `/area/export`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Area.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const templateArea = async () => {
+      return await api
+        .post(
+          `/area/template`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Area Template.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const importArea = async (payload: File) => {
+      const formData = new FormData();
+      formData.append("file", payload);
+
+      return await api
+        .post(`/area/import`, formData)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+    // --- END
+
     // --- SUBBIDANG
     const getSubBidang = async (payload: IParams) => {
       return await api
@@ -1931,6 +2063,140 @@ export const useMasterStore = defineStore(
 
       return await api
         .post(`/sub-bidang/import`, formData)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+    // --- END
+
+    // --- SUB AREA
+    const getSubArea = async (payload: IParams) => {
+      return await api
+        .get(`/sub-area`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const createSubArea = async (payload: SubAreaCreateInterface) => {
+      return await api
+        .post(`/sub-area`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const updateSubArea = async (
+      id: string,
+      payload: SubAreaCreateInterface
+    ) => {
+      return await api
+        .put(`/sub-area/${id}`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteSubArea = async (id: string) => {
+      return await api
+        .delete(`/sub-area/${id}`)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const downloadSubArea = async (params?: AxiosRequestConfig["params"]) => {
+      return await api
+        .post(
+          `/sub-area/export`,
+          {},
+          {
+            responseType: "blob",
+            params,
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Sub Area.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const templateSubArea = async () => {
+      return await api
+        .post(
+          `/sub-area/template`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Sub Area Template.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const importSubArea = async (payload: File) => {
+      const formData = new FormData();
+      formData.append("file", payload);
+
+      return await api
+        .post(`/sub-area/import`, formData)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -3225,7 +3491,21 @@ export const useMasterStore = defineStore(
       getManpowerGrouping,
       getConsMatGrouping,
       getNotificationLatest,
-      notificationMarkAsRead
+      notificationMarkAsRead,
+      getArea,
+      createArea,
+      updateArea,
+      deleteArea,
+      downloadArea,
+      templateArea,
+      importArea,
+      getSubArea,
+      createSubArea,
+      updateSubArea,
+      deleteSubArea,
+      downloadSubArea,
+      templateSubArea,
+      importSubArea,
     };
   },
   {

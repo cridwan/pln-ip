@@ -258,6 +258,9 @@ onMounted(() => {
           <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
         </div>
       </template>
+      <template #column_sub_area="{ entity }">
+        <span class="text-white">{{ entity?.sub_area?.name }}</span>
+      </template>
     </Table>
 
     <FormLocation v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
