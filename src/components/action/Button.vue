@@ -170,34 +170,74 @@ const heightLoading = computed(() => {
     <RouterLink :to="url" class="pln-btn" :class="[buttonsDesign, classButton]">
       <div v-show="loading" class="flex items-center gap-2">
         <span>{{ text }}</span>
-        <Loading :disabled="disabled" :width="widthLoading" :height="heightLoading" />
+        <Loading
+          :disabled="disabled"
+          :width="widthLoading"
+          :height="heightLoading"
+        />
       </div>
 
-      <div v-show="icon_only !== '' && icon_before === '' && icon_after === ''" class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_only !== '' &&
+          icon_before === '' &&
+          icon_after === ''
+        "
+        class="flex items-center gap-2"
+      >
         <Icon :name="icon_only" />
       </div>
 
-      <div v-show="icon_before !== '' && icon_after === '' && icon_only === ''" class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_before !== '' &&
+          icon_after === '' &&
+          icon_only === ''
+        "
+        class="flex items-center gap-2"
+      >
         <Icon :name="icon_before" />
         <span>{{ text }}</span>
       </div>
 
-      <div v-show="icon_after !== '' && icon_before === '' && icon_only === ''" class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_after !== '' &&
+          icon_before === '' &&
+          icon_only === ''
+        "
+        class="flex items-center gap-2"
+      >
         <span>{{ text }}</span>
         <Icon :name="icon_after" />
       </div>
 
-      <div v-show="icon_after !== '' && icon_before !== '' && icon_only === ''" class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_after !== '' &&
+          icon_before !== '' &&
+          icon_only === ''
+        "
+        class="flex items-center gap-2"
+      >
         <Icon :name="icon_before" />
         <span>{{ text }}</span>
         <Icon :name="icon_after" />
       </div>
 
-      <div v-show="!loading &&
-        icon_only === '' &&
-        icon_after === '' &&
-        icon_before === ''
-        " class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_only === '' &&
+          icon_after === '' &&
+          icon_before === ''
+        "
+        class="flex items-center gap-2"
+      >
         {{ text }}
       </div>
     </RouterLink>
@@ -207,34 +247,74 @@ const heightLoading = computed(() => {
     <button class="pln-btn" :class="[buttonsDesign, classButton]" :type="type">
       <div v-show="loading" class="flex items-center gap-2">
         <span>{{ text }}</span>
-        <Loading :disabled="disabled" :width="widthLoading" :height="heightLoading" />
+        <Loading
+          :disabled="disabled"
+          :width="widthLoading"
+          :height="heightLoading"
+        />
       </div>
 
-      <div v-show="icon_only !== '' && icon_before === '' && icon_after === ''" class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_only !== '' &&
+          icon_before === '' &&
+          icon_after === ''
+        "
+        class="flex items-center gap-2"
+      >
         <Icon :name="icon_only" />
       </div>
 
-      <div v-show="icon_before !== '' && icon_after === '' && icon_only === ''" class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_before !== '' &&
+          icon_after === '' &&
+          icon_only === ''
+        "
+        class="flex items-center gap-2"
+      >
         <Icon :name="icon_before" />
         <span>{{ text }}</span>
       </div>
 
-      <div v-show="icon_after !== '' && icon_before === '' && icon_only === ''" class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_after !== '' &&
+          icon_before === '' &&
+          icon_only === ''
+        "
+        class="flex items-center gap-2"
+      >
         <span>{{ text }}</span>
         <Icon :name="icon_after" />
       </div>
 
-      <div v-show="icon_after !== '' && icon_before !== '' && icon_only === ''" class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_after !== '' &&
+          icon_before !== '' &&
+          icon_only === ''
+        "
+        class="flex items-center gap-2"
+      >
         <Icon :name="icon_before" />
         <span>{{ text }}</span>
         <Icon :name="icon_after" />
       </div>
 
-      <div v-show="!loading &&
-        icon_before === '' &&
-        icon_after === '' &&
-        icon_only === ''
-        " class="flex items-center gap-2">
+      <div
+        v-show="
+          !loading &&
+          icon_before === '' &&
+          icon_after === '' &&
+          icon_only === ''
+        "
+        class="flex items-center gap-2"
+      >
         {{ text }}
       </div>
     </button>
