@@ -72,3 +72,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+body>div[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
