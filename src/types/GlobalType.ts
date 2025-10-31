@@ -22,7 +22,7 @@ export interface ProjectCardInterface {
 
 export interface IParams {
   search: string;
-  filter?: string;
+  filter?: string | Record<string, any>;
   filters?: Record<string, any>[] | string;
   currentPage?: number;
   perPage?: number;

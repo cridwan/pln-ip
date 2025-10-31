@@ -49,14 +49,11 @@ const route = useRoute();
 </script>
 
 <template>
-  <div
-    class="layout-main"
-    :style="{
-      backgroundImage: `url(${imgUrl})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }"
-  >
+  <div class="layout-main" :style="{
+    backgroundImage: `url(${imgUrl})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }">
     <header>
       <HeaderMain />
     </header>
@@ -74,7 +71,7 @@ const route = useRoute();
 
 <style lang="sass">
 .layout-main
-  @apply fixed max-h-screen overflow-y-auto w-full h-full min-h-screen bg-transparent flex flex-col
+  @apply fixed max-h-screen overflow-y-auto w-full h-full min-h-screen bg-transparent flex flex-col z-[1]
   > header
     @apply fixed h-[80px] w-full z-[9999]
   > main

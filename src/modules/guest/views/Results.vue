@@ -11,7 +11,7 @@ import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 import type { ResultsInterface } from "../types/ResultsType";
 import { ColumnsResults } from "../constants/ResultsConstant";
 import { useTransactionStore } from "../stores/TransactionStore";
-
+console.log
 const Data = ref<ResultsInterface[]>([
   {
     id: 2,
@@ -40,7 +40,7 @@ const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const is_loading = ref<string | null>(null);
-
+console.log(route.params)
 //--- DOWNLOAD BUDGET ACTIVITY
 const { refetch: refetchDownloadBudgetActivity } = useQuery({
   queryKey: ["downloadResultBudgetActivity"],
@@ -67,11 +67,11 @@ const { refetch: refetchDownloadBudgetActivity } = useQuery({
 
 //--- DOWNLOAD SCOPE
 const { refetch: refetchDownloadScope } = useQuery({
-  queryKey: ["downloadResultScope"],
+  queryKey: ["downloadResultScopeGuest"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultScope(
-        route.params.menu as string
+        route.params.id_inspection as string
       );
       is_loading.value = null;
 
@@ -91,11 +91,11 @@ const { refetch: refetchDownloadScope } = useQuery({
 
 //--- DOWNLOAD CONSMAT
 const { refetch: refetchDownloadConsMat } = useQuery({
-  queryKey: ["downloadResultConsMat"],
+  queryKey: ["downloadResultConsMatGuest"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultConsMat(
-        route.params.menu as string
+        route.params.id_inspection as string
       );
       is_loading.value = null;
 
@@ -115,11 +115,11 @@ const { refetch: refetchDownloadConsMat } = useQuery({
 
 //--- DOWNLOAD PART
 const { refetch: refetchDownloadPart } = useQuery({
-  queryKey: ["downloadResultPart"],
+  queryKey: ["downloadResultPartGuest"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultPart(
-        route.params.menu as string
+        route.params.id_inspection as string
       );
       is_loading.value = null;
 
@@ -139,11 +139,11 @@ const { refetch: refetchDownloadPart } = useQuery({
 
 //--- DOWNLOAD MANPOWER
 const { refetch: refetchDownloadManpower } = useQuery({
-  queryKey: ["downloadResultManpower"],
+  queryKey: ["downloadResultManpowerGuest"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultManpower(
-        route.params.menu as string
+        route.params.id_inspection as string
       );
       is_loading.value = null;
 
@@ -163,7 +163,7 @@ const { refetch: refetchDownloadManpower } = useQuery({
 
 //--- DOWNLOAD TOOLS
 const { refetch: refetchDownloadTools } = useQuery({
-  queryKey: ["downloadResultTools"],
+  queryKey: ["downloadResultToolsGuest"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultTools(
@@ -187,7 +187,7 @@ const { refetch: refetchDownloadTools } = useQuery({
 
 //--- DOWNLOAD HSE
 const { refetch: refetchDownloadHse } = useQuery({
-  queryKey: ["downloadResultHse"],
+  queryKey: ["downloadResultHseGuest"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultHse(
@@ -211,7 +211,7 @@ const { refetch: refetchDownloadHse } = useQuery({
 
 //--- DOWNLOAD QC PLAN
 const { refetch: refetchDownloadQcPlan } = useQuery({
-  queryKey: ["downloadResultQcPlan"],
+  queryKey: ["downloadResultQcPlanGuest"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultQcPlan(
