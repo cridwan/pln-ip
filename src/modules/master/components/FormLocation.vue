@@ -3,7 +3,7 @@ import { reactive, ref, computed, type PropType, watch } from "vue";
 
 import { Button, Input, Modal, Select, Textarea } from "@/components";
 import useVuelidate from "@vuelidate/core";
-import { required, helpers } from "@vuelidate/validators";
+import { required, helpers, requiredIf } from "@vuelidate/validators";
 import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import { all_characters, mergeArrays } from "@/helpers/global";
 
@@ -81,7 +81,7 @@ const rules = computed(() => {
       required: helpers.withMessage(`This field is required`, required),
     },
     description: {
-      required: helpers.withMessage(`This field is required`, required),
+      required: helpers.withMessage(`This field is required`, requiredIf(false)),
     },
     color: {
       required: helpers.withMessage(`This field is required`, required),
@@ -288,7 +288,7 @@ watch(
       <Input v-model="model.lat" star :rules="rules.lat" :custom_symbols="all_characters" label="Latitude" />
       <Input v-model="model.lon" star :rules="rules.lon" :custom_symbols="all_characters" label="Longitude" />
       <Input v-model="model.slug" star :rules="rules.slug" :custom_symbols="all_characters" label="Kode" />
-      <Textarea v-model="model.description" star label="Deskripsi" :rules="rules.description" :rows="3" />
+      <Textarea v-model="model.description" label="Deskripsi" :rules="rules.description" :rows="3" />
       <Select v-model="model.color" label="Jenis Pembangkit" options_label="label" options_value="value" star
         :rules="rules.color" :options="OptionsType" />
       <Select v-model="model.sub_area_uuid" label="Sub Area" options_label="label" options_value="value"
