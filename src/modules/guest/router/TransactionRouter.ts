@@ -42,7 +42,7 @@ export const routeTransaction = [
     meta: {
       layout: GuestLayout,
       requireAuth: true,
-      role: "superuser",
+      role: ["guest"],
       except: ["superuser"],
     },
   },

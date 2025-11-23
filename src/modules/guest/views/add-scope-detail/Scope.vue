@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
 
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
-import { Button, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 import { useGlobalStore } from "@/stores/GlobalStore";
@@ -24,11 +24,13 @@ import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import type { ProjectInterface } from "../../types/ProjectType";
 // import FormAdScopeDetail from "../../components/add-scope/FormAdScopeDetail.vue";
-import TableEquipment from "../../components/scope/TableEquipment.vue";
+import TableEquipment from "../../components/add-scope/TableEquipment.vue";
 import FormScope from "../../components/FormScope.vue";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const authStore = useAuthStore();
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const { access_token } = storeToRefs(authStore);
 const open_form = ref(false);
 const entitiesScope = ref<ScopeInterface[]>([]);
@@ -44,7 +46,7 @@ const params = reactive({
     {
       group: "AND",
       operator: "EQ",
-      column: "additionalScope.uuid",
+      column: "additional_scope_uuid",
       value: route.params.id_scope,
     },
   ],
@@ -91,7 +93,7 @@ const {
   queryKey: ["getScopeAtScopeDetailAddScopeGuest"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getScope(params);
+      const { data } = await masterStore.getScope(params, '/add-scope/detail');
       const response = data as IPagination<ResponseScopeInterface[]>;
       total_item.value = response.total;
       const new_arr: ScopeInterface[] =
@@ -545,6 +547,37 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     }
   });
 };
+
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.addScope),
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
@@ -554,18 +587,19 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     <span v-if="isLoadingDuration">Loading...</span>
     <span v-else>{{ dataDuration }} Days</span>
   </div>
-  <Button v-if="
+  <!-- <Button v-if="
     dataForm?.sub_bidang_uuid &&
     dataApproval?.status !== 'approve' &&
     access_token
   " icon_only="plus" class="absolute right-[9rem] top-[6.5rem]" size="sm" rounded="full" color="blue"
-    @click="handleCreate" />
+    @click="handleCreate" /> -->
   <div class="flex gap-8">
     <div class="basis-1/5">
       <FilterScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
     </div>
     <div class="flex-1 overflow-auto">
       <div class="max-w-full min-w-full">
+        <Breadcrumb :items="breadcrumb" />
         <Table label-create="Asset" :columns="ColumnsScope" :entities="entitiesScope" :loading="isLoadingScope"
           :pagination="pagination" :is-create="false" v-model:model-search="params.search" @delete="handleDelete"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable" @open-children="openChildren"
@@ -574,7 +608,7 @@ const getData = (id: string, response: EquipmentInterface[]) => {
             <tr v-if="
               children_active.find((el) => el.id === entity.id)?.open === true
             ">
-              <td :colspan="ColumnsScope.length + 1">
+              <td :colspan="ColumnsScope.length + 4">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
                   <TableEquipment :is-additional="true" :id="entity.id" :entity="entity.children"
                     :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open

@@ -549,12 +549,12 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     <span v-else>{{ dataDuration }} Days</span>
   </div>
   <!-- v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'" -->
-  <Button v-if="
+  <!-- <Button v-if="
     dataForm?.sub_bidang_uuid &&
     dataApproval?.status !== 'approve' &&
     access_token
   " icon_only="plus" class="absolute right-[9rem] top-[6.5rem]" size="sm" rounded="full" color="blue"
-    @click="handleCreate" />
+    @click="handleCreate" /> -->
   <div class="flex gap-8">
     <div class="basis-1/5">
       <FilterScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
@@ -562,15 +562,14 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     <div class="flex-1 overflow-auto">
       <div class="max-w-full min-w-full">
         <Table label-create="Asset" :columns="ColumnsScope" :entities="entitiesScope" :loading="isLoadingScope"
-          :pagination="pagination" :is-create="false"
-          :is-action="dataApproval?.status !== 'approve' && access_token !== ''" v-model:model-search="params.search"
+          :pagination="pagination" :is-create="false" :is-action="false" v-model:model-search="params.search"
           @delete="handleDelete" @change-page="changePage" @change-limit="changeLimit" @search="searchTable"
           @open-children="openChildren">
           <template #children="{ entity, index, parentActive }">
             <tr v-if="
               children_active.find((el) => el.id === entity.id)?.open === true
             ">
-              <td :colspan="ColumnsScope.length + 1">
+              <td :colspan="ColumnsScope.length + 4">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
                   <TableEquipment :id="entity.id" :entity="entity.children" :status-approval="dataApproval?.status"
                     :open="children_active.find((el) => el.id === entity.id)?.open

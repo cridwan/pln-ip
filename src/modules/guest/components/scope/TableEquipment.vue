@@ -59,7 +59,7 @@ const params = reactive({
     {
       group: "AND",
       operator: "EQ",
-      column: "scopeStandart.uuid",
+      column: "scope_standart_uuid",
       value: "",
     },
   ],

@@ -298,11 +298,11 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button v-if="
+    <!-- <Button v-if="
       dataForm?.activity_uuid &&
       dataApproval?.status !== 'approve' &&
       access_token
-    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" /> -->
 
     <div class="flex gap-8">
       <div class="basis-1/5">
@@ -312,10 +312,10 @@ onMounted(() => {
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Material" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
-            " :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []" :loading="isLoadingConsMat"
-            :pagination="pagination" :is-create="false" class="mt-6" v-model:model-search="params.search"
-            @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+          <Table label-create="Material" :is-action="false" :columns="ColumnsConsumableMaterial"
+            :entities="dataConsMat?.data || []" :loading="isLoadingConsMat" :pagination="pagination" :is-create="false"
+            class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+            @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
                 <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
@@ -342,8 +342,7 @@ onMounted(() => {
                 -
               </p>
               <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''"
-                :label="entity.consmat?.name" :loading="isLoadingUpdate"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+                :label="entity.consmat?.name" :loading="isLoadingUpdate" :disabled="true"
                 @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity }">

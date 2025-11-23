@@ -191,7 +191,7 @@ const {
       const { data } = await masterStore.getScope({
         ...params_scope,
         currentPage: pageParam,
-      });
+      }, '/add-scope/detail');
 
       const response = data as IPagination<ScopeInterface[]>;
 
@@ -233,7 +233,7 @@ const {
       const { data } = await masterStore.getEquipment({
         ...params_equipment,
         currentPage: pageParam,
-      });
+      }, '/add-scope/detail');
 
       const response = data.data as IPagination<EquipmentInterface[]>;
 
@@ -275,7 +275,7 @@ const {
       const { data } = await masterStore.getActivity({
         ...params_activity,
         currentPage: pageParam,
-      });
+      }, '/add-scope/detail');
 
       const response = data.data as IPagination<ScopeInterface[]>;
 
