@@ -25,6 +25,7 @@ import FormConsumableMaterialStd from "../components/FormConsumableMaterialStd.v
 import ButtonGroup from "../components/ButtonGroup.vue";
 
 const dataForm = ref<ConsumableMaterialStdCreateModelInterface | null>(null);
+const formConsumableMaterialStd = ref<InstanceType<typeof FormConsumableMaterialStd> | null>(null)
 const masterStore = useMasterStore();
 const total_item = ref(0);
 const params = reactive({
@@ -90,7 +91,7 @@ const {
 //--- DELETE CONSUMABLE MATERIAL STD
 const { mutate: deleteConsMatStd, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteManpowerStd(id);
+    return await masterStore.deleteConsumableMaterialStd(id);
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -100,6 +101,10 @@ const { mutate: deleteConsMatStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchConsMatStd();
+
+    if (formConsumableMaterialStd.value?.refetchConsumableMaterial) {
+      formConsumableMaterialStd.value.refetchConsumableMaterial()
+    }
   },
   onError: (error: any) => {
     toastRef.value?.showToast({
@@ -203,6 +208,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchConsMatStd();
+
+  if (formConsumableMaterialStd.value?.refetchConsumableMaterial) {
+    formConsumableMaterialStd.value.refetchConsumableMaterial()
+  }
 };
 
 const handleError = (error: any) => {
@@ -343,9 +352,11 @@ onMounted(() => {
     </div>
 
     <FormConsumableMaterialStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item"
-      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess"
+      ref="formConsumableMaterialStd" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
+    @delete="onDelete" />
 </template>

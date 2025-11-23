@@ -794,11 +794,11 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateScope = async (prefix: string = "") => {
+    const templateScope = async (prefix: string = "", payload: Record<string, any> = {}) => {
       return await api
         .post(
           `${prefix}/scope-standart/template`,
-          {},
+          payload,
           {
             responseType: "blob",
           }
@@ -2602,11 +2602,11 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateActivity = async (prefix: string = "") => {
+    const templateActivity = async (prefix: string = "", payload: Record<string, any> = {}) => {
       return await api
         .post(
           `${prefix}/activity/template`,
-          {},
+          payload,
           {
             responseType: "blob",
           }
@@ -2654,7 +2654,7 @@ export const useMasterStore = defineStore(
     // EQUIPMENT
     const getEquipment = async (payload: IParams, prefix: string = "") => {
       return await api
-        .get(`/equipment`, {
+        .get(`${prefix}/equipment`, {
           params: payload,
         })
         .then((resp) => {
@@ -2736,11 +2736,11 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateEquipment = async (prefix: string = "") => {
+    const templateEquipment = async (prefix: string = "", payload: Record<string, any> = {}) => {
       return await api
         .post(
           `${prefix}/equipment/template`,
-          {},
+          payload,
           {
             responseType: "blob",
           }
@@ -3007,11 +3007,11 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateManpowerStd = async (prefix: string = "") => {
+    const templateManpowerStd = async (prefix: string = "", payload: Record<string, any> = {}) => {
       return await api
         .post(
           `${prefix}/manpower-std/template`,
-          {},
+          payload,
           {
             responseType: "blob",
           }
@@ -3097,9 +3097,9 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const deleteConsumableMaterialStd = async (id: string) => {
+    const deleteConsumableMaterialStd = async (id: string, prefix: string = '') => {
       return await api
-        .delete(`/cons-mat-std/${id}`)
+        .delete(`${prefix}/cons-mat-std/${id}`)
         .then((res) => {
           return Promise.resolve(res);
         })
@@ -3146,11 +3146,11 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateConsumableMaterialStd = async (prefix: string = "") => {
+    const templateConsumableMaterialStd = async (prefix: string = "", payload: Record<string, any> = {}) => {
       return await api
         .post(
           `${prefix}/cons-mat-std/template`,
-          {},
+          payload,
           {
             responseType: "blob",
           }

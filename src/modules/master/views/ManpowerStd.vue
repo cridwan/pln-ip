@@ -28,6 +28,7 @@ import { ColumnsManpowerStd } from "../constants/ManpowerStdConstant";
 import ButtonGroup from "../components/ButtonGroup.vue";
 
 const dataForm = ref<ManpowerStdCreateModelInterface | null>(null);
+const formManpowerStd = ref<InstanceType<typeof FormManpowerStd> | null>(null)
 const masterStore = useMasterStore();
 const total_item = ref(0);
 const params = reactive({
@@ -101,6 +102,9 @@ const { mutate: deleteManpowerStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchManpowerStd();
+    if (formManpowerStd.value?.refetchManpower) {
+      formManpowerStd.value.refetchManpower()
+    }
   },
   onError: (error: any) => {
     toastRef.value?.showToast({
@@ -204,6 +208,9 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchManpowerStd();
+  if (formManpowerStd.value?.refetchManpower) {
+    formManpowerStd.value.refetchManpower()
+  }
 };
 
 const handleError = (error: any) => {
@@ -358,9 +365,10 @@ onMounted(() => {
     </div>
 
     <FormManpowerStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+      @error="handleError" @removeSucess="handleRemoveSuccess" ref="formManpowerStd" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.manpower?.name" :loading="isLoadingDelete"
+    @delete="onDelete" />
 </template>

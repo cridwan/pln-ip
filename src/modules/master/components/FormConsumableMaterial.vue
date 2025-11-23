@@ -8,6 +8,7 @@ import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import type { IPagination, IParams } from "@/types/GlobalType";
 import {
   all_characters,
+  formatToFloat,
   mergeArrays,
   numbers_positive,
   numbers_positive_negative,
@@ -157,7 +158,7 @@ const handleSubmit = async () => {
       id: props.selectedValue?.uuid,
       payload: {
         name: model.value.name,
-        price: parseFloat(model.value.price),
+        price: formatToFloat(model.value.price),
         merk: model.value.merk,
         global_unit_uuid: model.value.global_unit_uuid,
         activity_uuid: model.value.activity_uuid,
@@ -166,7 +167,7 @@ const handleSubmit = async () => {
   } else {
     createConsMat({
       name: model.value.name,
-      price: parseFloat(model.value.price),
+      price: formatToFloat(model.value.price),
       merk: model.value.merk,
       global_unit_uuid: model.value.global_unit_uuid,
       activity_uuid: model.value.activity_uuid,
@@ -265,74 +266,27 @@ watch(
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="
-      props.selectedValue
-        ? 'Ubah Consumable Material'
-        : 'Tambah Consumbale Material'
-    "
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Input
-        v-model="model.name"
-        star
-        label="Nama Consumable Material"
-        :rules="rules.name"
-        :custom_symbols="all_characters"
-      />
-      <Input
-        v-model="model.price"
-        star
-        label="Harga"
-        :rules="rules.price"
-        :custom_symbols="numbers_positive"
-      />
-      <Input
-        v-model="model.merk"
-        star
-        label="Merk"
-        :rules="rules.merk"
-        :custom_symbols="all_characters"
-      />
-      <Select
-        v-model="model.global_unit_uuid"
-        star
-        label="Global Unit"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_global_unit.search"
-        :search="true"
-        :loading="is_loading_global_unit"
-        :loading-next-page="isFetchingNextPageGlobalUnit"
-        :rules="rules.global_unit_uuid"
-        :options="options_global_unit"
-        @scroll="scrollGlobalUnit"
-        @search="searchGlobalUnit"
-      />
+  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue
+    ? 'Ubah Consumable Material'
+    : 'Tambah Consumbale Material'
+    " v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Input v-model="model.name" star label="Nama Consumable Material" :rules="rules.name"
+        :custom_symbols="all_characters" />
+      <Input v-model="model.price" star label="Harga" :rules="rules.price" :custom_symbols="numbers_positive"
+        :is_currency="true" />
+      <Input v-model="model.merk" star label="Merk" :rules="rules.merk" :custom_symbols="all_characters" />
+      <Select v-model="model.global_unit_uuid" star label="Global Unit" options_label="label" options_value="value"
+        v-model:model-search="params_global_unit.search" :search="true" :loading="is_loading_global_unit"
+        :loading-next-page="isFetchingNextPageGlobalUnit" :rules="rules.global_unit_uuid" :options="options_global_unit"
+        @scroll="scrollGlobalUnit" @search="searchGlobalUnit" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate" />
       </div>
     </form>
   </Modal>

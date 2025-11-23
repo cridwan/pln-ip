@@ -37,34 +37,18 @@ const toMonitoring = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <button
-          v-if="authStore.users"
-          class="user-info"
-          @click="router.push('/profile')"
-        >
+        <button v-if="authStore.users" class="user-info" @click="router.push('/profile')">
           <p>User : {{ authStore.users?.email }}</p>
         </button>
         <button class="menu-button" @click="router.push('/')">Location</button>
-        <button
-          class="menu-button"
-          :class="{ active: route.path.includes('create') }"
-          @click="toCreate"
-        >
+        <button class="menu-button" :class="{ active: route.path.includes('create') }" @click="toCreate">
           Generate Scope
         </button>
-        <button
-          class="menu-button"
-          :class="{ active: route.path.includes('project-monitoring') }"
-          v-show="authStore.users"
-          @click="toMonitoring"
-        >
+        <button class="menu-button" :class="{ active: route.path.includes('project-monitoring') }"
+          v-show="authStore.users" @click="toMonitoring">
           Monitoring
         </button>
-        <button
-          v-if="authStore.users?.role === 'planner'"
-          class="menu-button"
-          @click="router.push('/master/location')"
-        >
+        <button v-if="authStore.users?.role === 'planner'" class="menu-button" @click="router.push('/master/user')">
           Master
         </button>
         <!-- <button class="menu-button">Preview</button>

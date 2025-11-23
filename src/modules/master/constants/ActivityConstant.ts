@@ -19,4 +19,17 @@ export const ColumnsActivity: TableColumnType[] = [
     align: "left",
     sort: false,
   },
+  {
+
+    key: "ik_link",
+    label: "Ika Link",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "ik_doc",
+    label: "Ika Doc",
+    align: "left",
+    sort: false,
+  }
 ];

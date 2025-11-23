@@ -57,7 +57,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const redirectMap: Record<string, string> = {
-    superuser: "/master/location",
+    superuser: "/master/user",
     approval: "/",
     planner: "/",
   };

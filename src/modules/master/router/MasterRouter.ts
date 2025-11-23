@@ -187,7 +187,7 @@ export const routeMaster = [
     },
   },
   {
-    path: "/master/part",
+    path: "/master/parts",
     name: "master part",
     component: () => import("@/modules/master/views/Part.vue"),
     meta: {
@@ -207,7 +207,7 @@ export const routeMaster = [
     },
   },
   {
-    path: "/master/manpower",
+    path: "/master/manpowers",
     name: "master manpower",
     component: () => import("@/modules/master/views/Manpower.vue"),
     meta: {

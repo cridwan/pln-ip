@@ -43,7 +43,7 @@ const params = reactive({
       group: "AND",
       operator: "EQ",
       column: "activity.equipment.scopeStandart.inspection_type_uuid",
-      value: route.params.menu,
+      value: route.params.id_inspection,
     },
   ],
   currentPage: 1,
@@ -230,7 +230,7 @@ const setFilter = () => {
       group: "AND",
       operator: "EQ",
       column: "activity.equipment.scopeStandart.inspection_type_uuid",
-      value: route.params.menu,
+      value: route.params.id_inspection,
     },
     {
       group: "AND",
@@ -248,7 +248,7 @@ const resetFilter = () => {
       group: "AND",
       operator: "EQ",
       column: "activity.equipment.scopeStandart.inspection_type_uuid",
-      value: route.params.menu,
+      value: route.params.id_inspection,
     },
   ];
 };

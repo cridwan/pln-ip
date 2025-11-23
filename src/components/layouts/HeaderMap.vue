@@ -45,35 +45,23 @@ const login = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <div
-          class="notification-map text-blue-950 flex items-center justify-center cursor-pointer mr-8 mt-1"
-          v-show="authStore.users"
-        >
+        <div class="notification-map text-blue-950 flex items-center justify-center cursor-pointer mr-8 mt-1"
+          v-show="authStore.users">
           <NotificationMap :data-notification="dataNotification">
             <div class="relative">
               <Icon name="bell-alert" size="10" />
-              <span
-                v-if="dataNotification && dataNotification?.length > 0"
-                class="rounded-full size-3 text-[9px] flex items-center justify-center text-white bg-red-500 absolute top-0 right-0"
-                >{{ dataNotification.length }}</span
-              >
+              <span v-if="dataNotification && dataNotification?.length > 0"
+                class="rounded-full size-3 text-[9px] flex items-center justify-center text-white bg-red-500 absolute top-0 right-0">{{
+                dataNotification.length }}</span>
             </div>
           </NotificationMap>
         </div>
-        <button
-          v-if="authStore.users"
-          class="user-info"
-          @click="router.push('/profile')"
-        >
+        <button v-if="authStore.users" class="user-info" @click="router.push('/profile')">
           <p>User : {{ authStore.users?.email }}</p>
         </button>
         <!-- <button class="menu-button">UBH</button> -->
         <button class="menu-button active">Location</button>
-        <button
-          v-if="authStore.users?.role === 'planner'"
-          class="menu-button"
-          @click="router.push('/master/location')"
-        >
+        <button v-if="authStore.users?.role === 'planner'" class="menu-button" @click="router.push('/master/user')">
           Master
         </button>
         <!-- <button class="menu-button" @click="router.push('/user-history')">

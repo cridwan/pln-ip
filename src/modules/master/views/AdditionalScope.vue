@@ -241,6 +241,12 @@ const handleShow = (item: AdditionalScopeInterface) => {
   router.push({
     name: "master additional scope standart",
     params: { id: item.uuid, name: item.name },
+    query: {
+      location: item.inspection_type?.machine?.unit?.location?.name ?? '',
+      unit: item.inspection_type?.machine?.unit?.name ?? '',
+      machine: item.inspection_type?.machine?.name ?? '',
+      inspectionType: item.inspection_type.name ?? '',
+    }
   });
 };
 

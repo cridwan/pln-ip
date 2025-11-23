@@ -487,7 +487,7 @@ const selectSubBidang = (e: OptionType) => {
       group: "AND",
       operator: "EQ",
       column: "inspection_type_uuid",
-      value: route.params.menu,
+      value: route.params.id_inspection,
     },
   ];
   is_loading_scope.value = true;

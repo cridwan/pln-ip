@@ -42,29 +42,18 @@ const getMenuActive = computed(() => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <button
-          v-if="authStore.users"
-          class="user-info-main"
-          @click="router.push('/profile')"
-        >
+        <button v-if="authStore.users" class="user-info-main" @click="router.push('/profile')">
           <p>User : {{ authStore.users?.email }}</p>
         </button>
         <button class="menu-button-main" @click="router.push('/')">
           Location
         </button>
         <button class="menu-button-main active">{{ getMenuActive }}</button>
-        <button
-          v-if="authStore.users?.role === 'planner'"
-          class="menu-button-main"
-          @click="router.push('/master/location')"
-        >
+        <button v-if="authStore.users?.role === 'planner'" class="menu-button-main"
+          @click="router.push('/master/user')">
           Master
         </button>
-        <button
-          class="sign-out-button-main"
-          @click="logout"
-          v-if="authStore.users"
-        >
+        <button class="sign-out-button-main" @click="logout" v-if="authStore.users">
           Sign Out
         </button>
         <button class="sign-out-button-main" @click="login" v-else>

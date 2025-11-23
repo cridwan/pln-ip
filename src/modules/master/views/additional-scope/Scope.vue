@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { AxiosError } from "axios";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type {
   IPagination,
@@ -21,8 +21,11 @@ import { useRoute } from "vue-router";
 import FormAdScope from "../../components/FormAdScope.vue";
 import FilterAdScope from "../../components/FilterAdScope.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
+import { parsedUrl } from "@/helpers/global";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const masterStore = useMasterStore();
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const route = useRoute();
 const total_item = ref(0);
 const params = reactive<IParams>({
@@ -120,7 +123,9 @@ const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
 //--- DOWNLOAD TEMPLATE
 const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
-    return await masterStore.templateScope('/add-scope/detail');
+    return await masterStore.templateScope('/add-scope/detail', {
+      filters: params.filters
+    });
   },
   onSuccess: () => { },
   onError: (error) => {
@@ -294,6 +299,31 @@ const handleImport = (file: File) => {
   });
   importScope(file);
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
@@ -314,6 +344,7 @@ const handleImport = (file: File) => {
         <FilterAdScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingScope" />
       </div>
       <div class="w-full">
+        <Breadcrumb :items="breadcrumb" />
         <Table label-create="User" :columns="ColumnsScope" :entities="dataScope?.data || []" :loading="isLoadingScope"
           :pagination="pagination" :is-create="false" v-model:model-search="params.search" @change-page="changePage"
           @change-limit="changeLimit" @search="searchTable">
@@ -324,10 +355,10 @@ const handleImport = (file: File) => {
             </div>
           </template>
           <template #column_document="{ entity }">
-            <p class="text-base text-neutral-50 text-left underline cursor-pointer" v-if="entity.document"
-              @click="previewDocument(entity.document)">
+            <a class="text-base text-neutral-50 text-left underline cursor-pointer" v-if="entity.document"
+              :href="parsedUrl(entity.document.document_link)">
               {{ entity.document?.document_name ?? "-" }}
-            </p>
+            </a>
             <p v-else>-</p>
           </template>
           <template #column_link="{ entity }">

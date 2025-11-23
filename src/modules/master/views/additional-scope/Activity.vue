@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { AxiosError } from "axios";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 
@@ -16,8 +16,11 @@ import FormAdActivity from "../../components/FormAdActivity.vue";
 import FilterAdActivity from "../../components/FilterAdActivity.vue";
 import { useRoute } from "vue-router";
 import ButtonGroup from "../../components/ButtonGroup.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
+import { parsedUrl } from "@/helpers/global";
 
 const dataForm = ref<ActivityFilterInterface | null>(null);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const masterStore = useMasterStore();
 const route = useRoute();
 const total_item = ref(0);
@@ -115,7 +118,9 @@ const { mutate: downloadActivity, isPending: isLoadingDownload } = useMutation({
 //--- DOWNLOAD TEMPLATE
 const { mutate: templateActivity, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
-    return await masterStore.templateActivity('/add-scope/detail');
+    return await masterStore.templateActivity('/add-scope/detail', {
+      filters: params.filters
+    });
   },
   onSuccess: () => { },
   onError: (error) => {
@@ -280,6 +285,32 @@ const handleExportTemplate = () => {
 const handleImport = (file: File) => {
   importActivity(file);
 };
+
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
@@ -300,6 +331,7 @@ const handleImport = (file: File) => {
         <FilterAdActivity @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingActivity" />
       </div>
       <div class="w-full">
+        <Breadcrumb :items="breadcrumb" />
         <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
           :loading="isLoadingActivity" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
@@ -313,6 +345,20 @@ const handleImport = (file: File) => {
             <p class="text-base text-neutral-50 text-left">
               {{ entity.equipment?.name }}
             </p>
+          </template>
+          <template #column_ik_link="{ entity }">
+            <a target="_blank" :href="entity.link_ik1" class="text-base text-neutral-50 text-left"
+              v-if="entity.link_ik1">
+              {{ entity.link_ik1 ?? '-' }}
+            </a>
+            <span v-else>-</span>
+          </template>
+          <template #column_ik_doc="{ entity }">
+            <a target="_blank" :href="parsedUrl(entity.document.document_link)"
+              class="text-base text-neutral-50 text-left" v-if="entity.document">
+              {{ entity.document?.document_name }}
+            </a>
+            <span v-else>-</span>
           </template>
         </Table>
       </div>

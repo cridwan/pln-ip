@@ -23,6 +23,7 @@ import type {
 import FormActivity from "../components/FormActivity.vue";
 import FilterActivity from "../components/FilterActivity.vue";
 import ButtonGroup from "../components/ButtonGroup.vue";
+import { parsedUrl } from "@/helpers/global";
 
 const dataForm = ref<ActivityModelCreateInterface | null>(null);
 const masterStore = useMasterStore();
@@ -336,6 +337,20 @@ onMounted(() => {
             <p class="text-base text-neutral-50 text-left">
               {{ entity.equipment?.name }}
             </p>
+          </template>
+          <template #column_ik_link="{ entity }">
+            <a target="_blank" :href="entity.link_ik1" class="text-base text-neutral-50 text-left"
+              v-if="entity.link_ik1">
+              {{ entity.link_ik1 ?? '-' }}
+            </a>
+            <span v-else>-</span>
+          </template>
+          <template #column_ik_doc="{ entity }">
+            <a target="_blank" :href="parsedUrl(entity.document.document_link)"
+              class="text-base text-neutral-50 text-left" v-if="entity.document">
+              {{ entity.document?.document_name }}
+            </a>
+            <span v-else>-</span>
           </template>
         </Table>
       </div>
