@@ -328,7 +328,7 @@ const selectSubBidang = (e: OptionType) => {
     {
       group: "AND",
       operator: "EQ",
-      column: "bidang_uuid",
+      column: "sub_bidang_uuid",
       value: e.value,
     },
     {

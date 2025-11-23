@@ -6,7 +6,7 @@ export const routeMaster = [
     path: "/master/monitoring-project",
     name: "master monitoring project",
     component: () => import("@/modules/master/views/MonitoringProject.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: { layout: MasterLayout, requireAuth: true, role: ["superuser", "planner"] },
   },
   {
     path: "/master/location",

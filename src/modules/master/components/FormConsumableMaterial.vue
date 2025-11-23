@@ -277,7 +277,7 @@ watch(
       <Input v-model="model.price" star label="Harga" :rules="rules.price" :custom_symbols="numbers_positive"
         :is_currency="true" />
       <Input v-model="model.merk" star label="Merk" :rules="rules.merk" :custom_symbols="all_characters" />
-      <Select v-model="model.global_unit_uuid" star label="Global Unit" options_label="label" options_value="value"
+      <Select v-model="model.global_unit_uuid" star label="Satuan" options_label="label" options_value="value"
         v-model:model-search="params_global_unit.search" :search="true" :loading="is_loading_global_unit"
         :loading-next-page="isFetchingNextPageGlobalUnit" :rules="rules.global_unit_uuid" :options="options_global_unit"
         @scroll="scrollGlobalUnit" @search="searchGlobalUnit" />
