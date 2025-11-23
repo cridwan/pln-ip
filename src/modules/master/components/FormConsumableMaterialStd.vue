@@ -15,12 +15,6 @@ import type {
 } from "@/types/GlobalType";
 import { Select } from "@/components";
 import type {
-  ManpowerStdCreateInterface,
-  ManpowerStdCreateModelInterface,
-  ManpowerStdInterface,
-} from "../types/ManpowerStdType";
-import type { ManpowerInterface } from "../types/ManpowerType";
-import type {
   ConsumableMaterialStdCreateInterface,
   ConsumableMaterialStdCreateModelInterface,
   ConsumableMaterialStdInterface,
@@ -279,13 +273,13 @@ watch(
         newConsumableMaterial?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: item.name };
+            return { value: item.uuid, label: `${item.name} / ${item.global_unit?.name}` };
           }) || [];
       options_consumable_material.value = mergeArrays(
         [
           {
             value: props.selectedValue?.cons_mat_uuid,
-            label: props.selectedValue?.consmat?.name,
+            label: `${props.selectedValue?.consmat?.name} / ${props.selectedValue?.consmat?.global_unit?.name}`,
           },
         ],
         new_data.filter(
@@ -297,70 +291,49 @@ watch(
         newConsumableMaterial?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: item.name };
+            return { value: item.uuid, label: `${item.name} / ${item.global_unit?.name}` };
           }) || [];
       options_consumable_material.value = new_data;
     }
   },
   { deep: true, immediate: true }
 );
+
+watch(() => props.dataForm, (newVal) => {
+  params_consumable_material.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: String(props.dataForm?.activity_uuid),
+    },
+  ];
+
+  refetchConsumableMaterial()
+}, { deep: true, immediate: true })
+
+defineExpose({ refetchConsumableMaterial })
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="
-      props.selectedValue
-        ? 'Ubah Consumable Material Standart'
-        : 'Tambah Consumable Material Standart'
-    "
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Select
-        v-model="model.cons_mat_uuid"
-        star
-        label="Consumable Material"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_consumable_material.search"
-        :search="true"
-        :loading="is_loading_consumable_material"
-        :loading-next-page="isFetchingNextPageConsumableMaterial"
-        :rules="rules.cons_mat_uuid"
-        :options="options_consumable_material"
-        @scroll="scrollConsumableMaterial"
-        @search="searchConsumableMaterial"
-      />
-      <Input
-        v-model="model.qty"
-        star
-        label="Qty"
-        :rules="rules.qty"
-        :custom_symbols="numbers_positive"
-      />
+  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue
+    ? 'Ubah Consumable Material Standart'
+    : 'Tambah Consumable Material Standart'
+    " v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Select v-model="model.cons_mat_uuid" star label="Consumable Material" options_label="label" options_value="value"
+        v-model:model-search="params_consumable_material.search" :search="true"
+        :loading="is_loading_consumable_material" :loading-next-page="isFetchingNextPageConsumableMaterial"
+        :rules="rules.cons_mat_uuid" :options="options_consumable_material" @scroll="scrollConsumableMaterial"
+        @search="searchConsumableMaterial" />
+      <Input v-model="model.qty" star label="Qty" :rules="rules.qty" :custom_symbols="numbers_positive" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate" />
       </div>
     </form>
   </Modal>

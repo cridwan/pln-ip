@@ -209,7 +209,7 @@ const {
       const { data } = await masterStore.getScope({
         ...params_scope,
         currentPage: pageParam,
-      });
+      }, '/add-scope/detail');
 
       const response = data as IPagination<ScopeInterface[]>;
 
@@ -250,7 +250,7 @@ const {
       const { data } = await masterStore.getEquipment({
         ...params_equipment,
         currentPage: pageParam,
-      });
+      }, '/add-scope/detail');
 
       const response = data.data as IPagination<EquipmentInterface[]>;
 
@@ -291,7 +291,7 @@ const {
       const { data } = await masterStore.getActivity({
         ...params_activity,
         currentPage: pageParam,
-      });
+      }, '/add-scope/detail');
 
       const response = data.data as IPagination<ScopeInterface[]>;
 
@@ -774,8 +774,7 @@ watch(
 
 <template>
   <div
-    class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
-  >
+    class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md">
     <span class="text-blue-950 font-semibold">Filter Manpower</span>
     <form class="" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
@@ -796,98 +795,32 @@ watch(
                 :loading="is_loading_inspection" :loading-next-page="isFetchingNextPageInspection"
                 :rules="rules.inspection_type_uuid" :options="options_inspection" @scroll="scrollInspection"
                 @search="searchInspection" /> -->
-        <Select
-          v-model="model.bidang_uuid"
-          label="Bidang"
-          options_label="label"
-          options_value="value"
-          v-model:model-search="params_bidang.search"
-          :search="true"
-          :loading="is_loading_bidang"
-          :loading-next-page="isFetchingNextPageBidang"
-          :rules="rules.bidang_uuid"
-          :options="options_bidang"
-          @scroll="scrollBidang"
-          @search="searchBidang"
-          @select="selectBidang"
-        />
-        <Select
-          v-model="model.sub_bidang_uuid"
-          label="Sub Bidang"
-          options_label="label"
-          options_value="value"
-          v-model:model-search="params_sub_bidang.search"
-          :search="true"
-          :loading="is_loading_sub_bidang"
-          :loading-next-page="isFetchingNextPageSubBidang"
-          :rules="rules.sub_bidang_uuid"
-          :options="options_sub_bidang"
-          @scroll="scrollSubBidang"
-          @search="searchSubBidang"
-          @select="selectSubBidang"
-        />
-        <Select
-          v-model="model.scope_standart_uuid"
-          label="Scope Standart"
-          options_label="label"
-          options_value="value"
-          v-model:model-search="params_scope.search"
-          :search="true"
-          :loading="is_loading_scope"
-          :loading-next-page="isFetchingNextPageScope"
-          :rules="rules.scope_standart_uuid"
-          :options="options_scope"
-          @scroll="scrollScope"
-          @search="searchScope"
-          @select="selectScope"
-        />
-        <Select
-          v-model="model.equipment_uuid"
-          label="Equipment"
-          options_label="label"
-          options_value="value"
-          v-model:model-search="params_equipment.search"
-          :search="true"
-          :loading="is_loading_equipment"
-          :loading-next-page="isFetchingNextPageEquipment"
-          :rules="rules.equipment_uuid"
-          :options="options_equipment"
-          @scroll="scrollEquipment"
-          @search="searchEquipment"
-          @select="selectEquipment"
-        />
-        <Select
-          v-model="model.activity_uuid"
-          label="Activity"
-          options_label="label"
-          options_value="value"
-          v-model:model-search="params_activity.search"
-          :search="true"
-          :loading="is_loading_activity"
-          :loading-next-page="isFetchingNextPageActivity"
-          :rules="rules.activity_uuid"
-          :options="options_activity"
-          @scroll="scrollActivity"
-          @search="searchActivity"
-        />
+        <Select v-model="model.bidang_uuid" label="Bidang" options_label="label" options_value="value"
+          v-model:model-search="params_bidang.search" :search="true" :loading="is_loading_bidang"
+          :loading-next-page="isFetchingNextPageBidang" :rules="rules.bidang_uuid" :options="options_bidang"
+          @scroll="scrollBidang" @search="searchBidang" @select="selectBidang" />
+        <Select v-model="model.sub_bidang_uuid" label="Sub Bidang" options_label="label" options_value="value"
+          v-model:model-search="params_sub_bidang.search" :search="true" :loading="is_loading_sub_bidang"
+          :loading-next-page="isFetchingNextPageSubBidang" :rules="rules.sub_bidang_uuid" :options="options_sub_bidang"
+          @scroll="scrollSubBidang" @search="searchSubBidang" @select="selectSubBidang" />
+        <Select v-model="model.scope_standart_uuid" label="Scope Standart" options_label="label" options_value="value"
+          v-model:model-search="params_scope.search" :search="true" :loading="is_loading_scope"
+          :loading-next-page="isFetchingNextPageScope" :rules="rules.scope_standart_uuid" :options="options_scope"
+          @scroll="scrollScope" @search="searchScope" @select="selectScope" />
+        <Select v-model="model.equipment_uuid" label="Equipment" options_label="label" options_value="value"
+          v-model:model-search="params_equipment.search" :search="true" :loading="is_loading_equipment"
+          :loading-next-page="isFetchingNextPageEquipment" :rules="rules.equipment_uuid" :options="options_equipment"
+          @scroll="scrollEquipment" @search="searchEquipment" @select="selectEquipment" />
+        <Select v-model="model.activity_uuid" label="Activity" options_label="label" options_value="value"
+          v-model:model-search="params_activity.search" :search="true" :loading="is_loading_activity"
+          :loading-next-page="isFetchingNextPageActivity" :rules="rules.activity_uuid" :options="options_activity"
+          @scroll="scrollActivity" @search="searchActivity" />
       </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Reset"
-          class="w-full"
-          variant="secondary"
-          :disabled="props.loading"
-          @click="resetValue"
-        />
-        <Button
-          type="submit"
-          text="Terapkan"
-          class="w-full"
-          color="blue"
-          :disabled="props.loading"
-          :loading="props.loading"
-        />
+        <Button text="Reset" class="w-full" variant="secondary" :disabled="props.loading" @click="resetValue" />
+        <Button type="submit" text="Terapkan" class="w-full" color="blue" :disabled="props.loading"
+          :loading="props.loading" />
       </div>
     </form>
   </div>

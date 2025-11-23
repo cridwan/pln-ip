@@ -296,63 +296,40 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+watch(() => props.dataForm, (newVal) => {
+  params_manpower.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: String(props.dataForm?.activity_uuid),
+    }
+  ];
+
+  refetchManpower()
+}, { deep: true, immediate: true })
+defineExpose({ refetchManpower })
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="
-      props.selectedValue
-        ? 'Ubah Manpower Standart'
-        : 'Tambah Manpower Standart'
-    "
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Select
-        v-model="model.manpower_uuid"
-        star
-        label="Manpower"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_manpower.search"
-        :search="true"
-        :loading="is_loading_manpower"
-        :loading-next-page="isFetchingNextPageManpower"
-        :rules="rules.manpower_uuid"
-        :options="options_manpower"
-        @scroll="scrollManpower"
-        @search="searchManpower"
-      />
-      <Input
-        v-model="model.qty"
-        star
-        label="Qty"
-        :rules="rules.qty"
-        :custom_symbols="numbers_positive"
-      />
+  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue
+    ? 'Ubah Manpower Standart'
+    : 'Tambah Manpower Standart'
+    " v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Select v-model="model.manpower_uuid" star label="Manpower" options_label="label" options_value="value"
+        v-model:model-search="params_manpower.search" :search="true" :loading="is_loading_manpower"
+        :loading-next-page="isFetchingNextPageManpower" :rules="rules.manpower_uuid" :options="options_manpower"
+        @scroll="scrollManpower" @search="searchManpower" />
+      <Input v-model="model.qty" star label="Qty" :rules="rules.qty" :custom_symbols="numbers_positive" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate" />
       </div>
     </form>
   </Modal>

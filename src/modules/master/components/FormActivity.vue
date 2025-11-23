@@ -86,7 +86,7 @@ const { mutate: createActivity, isPending: isLoadingCreate } = useMutation({
     if (modelUpload.value) {
       createDocument({
         document: modelUpload.value as File,
-        document_type: "App\\Models\\ScopeStandart",
+        document_type: "App\\Models\\Activity",
         document_uuid: data.data.data.uuid,
       });
     } else {
@@ -116,7 +116,7 @@ const { mutate: updateActivity, isPending: isLoadingUpdate } = useMutation({
     if (modelUpload.value) {
       createDocument({
         document: modelUpload.value as File,
-        document_type: "App\\Models\\ScopeStandart",
+        document_type: "App\\Models\\Activity",
         document_uuid: props.selectedValue?.uuid as string,
       });
     } else {
@@ -212,10 +212,11 @@ const removeSuccess = () => {
     <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
       @submit.prevent="handleSubmit">
       <Input v-model="model.name" star label="Nama" :rules="rules.name" :custom_symbols="all_characters" />
-      <Input v-model="model.duration" star label="Durasi" :rules="rules.duration" :custom_symbols="all_characters" />
+      <Input v-model="model.duration" star label="Durasi (Jam)" :rules="rules.duration"
+        :custom_symbols="all_characters" />
       <Input v-model="model.link_ik1" label="IK Online ex. (http://google.com)" :custom_symbols="all_characters" />
       <UploadStream label="File IK" :progress="uploadProgress" :selectedValues="documentValues"
-        @changes="handleChangeFile" @removeSuccess="removeSuccess" />
+        :fileType="['pdf', 'xls', 'xlsx', 'doc', 'docx']" @changes="handleChangeFile" @removeSuccess="removeSuccess" />
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button text="Batal" class="w-full" variant="secondary"

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { AxiosError } from "axios";
 import { useRoute } from "vue-router";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 
@@ -16,8 +16,10 @@ import type {
 import FormAdEquipment from "../../components/FormAdEquipment.vue";
 import FilterAdEquipment from "../../components/FilterAdEquipment.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const dataForm = ref<EquipmentFilterInterface | null>(null);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const masterStore = useMasterStore();
 const route = useRoute();
 const total_item = ref(0);
@@ -53,9 +55,10 @@ const {
   isFetching: isLoadingEquipment,
   refetch: refetchEquipment,
 } = useQuery({
-  queryKey: ["getEquipmentMaster"],
+  queryKey: ["getAddEquipmentMaster"],
   queryFn: async () => {
     try {
+      console.log('trigger disini')
       const { data } = await masterStore.getEquipment(params, '/add-scope/detail');
       const response = data.data as IPagination<EquipmentInterface[]>;
 
@@ -118,7 +121,9 @@ const { mutate: downloadEquipment, isPending: isLoadingDownload } = useMutation(
 const { mutate: templateEquipment, isPending: isLoadingTemplate } = useMutation(
   {
     mutationFn: async () => {
-      return await masterStore.templateEquipment('/add-scope/detail');
+      return await masterStore.templateEquipment('/add-scope/detail', {
+        filters: params.filters
+      });
     },
     onSuccess: () => { },
     onError: (error) => {
@@ -284,6 +289,31 @@ const handleResetFilter = () => {
 const handleRemoveSuccess = () => {
   refetchEquipment();
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
@@ -304,6 +334,7 @@ const handleRemoveSuccess = () => {
         <FilterAdEquipment @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingEquipment" />
       </div>
       <div class="w-full">
+        <Breadcrumb :items="breadcrumb" />
         <Table label-create="Sub Bidang" :columns="ColumnsEquipment" :entities="dataEquipment?.data || []"
           :loading="isLoadingEquipment" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable">

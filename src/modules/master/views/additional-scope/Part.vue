@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { AxiosError } from "axios";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type {
   IPagination,
@@ -10,7 +10,6 @@ import type {
 } from "@/types/GlobalType";
 
 import { useMasterStore } from "../../stores/MasterStore";
-import type { SequenceInterface } from "../../types/SequenceTypes";
 import type {
   PartStdCreateModelInterface,
   PartStdInterface,
@@ -20,9 +19,12 @@ import FilterPartStd from "../../components/additional/FilterPartStd.vue";
 import FormPartStd from "../../components/FormPartStd.vue";
 import { useRoute } from "vue-router";
 import ButtonGroup from "../../components/ButtonGroup.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const route = useRoute();
 const dataForm = ref<PartStdCreateModelInterface | null>(null);
+const formPartStd = ref<InstanceType<typeof FormPartStd> | null>(null)
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const masterStore = useMasterStore();
 const total_item = ref(0);
 const params = reactive({
@@ -85,6 +87,9 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchPartStd();
+    if (formPartStd.value?.refetchPart) {
+      formPartStd.value.refetchPart()
+    }
   },
   onError: (error: any) => {
     toastRef.value?.showToast({
@@ -197,6 +202,9 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchPartStd();
+  if (formPartStd.value?.refetchPart) {
+    formPartStd.value.refetchPart()
+  }
 };
 
 const handleError = (error: any) => {
@@ -271,11 +279,37 @@ const previewDocument = (document: ResponseDocumentInterface) => {
 const handleRemoveSuccess = () => {
   refetchPartStd();
 };
+
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0">
       <!-- <Button text="Import" rounded="full" color="blue" />
@@ -293,6 +327,7 @@ const handleRemoveSuccess = () => {
         <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingPartStd" />
       </div>
       <div class="w-full">
+        <Breadcrumb :items="breadcrumb" />
         <Table label-create="User" :columns="ColumnsPartStd" :entities="dataPartStd?.data || []"
           :loading="isLoadingPartStd" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
@@ -317,6 +352,6 @@ const handleRemoveSuccess = () => {
     </div>
 
     <FormPartStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+      @error="handleError" @removeSucess="handleRemoveSuccess" ref="formPartStd" />
   </div>
 </template>

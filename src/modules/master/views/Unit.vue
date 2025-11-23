@@ -30,12 +30,12 @@ const params = reactive({
   search: "",
   filter: "",
   filters: [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "location_uuid",
-      value: "",
-    },
+    // {
+    //   group: "AND",
+    //   operator: "EQ",
+    //   column: "location_uuid",
+    //   value: "",
+    // },
   ],
   currentPage: 1,
   perPage: 10,
@@ -177,12 +177,12 @@ const setFilter = () => {
 const resetFilter = () => {
   dataForm.value = null;
   params.filters = [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "location_uuid",
-      value: "",
-    },
+    // {
+    //   group: "AND",
+    //   operator: "EQ",
+    //   column: "location_uuid",
+    //   value: "",
+    // },
   ] as any;
 };
 
@@ -308,7 +308,8 @@ onMounted(() => {
           @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
+                v-if="dataForm?.location_uuid" />
               <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>

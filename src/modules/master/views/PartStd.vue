@@ -57,6 +57,7 @@ const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const is_loading_filter = ref(false);
+const formPartStd = ref<InstanceType<typeof FormPartStd> | null>(null)
 
 //--- GET PART STD
 const {
@@ -99,6 +100,9 @@ const { mutate: deletePartStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchpartStd();
+    if (formPartStd.value?.refetchPart) {
+      formPartStd.value?.refetchPart();
+    }
   },
   onError: (error: any) => {
     toastRef.value?.showToast({
@@ -200,6 +204,9 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchpartStd();
+  if (formPartStd.value?.refetchPart) {
+    formPartStd.value?.refetchPart()
+  }
 };
 
 const handleError = (error: any) => {
@@ -287,6 +294,10 @@ const previewDocument = (document: ResponseDocumentInterface) => {
 
 const handleRemoveSuccess = () => {
   refetchpartStd();
+
+  if (formPartStd.value?.refetchPart) {
+    formPartStd.value?.refetchPart()
+  }
 };
 
 const handleDownload = () => {
@@ -358,9 +369,9 @@ onMounted(() => {
     </div>
 
     <FormPartStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+      @error="handleError" @removeSucess="handleRemoveSuccess" ref="formPartStd" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

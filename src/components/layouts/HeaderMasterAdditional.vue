@@ -10,7 +10,7 @@ const router = useRouter();
 const route = useRoute();
 
 const toHome = () => {
-  router.push("/master/location");
+  router.push("/master/user");
 };
 
 const logout = () => {
@@ -30,11 +30,7 @@ const logout = () => {
         <button class="user-info" @click="router.push('/profile')">
           <p>User : superadmin@gmail.com</p>
         </button>
-        <button
-          v-if="authStore.users?.role === 'planner'"
-          class="menu-button"
-          @click="router.push('/')"
-        >
+        <button v-if="authStore.users?.role === 'planner'" class="menu-button" @click="router.push('/')">
           Location
         </button>
         <button class="sign-out-button" @click="logout">Sign Out</button>

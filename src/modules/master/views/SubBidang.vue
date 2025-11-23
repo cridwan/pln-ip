@@ -28,12 +28,12 @@ const params = reactive({
   search: "",
   filter: "",
   filters: [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "bidang_uuid",
-      value: "",
-    },
+    // {
+    //   group: "AND",
+    //   operator: "EQ",
+    //   column: "bidang_uuid",
+    //   value: "",
+    // },
   ],
   currentPage: 1,
   perPage: 10,
@@ -254,12 +254,12 @@ const handleOnFilter = (data: BidangTypeModelCreateInterface) => {
 const resetFilter = () => {
   dataForm.value = null;
   params.filters = [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "bidang_uuid",
-      value: "",
-    },
+    // {
+    //   group: "AND",
+    //   operator: "EQ",
+    //   column: "bidang_uuid",
+    //   value: "",
+    // },
   ] as any;
 };
 

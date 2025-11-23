@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { AxiosError } from "axios";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type {
   IPagination,
-  ResponseDocumentInterface,
 } from "@/types/GlobalType";
 
 import { useMasterStore } from "../../stores/MasterStore";
@@ -19,8 +18,11 @@ import { ColumnConsumableMaterialStd } from "../../constants/ConsumableMaterialS
 import FormConsumableMaterialStd from "../../components/FormConsumableMaterialStd.vue";
 import { useRoute } from "vue-router";
 import ButtonGroup from "../../components/ButtonGroup.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const dataForm = ref<ConsumableMaterialStdCreateModelInterface | null>(null);
+const formConsumableMaterialStd = ref<InstanceType<typeof FormConsumableMaterialStd> | null>(null)
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const route = useRoute();
 const masterStore = useMasterStore();
 const total_item = ref(0);
@@ -33,6 +35,12 @@ const params = reactive({
       operator: "EQ",
       column: "activity_uuid",
       value: "",
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity.equipment.scopeStandart.additionalScope",
+      value: route.params.id,
     },
   ],
   currentPage: 1,
@@ -76,7 +84,7 @@ const {
 //--- DELETE SCOPE
 const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteManpowerStd(id, '/add-scope/detail');
+    return await masterStore.deleteConsumableMaterialStd(id, '/add-scope/detail');
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -86,6 +94,9 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchConsMatStd();
+    if (formConsumableMaterialStd.value?.refetchConsumableMaterial) {
+      formConsumableMaterialStd.value.refetchConsumableMaterial();
+    }
   },
   onError: (error: any) => {
     toastRef.value?.showToast({
@@ -114,7 +125,9 @@ const { mutate: downloadConsMatStd, isPending: isLoadingDownload } =
 const { mutate: templateConsMatStd, isPending: isLoadingTemplate } =
   useMutation({
     mutationFn: async () => {
-      return await masterStore.templateConsumableMaterialStd('/add-scope/detail');
+      return await masterStore.templateConsumableMaterialStd('/add-scope/detail', {
+        filters: params.filters
+      });
     },
     onSuccess: () => { },
     onError: (error) => {
@@ -189,6 +202,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchConsMatStd();
+
+  if (formConsumableMaterialStd.value?.refetchConsumableMaterial) {
+    formConsumableMaterialStd.value.refetchConsumableMaterial();
+  }
 };
 
 const handleError = (error: any) => {
@@ -238,6 +255,12 @@ const resetFilter = () => {
       column: "activity_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity.equipment.scopeStandart.additionalScope",
+      value: route.params.id,
+    },
   ];
 };
 
@@ -267,11 +290,37 @@ const handleExportTemplate = () => {
 const handleImport = (file: File) => {
   importConsMatStd(file);
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.uuid" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
+    @delete="onDelete" />
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-0">
       <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
@@ -287,6 +336,7 @@ const handleImport = (file: File) => {
           :loading="isLoadingMatStd" />
       </div>
       <div class="w-full">
+        <Breadcrumb :items="breadcrumb" />
         <Table label-create="User" :columns="ColumnConsumableMaterialStd" :entities="dataMatStd?.data || []"
           :loading="isLoadingMatStd" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
@@ -311,6 +361,7 @@ const handleImport = (file: File) => {
     </div>
 
     <FormConsumableMaterialStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item"
-      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess"
+      ref="formConsumableMaterialStd" />
   </div>
 </template>

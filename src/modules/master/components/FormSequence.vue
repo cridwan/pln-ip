@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed, type PropType, watch } from "vue";
 
-import { Button, Input, Modal } from "@/components";
+import { Button, Input, Modal, Upload } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { useMutation } from "@tanstack/vue-query";
@@ -203,50 +203,20 @@ watch(
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Sequence' : 'Tambah Sequence'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Input
-        v-model="model.name"
-        label="Nama"
-        star
-        :rules="rules.name"
-        :custom_symbols="all_characters"
-      />
-      <UploadStream
-        v-model="model.file"
-        star
-        :rules="rules.file"
-        :progress="uploadProgress"
-        :selectedValues="documentValues"
-        @changes="handleChangeFile"
-        @removeSuccess="removeSuccess"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Sequence' : 'Tambah Sequence'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Input v-model="model.name" label="Nama" star :rules="rules.name" :custom_symbols="all_characters" />
+      <UploadStream v-model="model.file" star :rules="rules.file" :progress="uploadProgress"
+        :selectedValues="documentValues" @changes="handleChangeFile" @removeSuccess="removeSuccess" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue"
           :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-        />
+          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument" />
       </div>
     </form>
   </Modal>

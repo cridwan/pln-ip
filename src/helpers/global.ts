@@ -22,6 +22,13 @@ function useScreen() {
   return { screenWidth, screenHeight };
 }
 
+
+function formatToFloat(input: string) {
+  const number = input.replace(/\./g, '')
+
+  return parseFloat(number);
+}
+
 function numberFormat(inputNumber: number | string, isCurrency = false) {
   const number =
     typeof inputNumber === "string" ? parseInt(inputNumber, 10) : inputNumber;
@@ -53,6 +60,13 @@ function dateFormatId(date: string) {
     month: 'long',
     year: 'numeric'
   });
+}
+
+function parsedUrl(url: string) {
+  return (
+    import.meta.env.VITE_API_BASE_URL.replace("api", "") +
+    url
+  )
 }
 
 function convertToKebabCase(input: string): string {
@@ -116,5 +130,7 @@ export {
   phone,
   email,
   character_search,
-  dateFormatId
+  dateFormatId,
+  formatToFloat,
+  parsedUrl
 };

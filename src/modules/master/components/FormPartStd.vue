@@ -75,7 +75,14 @@ const rules = computed(() => {
 //--- GET PART
 const params_part = reactive<IParams>({
   search: "",
-  filters: [],
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: null,
+    }
+  ],
   currentPage: 1,
   perPage: 10,
 });
@@ -253,6 +260,19 @@ watch(modelValue, (value) => {
   }
 });
 
+watch(() => props.dataForm, (newData) => {
+  params_part.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: String(props.dataForm?.activity_uuid),
+    }
+  ]
+
+  refetchPart()
+}, { immediate: true, deep: true })
+
 const handleChangeFile = (e: File) => {
   modelUpload.value = e;
 };
@@ -271,13 +291,13 @@ watch(
         newPart?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: item.name };
+            return { value: item.uuid, label: `${item.name} / ${item.global_unit?.name}` };
           }) || [];
       options_part.value = mergeArrays(
         [
           {
             value: props.selectedValue?.part_uuid,
-            label: props.selectedValue?.part?.name,
+            label: `${props.selectedValue?.part?.name} / ${props.selectedValue?.part?.global_unit?.name} `,
           },
         ],
         new_data.filter((item) => item.value !== props.selectedValue?.part_uuid)
@@ -287,66 +307,33 @@ watch(
         newPart?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: item.name };
+            return { value: item.uuid, label: `${item.name} / ${item.global_unit?.name}` };
           }) || [];
       options_part.value = new_data;
     }
   },
   { deep: true, immediate: true }
 );
+
+defineExpose({ refetchPart })
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Part Standart' : 'Tambah Part Standart'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Select
-        v-model="model.part_uuid"
-        star
-        label="Part"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_part.search"
-        :search="true"
-        :loading="is_loading_part"
-        :loading-next-page="isFetchingNextPagePart"
-        :rules="rules.part_uuid"
-        :options="options_part"
-        @scroll="scrollPart"
-        @search="searchPart"
-      />
-      <Input
-        v-model="model.qty"
-        star
-        label="Qty"
-        :rules="rules.qty"
-        :custom_symbols="numbers_positive"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Part Standart' : 'Tambah Part Standart'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Select v-model="model.part_uuid" star label="Part" options_label="label" options_value="value"
+        v-model:model-search="params_part.search" :search="true" :loading="is_loading_part"
+        :loading-next-page="isFetchingNextPagePart" :rules="rules.part_uuid" :options="options_part"
+        @scroll="scrollPart" @search="searchPart" />
+      <Input v-model="model.qty" star label="Qty" :rules="rules.qty" :custom_symbols="numbers_positive" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate" />
       </div>
     </form>
   </Modal>

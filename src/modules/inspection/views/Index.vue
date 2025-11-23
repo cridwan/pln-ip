@@ -513,8 +513,9 @@ const toDelete = (item: ResponseProject) => {
               :key="key" class="px-4 hover:text-neutral-200 py-1 flex justify-between">
               <span class="cursor-pointer" @click="toTransaction(item.uuid)">{{
                 item.name
-                }}</span>
-              <Icon v-if="item.status != 'approve'" name="trash" class="cursor-pointer" @click="toDelete(item)" />
+              }}</span>
+              <Icon v-if="item.status != 'approve' && authStore.users?.role !== 'approval'" name="trash"
+                class="cursor-pointer" @click="toDelete(item)" />
             </p>
           </div>
         </div>
