@@ -2,6 +2,7 @@ import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import type { ResponseDocumentInterface } from "@/types/GlobalType";
 
 import type { TColor } from "./ScopeType";
+import type { InspectionTypeInterface } from "@/modules/master/types/InspectionType";
 
 interface WithFileInterface {
   note: string;
@@ -17,6 +18,8 @@ export interface AddScopeInterface {
     file: ValueUploadType[];
   } | null;
   oh_recom: WithFileInterface | null;
+  inspection_type?: InspectionTypeInterface,
+  name?: string,
   wo_priority: WithFileInterface | null;
   history: WithFileInterface | null;
   rla: WithFileInterface | null;
@@ -62,6 +65,7 @@ export interface ResponseAddScopeInterface {
     created_at: string;
     updated_at: string;
   }[];
+  inspection_type?: InspectionTypeInterface,
   asset_welnes: Category;
   oh_recom: Category;
   wo_priority: Category;

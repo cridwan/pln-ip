@@ -38,6 +38,10 @@ const props = defineProps({
       return [];
     },
   },
+  is_logging: {
+    type: Boolean,
+    default: true
+  },
   isAction: {
     type: Boolean,
     default: true,
@@ -86,36 +90,40 @@ const props = defineProps({
   },
 });
 const columns = computed(() => {
-  return props.columns.concat([
-    {
-      label: "Created At",
-      align: "left",
-      key: "created_at",
-      sort: false,
-      width: 20,
-    },
-    {
-      label: "Updated At",
-      align: "left",
-      key: "updated_at",
-      sort: false,
-      width: 20,
-    },
-    {
-      label: "Created By",
-      align: "left",
-      key: "created_by",
-      sort: false,
-      width: 20,
-    },
-    {
-      label: "Updated By",
-      align: "left",
-      key: "updated_by",
-      sort: false,
-      width: 20,
-    }
-  ]);
+  if (props.is_logging) {
+    return props.columns.concat([
+      {
+        label: "Created At",
+        align: "left",
+        key: "created_at",
+        sort: false,
+        width: 20,
+      },
+      {
+        label: "Updated At",
+        align: "left",
+        key: "updated_at",
+        sort: false,
+        width: 20,
+      },
+      {
+        label: "Created By",
+        align: "left",
+        key: "created_by",
+        sort: false,
+        width: 20,
+      },
+      {
+        label: "Updated By",
+        align: "left",
+        key: "updated_by",
+        sort: false,
+        width: 20,
+      }
+    ]);
+  }
+
+  return props.columns;
 });
 const emit = defineEmits([
   "search",

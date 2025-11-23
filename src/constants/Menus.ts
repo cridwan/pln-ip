@@ -318,6 +318,57 @@ export const MenusAddScope: MenuInterface[] = [
   },
 ];
 
+export const MenusGuestAddScope: MenuInterface[] = [
+  {
+    id: 1,
+    name: "Additional Scope",
+    url: "/",
+    icon: "out",
+  },
+  {
+    id: 2,
+    name: "Scope",
+    url: "/scope",
+    icon: "document",
+  },
+  // {
+  //   id: 2,
+  //   name: "Instruksi Kerja",
+  //   url: "/work-instruction",
+  //   icon: "megaphone",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Equipment",
+  //   url: "/equipment",
+  //   icon: "wrench",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Activity",
+  //   url: "/activity",
+  //   icon: "pulse-line",
+  // },
+  {
+    id: 4,
+    name: "Consumable Material",
+    url: "/consumable-material",
+    icon: "box",
+  },
+  {
+    id: 5,
+    name: "Manpower",
+    url: "/manpower",
+    icon: "male",
+  },
+  {
+    id: 6,
+    name: "Part",
+    url: "/part",
+    icon: "trolley-items",
+  },
+];
+
 export const MenusMaster: MenuInterface[] = [
   {
     id: 16,

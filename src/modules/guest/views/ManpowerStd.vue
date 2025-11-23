@@ -297,11 +297,11 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button v-if="
+    <!-- <Button v-if="
       dataForm?.activity_uuid &&
       dataApproval?.status !== 'approve' &&
       access_token
-    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" /> -->
 
     <div class="flex gap-8">
       <div class="basis-1/5">
@@ -311,8 +311,8 @@ onMounted(() => {
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
           <Table label-create="Manpower" :columns="ColumnsManpower" :entities="dataManPower?.data || []"
-            :loading="isLoadingManPower" :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
-              " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+            :loading="isLoadingManPower" :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
+            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
             @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
@@ -335,8 +335,7 @@ onMounted(() => {
                 -
               </p>
               <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''"
-                :label="entity.manpower.name" :loading="isLoadingUpdate"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+                :label="entity.manpower.name" :loading="isLoadingUpdate" :disabled="true"
                 @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity }">

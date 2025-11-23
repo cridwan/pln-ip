@@ -56,7 +56,7 @@ const params = reactive({
     {
       group: "AND",
       operator: "EQ",
-      column: "equipment.uuid",
+      column: "equipment_uuid",
       value: "",
     },
   ],

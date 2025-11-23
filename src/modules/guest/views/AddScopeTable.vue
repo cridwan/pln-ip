@@ -24,6 +24,7 @@ import { useTransactionStore } from "../stores/TransactionStore";
 import FormAdScope from "../components/FormAdScope.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
+import type { InspectionTypeInterface } from "@/modules/master/types/InspectionType";
 
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
@@ -98,6 +99,8 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
             animation: item.animation,
             day: item.day,
             asset: item.name || "",
+            name: item.name,
+            inspection_type: item.inspection_type,
             asset_welness: item.asset_welnes
               ? {
                 color: item.asset_welnes?.color,
@@ -404,9 +407,19 @@ const saveFieldWithFile = (
     additional_scope_uuid: entity.id,
   });
 };
-const toDetail = (id: string, original_uuid: string) => {
+const toDetail = (entity: AddScopeInterface & { original_uuid: string }) => {
   router.push(
-    `/${route.params.id}/guest/${route.params.id_unit}/${route.params.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/add-scope/${id}/scope?original_uuid=${original_uuid}`
+    {
+      path: `/${route.params.id}/guest/${route.params.id_unit}/${route.params.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/add-scope/${entity.id}/scope?original_uuid=${entity.original_uuid}`,
+      query: {
+        location: entity.inspection_type?.machine?.unit?.location?.name,
+        unit: entity.inspection_type?.machine?.unit?.name,
+        machine: entity.inspection_type?.machine?.name,
+        inspectionType: entity.inspection_type?.name,
+        addScope: entity.name
+      }
+    },
+
   );
 };
 
@@ -545,9 +558,9 @@ const handleError = (error: any) => {
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-2">
           <!-- <ButtonDots :day="entity.day" @detail="toDetail(entity.id)" @squence="toSquence(entity)" /> -->
-          <Icon name="eye" class="cursor-pointer text-white" @click="toDetail(entity.id, entity.original_uuid)" />
-          <Icon v-if="dataApproval?.status !== 'approve' && access_token" name="trash" class="cursor-pointer text-white"
-            @click="handleDelete(entity)" />
+          <Icon name="eye" class="cursor-pointer text-white" @click="toDetail(entity)" />
+          <!-- <Icon v-if="dataApproval?.status !== 'approve' && access_token" name="trash" class="cursor-pointer text-white"
+            @click="handleDelete(entity)" /> -->
         </div>
       </template>
     </Table>

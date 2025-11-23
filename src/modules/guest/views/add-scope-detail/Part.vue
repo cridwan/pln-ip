@@ -283,7 +283,27 @@ const saveQuantity = (e: { quantity: string }, entity: PartStdInterface) => {
 onMounted(() => {
   breadcrumb.value = [
     {
-      name: "Part Std",
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.addScope),
       as_link: false,
       url: "",
     },
@@ -293,11 +313,11 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button v-if="
+    <!-- <Button v-if="
       dataForm?.activity_uuid &&
       dataApproval?.status !== 'approve' &&
       access_token
-    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" /> -->
 
     <div class="flex gap-8">
       <div class="basis-1/5">
@@ -307,8 +327,8 @@ onMounted(() => {
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
           <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
-            :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
-              " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+            :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
+            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
             @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
@@ -332,8 +352,7 @@ onMounted(() => {
                 -
               </p>
               <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity.part?.name"
-                :loading="isLoadingUpdate" :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveQuantity(e, entity)" />
+                :loading="isLoadingUpdate" :disabled="true" @save="(e) => saveQuantity(e, entity)" />
             </template>
 
             <template #column_price="{ entity }">
