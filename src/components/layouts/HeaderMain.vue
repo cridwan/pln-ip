@@ -24,16 +24,16 @@ const login = () => {
 };
 
 const getMenuActive = computed(() => {
-  console.log(route.params);
-  if (route.params.menu === "ci") {
-    return "Combustion Inspection";
-  } else if (route.params.menu === "ti") {
-    return "Turbine Inspection";
-  } else if (route.params.menu === "mi") {
-    return "Major Inspection";
-  } else {
-    return route.params.menu;
-  }
+  // if (route.params.menu === "ci") {
+  //   return "Combustion Inspection";
+  // } else if (route.params.menu === "ti") {
+  //   return "Turbine Inspection";
+  // } else if (route.params.menu === "mi") {
+  //   return "Major Inspection";
+  // } else {
+  //   return route.params.menu;
+  // }
+  return String(route.query.inspection).toUpperCase();
 });
 </script>
 

@@ -29,8 +29,11 @@ import type { ProjectInterface } from "../types/ProjectType";
 import type { UpdateManPowerInterface } from "../types/ManpowerType";
 import FormQuantity from "../components/FormQuantity.vue";
 import TableSummary from "@/components/tables/TableSummary.vue";
+import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
 
 const authStore = useAuthStore();
+const original_uuid = ref<string | undefined>(undefined)
+const formManpowerStd = ref<InstanceType<typeof FormManpowerStd> | null>(null)
 const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
@@ -126,6 +129,10 @@ const { mutate: deleteManpowerStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchManPower();
+
+    if (formManpowerStd.value?.refetchManpower) {
+      formManpowerStd.value.refetchManpower()
+    }
   },
   onError: (error: any) => {
     console.log(error);
@@ -205,6 +212,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchManPower();
+
+  if (formManpowerStd.value?.refetchManpower) {
+    formManpowerStd.value.refetchManpower()
+  }
 };
 
 const handleError = (error: any) => {
@@ -263,15 +274,17 @@ const resetFilter = () => {
   ];
 };
 
-const handleOnFilter = (data: FilterManpowerStdInterface) => {
+const handleOnFilter = (data: FilterManpowerStdInterface, activity: ActivityInterface) => {
   is_loading_filter.value = true;
   dataForm.value = data;
+  original_uuid.value = activity.original_uuid as string;
   setFilter();
   refetchManPower();
 };
 
 const handleResetFilter = () => {
   is_loading_filter.value = true;
+  original_uuid.value = undefined;
   resetFilter();
   refetchManPower();
 };
@@ -326,8 +339,8 @@ onMounted(() => {
             @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
-                  v-if="dataForm?.activity_uuid" />
+                <!-- <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
+                  v-if="dataForm?.activity_uuid" /> -->
                 <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
                   v-if="dataForm?.activity_uuid" />
               </div>
@@ -377,7 +390,7 @@ onMounted(() => {
 
   <Toast ref="toastRef" />
   <FormManpowerStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-    @error="handleError" @removeSucess="handleRemoveSuccess" />
+    @error="handleError" @removeSucess="handleRemoveSuccess" ref="formManpowerStd" :original_uuid="original_uuid" />
   <ModalDelete v-model="open_delete" :title="selected_item?.manpower?.name" :loading="isLoadingDelete"
     @delete="onDelete" />
 </template>

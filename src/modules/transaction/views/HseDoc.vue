@@ -75,17 +75,17 @@ const { isFetching: isLoadingHseDoc, refetch: refetchHseDoc } = useQuery({
           created_at: item.created_at,
           document: item.document
             ? {
-                file: item.document
-                  ? [
-                      {
-                        id: item.document.uuid,
-                        name: item.document.document_original_name,
-                        size: item.document.document_size,
-                        file: item.document.document_link,
-                      },
-                    ]
-                  : [],
-              }
+              file: item.document
+                ? [
+                  {
+                    id: item.document.uuid,
+                    name: item.document.document_original_name,
+                    size: item.document.document_size,
+                    file: item.document.document_link,
+                  },
+                ]
+                : [],
+            }
             : null,
           document_original: item.document,
           hse_doc_uuid: item.hse_doc_uuid,
@@ -212,48 +212,30 @@ function searchTable() {
 
 <template>
   <Toast ref="toastRef" />
-  <Table
-    :columns="ColumnsHse"
-    :entities="entitiesHseDoc"
-    :loading="isLoadingHseDoc"
-    :pagination="pagination"
-    :is-create="false"
-    :is-action="false"
-    v-model:model-search="params.search"
-    @change-page="changePage"
-    @change-limit="changeLimit"
-    @search="searchTable"
-  >
+  <Table :is_logging="false" :columns="ColumnsHse" :entities="entitiesHseDoc" :loading="isLoadingHseDoc"
+    :pagination="pagination" :is-create="false" :is-action="false" v-model:model-search="params.search"
+    @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
     <template #column_name="{ entity }">
       <span class="text-white">{{ entity.parent?.name ?? "" }}</span>
     </template>
     <template #column_attachment="{ entity }">
       <div class="w-full flex justify-center">
-        <p
-          v-if="
-            (dataApproval?.status === 'approve' && !entity.document) ||
-            (!access_token && !entity.document)
-          "
-        >
+        <p v-if="
+          (dataApproval?.status === 'approve' && !entity.document) ||
+          (!access_token && !entity.document)
+        ">
           -
         </p>
-        <FormOnlyUploadFile
-          v-else
-          ref="attachment"
-          :value="entity.document"
-          :label="entity.parent.name"
-          :loading="is_loading_create"
-          :disabled="dataApproval?.status === 'approve' || !access_token"
-          @save="(e) => saveFile(e, entity)"
-        />
+        <FormOnlyUploadFile v-else ref="attachment" :value="entity.document" :label="entity.parent.name"
+          :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
+          @save="(e) => saveFile(e, entity)" />
       </div>
     </template>
     <template #column_preview="{ entity }">
       <div v-if="entity.document" class="w-full flex justify-center">
         <div
           class="bg-cyan-500 text-center border border-neutral-50 rounded-lg px-2 min-w-[120px] text-base text-neutral-50 cursor-pointer"
-          @click="preview(entity)"
-        >
+          @click="preview(entity)">
           Preview
         </div>
       </div>

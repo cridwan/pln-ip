@@ -321,8 +321,8 @@ const handleDownload = (item: ResultsInterface) => {
   <p class="text-center w-full font-bold text-2xl text-blue-900 mb-10">
     REPORT
   </p>
-  <Table :is-create="false" :is-search="false" :is-action="false" :columns="ColumnsResults" :entities="Data"
-    :is-pagination="false">
+  <Table :is_logging="false" :is-create="false" :is-search="false" :is-action="false" :columns="ColumnsResults"
+    :entities="Data" :is-pagination="false">
     <template #column_download="{ entity }">
       <div class="flex justify-center">
         <button class="button-download" @click="handleDownload(entity)">

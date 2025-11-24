@@ -29,6 +29,10 @@ const props = defineProps({
   isAdditional: {
     type: Boolean,
     default: false
+  },
+  original_uuid: {
+    type: String,
+    default: ''
   }
 });
 
@@ -40,7 +44,7 @@ const localForm = ref<ActivityModelCreateInterface | null | undefined>(
   props.dataForm
 );
 const uploadProgress = ref<number>(0);
-const emit = defineEmits(["success", "error", "removeSucess", "refetchScope"]);
+const emit = defineEmits(["success", "error", "removeSucess"]);
 const is_loading_activity = ref(false);
 const options_scope = ref<OptionType[]>([]);
 const masterStore = useMasterStore();
@@ -123,15 +127,15 @@ const params_activity = reactive({
     additional_scope_uuid: route.params.id_scope as string,
   } : {
     equipment_uuid: props.dataForm?.equipment_uuid as string,
-    project_uuid: route.params.id_project as string,
+    inspection_type_uuid: route.params.id_inspection as string,
   })
 });
 const {
-  data: dataScope,
-  refetch: refetchScope,
-  fetchNextPage: fetchNextPageScope,
-  hasNextPage: hasNextPageScope,
-  isFetchingNextPage: isFetchingNextPageScope,
+  data: dataActivity,
+  refetch: refetchActivity,
+  fetchNextPage: fetchNextPageActivity,
+  hasNextPage: hasNextPageActivity,
+  isFetchingNextPage: isFetchingNextPageActivity,
 } = useInfiniteQuery({
   queryKey: ["getActivityTransactionForm"],
   enabled: !is_loading_activity.value,
@@ -166,22 +170,22 @@ const searchScope = () => {
   timeout_scope.value = window.setTimeout(() => {
     is_loading_activity.value = true;
     params_activity.currentPage = 1;
-    refetchScope();
+    refetchActivity();
   }, 1000);
 };
 const scrollScope = (e: Event) => {
   const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLElement;
   if (
     scrollTop + clientHeight >= scrollHeight - 1 &&
-    hasNextPageScope.value &&
-    !isFetchingNextPageScope.value
+    hasNextPageActivity.value &&
+    !isFetchingNextPageActivity.value
   ) {
-    fetchNextPageScope();
+    fetchNextPageActivity();
   }
 };
 
 watch(
-  [modelValue, dataScope],
+  [modelValue, dataActivity],
   ([newModel, newScope]) => {
     console.log(newScope);
     const new_data: OptionType[] =
@@ -195,10 +199,12 @@ watch(
   { deep: true, immediate: true }
 );
 
-watch(() => props.dataForm, (newVal) => {
-  params_activity.equipment_uuid = newVal?.equipment_uuid as string;
-  refetchScope();
+watch(() => props.original_uuid, () => {
+  params_activity.equipment_uuid = props.original_uuid as string;
+  refetchActivity();
 }, { deep: true, immediate: true })
+
+defineExpose({ refetchActivity })
 </script>
 
 <template>
@@ -207,7 +213,7 @@ watch(() => props.dataForm, (newVal) => {
       @submit.prevent="handleSubmit">
       <Select v-model="model.activity_uuid" label="Activity" options_label="label" options_value="value"
         v-model:model-search="params_activity.search" :search="true" :loading="is_loading_activity"
-        :loading-next-page="isFetchingNextPageScope" :rules="rules.activity_uuid" :options="options_scope"
+        :loading-next-page="isFetchingNextPageActivity" :rules="rules.activity_uuid" :options="options_scope"
         @scroll="scrollScope" @search="searchScope" />
 
       <div class="w-full flex items-center gap-4 mt-4">

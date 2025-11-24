@@ -12,6 +12,7 @@ export type TColor = "red" | "green" | "yellow" | "";
 
 export interface ScopeInterface {
   id: string;
+  original_uuid?: string;
   asset: string;
   asset_welness: {
     color: TColor;
@@ -45,6 +46,7 @@ interface Category {
 
 export interface ResponseScopeInterface {
   uuid: string;
+  original_uuid?: string;
   name: string;
   link: string | null;
   global_unit_uuid: string;

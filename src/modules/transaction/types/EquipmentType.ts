@@ -2,6 +2,7 @@ import type { ResponseScopeInterface } from "./ScopeType";
 
 export interface EquipmentInterface {
   uuid: string;
+  original_uuid?: string;
   name: string;
   scope_standart_uuid: string;
   scope_standart: ResponseScopeInterface;
