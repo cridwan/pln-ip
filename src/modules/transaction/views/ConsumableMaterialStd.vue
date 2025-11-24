@@ -30,13 +30,16 @@ import type { ProjectInterface } from "../types/ProjectType";
 import FormQuantity from "../components/FormQuantity.vue";
 import type { UpdateConsMatInterface } from "../types/ConsumableMaterialType";
 import TableSummary from "@/components/tables/TableSummary.vue";
+import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
 
 const dataSummary = ref<{ total_price: Number, price: Number, total_qty: Number }>({
   total_price: 0,
   price: 0,
   total_qty: 0
 });
+const original_uuid = ref<string | undefined>(undefined)
 const authStore = useAuthStore();
+const formConsumableMaterial = ref<InstanceType<typeof FormConsumableMaterialStd> | null>(null)
 const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
@@ -127,6 +130,10 @@ const { mutate: deleteConsMatStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchConsMat();
+
+    if (formConsumableMaterial.value?.refetchConsumableMaterial) {
+      formConsumableMaterial.value.refetchConsumableMaterial()
+    }
   },
   onError: (error: any) => {
     console.log(error);
@@ -206,6 +213,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchConsMat();
+
+  if (formConsumableMaterial.value?.refetchConsumableMaterial) {
+    formConsumableMaterial.value.refetchConsumableMaterial()
+  }
 };
 
 const handleError = (error: any) => {
@@ -264,15 +275,17 @@ const resetFilter = () => {
   ];
 };
 
-const handleOnFilter = (data: FilterConsumableMaterialStdInterface) => {
+const handleOnFilter = (data: FilterConsumableMaterialStdInterface, activity: ActivityInterface) => {
   is_loading_filter.value = true;
   dataForm.value = data;
+  original_uuid.value = activity.original_uuid as string
   setFilter();
   refetchConsMat();
 };
 
 const handleResetFilter = () => {
   is_loading_filter.value = true;
+  original_uuid.value = undefined
   resetFilter();
   refetchConsMat();
 };
@@ -328,8 +341,8 @@ onMounted(() => {
             @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
-                  v-if="dataForm?.activity_uuid" />
+                <!-- <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
+                  v-if="dataForm?.activity_uuid" /> -->
                 <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
                   v-if="dataForm?.activity_uuid" />
               </div>
@@ -388,7 +401,8 @@ onMounted(() => {
 
   <Toast ref="toastRef" />
   <FormConsumableMaterialStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
-    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" ref="formConsumableMaterial"
+    :original_uuid="original_uuid" />
   <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
     @delete="onDelete" />
 </template>

@@ -4,6 +4,7 @@ import type { EquipmentInterface } from "./EquipmentType";
 export interface ActivityInterface {
   uuid: string;
   name: string;
+  original_uuid?: string;
   document: ResponseDocumentInterface;
   document_uuid: string;
   equipment_uuid: string;

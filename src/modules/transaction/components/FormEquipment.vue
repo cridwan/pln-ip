@@ -7,7 +7,6 @@ import { required, helpers } from "@vuelidate/validators";
 import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import type {
   IPagination,
-  IParams,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
@@ -21,7 +20,6 @@ import type {
   FormEquipmentCloneInterface,
   FormEquipmentInterface,
 } from "../types/EquipmentType";
-import { api } from "@/api/axios";
 import { useTransactionStore } from "../stores/TransactionStore";
 
 const props = defineProps({
@@ -31,6 +29,14 @@ const props = defineProps({
   isAdditional: {
     type: Boolean,
     default: false
+  },
+  id: {
+    type: String,
+    default: ''
+  },
+  orignal_uuid: {
+    type: String,
+    default: ''
   }
 });
 
@@ -92,8 +98,6 @@ const handleSubmit = async () => {
 
   if (!isValid) return;
 
-  console.log(model.value, props.dataForm);
-
   const payload: FormEquipmentCloneInterface = {
     equipment_uuid: model.value.equipment_uuid,
     scope_standart_uuid: props.dataForm?.scope_standart_uuid as string,
@@ -133,8 +137,8 @@ const params_Equipment = reactive({
     scope_standart_uuid: props.dataForm?.scope_standart_uuid as string,
     additional_scope_uuid: route.params.id_scope as string,
   } : {
-    scope_standart_uuid: props.dataForm?.scope_standart_uuid as string,
-    project_uuid: route.params.id_project as string,
+    scope_standart_uuid: props.orignal_uuid as string,
+    inspection_type_uuid: route.params.id_inspection as string,
   })
 });
 const {
@@ -207,10 +211,12 @@ watch(
   { deep: true, immediate: true }
 );
 
-watch(() => props.dataForm, (newVal) => {
-  params_Equipment.scope_standart_uuid = newVal?.scope_standart_uuid as string
+watch(() => props.orignal_uuid, () => {
+  params_Equipment.scope_standart_uuid = props.orignal_uuid as string
   refetchEquipment();
 }, { immediate: true, deep: true })
+
+defineExpose({ refetchEquipment })
 </script>
 
 <template>

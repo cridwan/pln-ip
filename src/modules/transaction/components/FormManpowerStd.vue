@@ -30,6 +30,10 @@ const props = defineProps({
   dataForm: {
     type: Object as PropType<FilterManpowerStdInterface | null>,
   },
+  original_uuid: {
+    type: String,
+    default: ''
+  }
 });
 
 const emit = defineEmits(["success", "error"]);
@@ -68,14 +72,14 @@ const rules = computed(() => {
 
 //--- GET MANPOWER
 const params_manpower = reactive<
-  IParams & { activity_uuid: string; project_uuid: string }
+  IParams & { activity_uuid: string; inspection_type_uuid: string }
 >({
   search: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
   activity_uuid: props.dataForm?.activity_uuid as string,
-  project_uuid: route.params.id_project as string,
+  inspection_type_uuid: route.params.id_inspection as string,
 });
 const {
   data: dataManpower,
@@ -225,58 +229,32 @@ watch(
 );
 
 watch(
-  () => props.dataForm,
-  (newVal) => {
-    params_manpower.activity_uuid = newVal?.activity_uuid as string;
+  () => props.original_uuid,
+  () => {
+    params_manpower.activity_uuid = props.original_uuid as string;
     refetchManpower();
   },
   { deep: true, immediate: true }
 );
+
+defineExpose({ refetchManpower })
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Select
-        v-model="model.manpower_uuid"
-        label="Manpower"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_manpower.search"
-        :search="true"
-        :loading="is_loading_manpower"
-        :loading-next-page="isFetchingNextPageManpower"
-        :rules="rules.manpower_uuid"
-        :options="options_manpower"
-        @scroll="scrollManpower"
-        @search="searchManpower"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Select v-model="model.manpower_uuid" label="Manpower" options_label="label" options_value="value"
+        v-model:model-search="params_manpower.search" :search="true" :loading="is_loading_manpower"
+        :loading-next-page="isFetchingNextPageManpower" :rules="rules.manpower_uuid" :options="options_manpower"
+        @scroll="scrollManpower" @search="searchManpower" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate"
-          :loading="isLoadingCreate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate"
+          :loading="isLoadingCreate" />
       </div>
     </form>
   </Modal>

@@ -15,6 +15,7 @@ import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import { useTransactionStore } from "../../stores/TransactionStore";
 import FormActivity from "../../components/FormActivity.vue";
+import { parsedUrl } from "@/helpers/global";
 
 const props = defineProps({
   modelValue: {
@@ -22,6 +23,10 @@ const props = defineProps({
     default: false,
   },
   id: {
+    type: String,
+    default: "",
+  },
+  original_uuid: {
     type: String,
     default: "",
   },
@@ -33,10 +38,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isAction: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
-
+const formActivity = ref<InstanceType<typeof FormActivity> | null>(null)
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
@@ -115,6 +124,10 @@ const { mutate: deleteActivity, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchActivity();
+
+    if (formActivity.value?.refetchActivity) {
+      formActivity.value.refetchActivity()
+    }
   },
   onError: (error: any) => {
     console.log(error);
@@ -175,6 +188,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchActivity();
+
+  if (formActivity.value?.refetchActivity) {
+    formActivity.value.refetchActivity()
+  }
 };
 
 const handleError = (error: any) => {
@@ -199,46 +216,18 @@ watch(model, (value) => {
 </script>
 
 <template>
-  <Modal
-    width="1000"
-    height="500"
-    :showButtonClose="false"
-    :title="'Data Activity'"
-    v-model="model"
-  >
+  <Modal width="1000" height="500" :showButtonClose="false" :title="'Data Activity'" v-model="model">
     <div class="flex flex-col">
-      <div
-        v-if="statusApproval !== 'approve' && access_token"
-        class="flex justify-end"
-      >
-        <Button
-          icon_only="plus"
-          size="sm"
-          rounded="full"
-          color="blue"
-          @click="handleCreate"
-        />
+      <div v-if="statusApproval !== 'approve' && access_token" class="flex justify-end">
+        <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" v-show="props.isAction" />
       </div>
-      <Table
-        label-create="Sub Bidang"
-        :columns="ColumnsActivity"
-        :entities="dataActivity?.data || []"
-        :loading="isLoading"
-        :pagination="pagination"
-        :is-create="false"
-        :is-search="false"
-        :is-action="statusApproval !== 'approve' && access_token !== ''"
-        class="mt-6"
-        @change-page="changePage"
-        @change-limit="changeLimit"
-      >
+      <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
+        :loading="isLoading" :pagination="pagination" :is-create="false" :is-search="false"
+        :is-action="props.isAction && (statusApproval !== 'approve' && access_token !== '')" class="mt-6"
+        @change-page="changePage" @change-limit="changeLimit">
         <template #column_action="{ entity }">
           <div class="flex items-center justify-center gap-4">
-            <Icon
-              name="trash"
-              class="icon-action-table"
-              @click="handleDelete(entity)"
-            />
+            <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
           </div>
         </template>
         <template #column_equipment="{ entity }">
@@ -246,25 +235,27 @@ watch(model, (value) => {
             {{ entity.equipment?.name }}
           </p>
         </template>
+        <template #column_ik_link="{ entity }">
+          <a target="_blank" :href="entity.link_ik1" class="text-base text-neutral-50 text-left" v-if="entity.link_ik1">
+            {{ entity.link_ik1 ?? '-' }}
+          </a>
+          <span v-else>-</span>
+        </template>
+        <template #column_ik_doc="{ entity }">
+          <a target="_blank" :href="parsedUrl(entity.document.document_link)"
+            class="text-base text-neutral-50 text-left" v-if="entity.document">
+            {{ entity.document?.document_name }}
+          </a>
+          <span v-else>-</span>
+        </template>
       </Table>
     </div>
   </Modal>
 
-  <FormActivity
-    :is-additional="props.isAdditional"
-    v-model="open_form"
-    :data-form="dataForm"
-    :selected-value="selected_item"
-    @success="handleSuccess"
-    @error="handleError"
-    @removeSucess="handleRemoveSuccess"
-  />
+  <FormActivity :is-additional="props.isAdditional" v-model="open_form" :data-form="dataForm"
+    :original_uuid="props.original_uuid" :selected-value="selected_item" @success="handleSuccess" @error="handleError"
+    @removeSucess="handleRemoveSuccess" ref="formActivity" />
 
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
   <Toast ref="toastRef" />
 </template>

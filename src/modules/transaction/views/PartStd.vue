@@ -32,6 +32,8 @@ import FormQuantity from "../components/FormQuantity.vue";
 import type { UpdatePartInterface } from "../types/PartType";
 import TableSummary from "@/components/tables/TableSummary.vue";
 
+const original_uuid = ref<string | undefined>(undefined)
+const formPartStd = ref<InstanceType<typeof FormPartStd> | null>(null)
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
@@ -130,6 +132,9 @@ const { mutate: deletePartStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchPart();
+    if (formPartStd.value?.refetchPart) {
+      formPartStd.value.refetchPart()
+    }
   },
   onError: (error: any) => {
     console.log(error);
@@ -209,6 +214,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchPart();
+
+  if (formPartStd.value?.refetchPart) {
+    formPartStd.value.refetchPart()
+  }
 };
 
 const handleError = (error: any) => {
@@ -259,6 +268,7 @@ const setFilter = () => {
 
 const resetFilter = () => {
   dataForm.value = null;
+  original_uuid.value = undefined;
   dataActivity.value = null;
   params.filters = [
     {
@@ -277,6 +287,7 @@ const handleOnFilter = (
   is_loading_filter.value = true;
   dataForm.value = data;
   dataActivity.value = activity;
+  original_uuid.value = activity.original_uuid as string
   setFilter();
   refetchPart();
 };
@@ -421,6 +432,6 @@ onMounted(() => {
 
   <Toast ref="toastRef" />
   <FormPartStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-    @error="handleError" @removeSucess="handleRemoveSuccess" />
+    :original_uuid="original_uuid" @error="handleError" @removeSucess="handleRemoveSuccess" ref="formPartStd" />
   <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

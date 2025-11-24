@@ -10,7 +10,7 @@ import { mergeArrays } from "@/helpers/global";
 // import { useMasterStore } from "@/modules/master/stores/MasterStore";
 import type {
   IPagination,
-  IParams,
+  // IParams,
   // ResponseDocumentInterface,
 } from "@/types/GlobalType";
 import type {
@@ -38,6 +38,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  original_uuid: {
+    type: String,
+    default: ''
+  }
 });
 
 // const modelUpload = ref<File | null>(null);
@@ -83,13 +87,13 @@ const params_consumable_material = reactive({
   perPage: 10,
   ...(props.isAdditional
     ? {
-        activity_uuid: props.dataForm?.activity_uuid as string,
-        additional_scope_uuid: route.params.id_scope as string,
-      }
+      activity_uuid: props.dataForm?.activity_uuid as string,
+      additional_scope_uuid: route.params.id_scope as string,
+    }
     : {
-        activity_uuid: props.dataForm?.activity_uuid as string,
-        project_uuid: route.params.id_project as string,
-      }),
+      activity_uuid: props.dataForm?.activity_uuid as string,
+      inspection_type_uuid: route.params.id_inspection as string,
+    }),
 });
 
 const {
@@ -241,63 +245,36 @@ watch(
 );
 
 watch(
-  () => props.dataForm,
-  (newVal) => {
-    params_consumable_material.activity_uuid = newVal?.activity_uuid as string;
+  () => props.original_uuid,
+  () => {
+    params_consumable_material.activity_uuid = props.original_uuid as string;
 
     refetchConsumableMaterial();
   },
   { deep: true, immediate: true }
 );
+
+defineExpose({ refetchConsumableMaterial })
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="
-      props.selectedValue
-        ? 'Ubah Consumable Material Std'
-        : 'Tambah Consumable Material Std'
-    "
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Select
-        v-model="model.cons_mat_uuid"
-        label="Consumable Material"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_consumable_material.search"
-        :search="true"
-        :loading="is_loading_consumable_material"
-        :loading-next-page="isFetchingNextPageConsumableMaterial"
-        :rules="rules.cons_mat_uuid"
-        :options="options_consumable_material"
-        @scroll="scrollConsumableMaterial"
-        @search="searchConsumableMaterial"
-      />
+  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue
+    ? 'Ubah Consumable Material Std'
+    : 'Tambah Consumable Material Std'
+    " v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Select v-model="model.cons_mat_uuid" label="Consumable Material" options_label="label" options_value="value"
+        v-model:model-search="params_consumable_material.search" :search="true"
+        :loading="is_loading_consumable_material" :loading-next-page="isFetchingNextPageConsumableMaterial"
+        :rules="rules.cons_mat_uuid" :options="options_consumable_material" @scroll="scrollConsumableMaterial"
+        @search="searchConsumableMaterial" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate"
-          :loading="isLoadingCreate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate"
+          :loading="isLoadingCreate" />
       </div>
     </form>
   </Modal>

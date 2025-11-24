@@ -97,7 +97,8 @@ const { isPending: isLoadingRequest, mutate: approveRequestProject } =
 const params_users = reactive<IParams>({
   search: "",
   filter: {
-    role: "approval"
+    role: "approval",
+    area: "yes"
   },
   currentPage: 1,
   perPage: 10,

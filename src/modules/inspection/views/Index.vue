@@ -179,9 +179,16 @@ const { mutate: generate, isPending: isLoadingGenerate } = useMutation({
     return await scopeStore.generate(payload);
   },
   onSuccess: (data) => {
-    router.push(
-      `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${data?.data?.data?.uuid}/${scopeSelected.value}/scope`
+    const find_item = dataInspectionType.value?.data.find(
+      (item) => item.uuid === scopeSelected.value
     );
+    const inspection = find_item?.name.toLowerCase();
+    router.push({
+      path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${data?.data?.data?.uuid}/${scopeSelected.value}/scope`,
+      query: {
+        inspection
+      }
+    });
   },
   onError: (error: any) => {
     console.log(error);
@@ -438,8 +445,17 @@ const generateScope = () => {
 };
 
 const toTransaction = (uuid: string) => {
+  const find_item = dataInspectionType.value?.data.find(
+    (item) => item.uuid === scopeSelected.value
+  );
+  const inspection = find_item?.name.toLowerCase();
   router.push(
-    `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${uuid}/${scopeSelected.value}/scope`
+    {
+      path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${uuid}/${scopeSelected.value}/scope`,
+      query: {
+        inspection
+      }
+    }
   );
 };
 
@@ -513,7 +529,7 @@ const toDelete = (item: ResponseProject) => {
               :key="key" class="px-4 hover:text-neutral-200 py-1 flex justify-between">
               <span class="cursor-pointer" @click="toTransaction(item.uuid)">{{
                 item.name
-              }}</span>
+                }}</span>
               <Icon v-if="item.status != 'approve' && authStore.users?.role !== 'approval'" name="trash"
                 class="cursor-pointer" @click="toDelete(item)" />
             </p>

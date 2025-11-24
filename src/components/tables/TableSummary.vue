@@ -18,14 +18,14 @@ const props = defineProps({
 <template>
     <table class="text-white">
         <tbody>
-            <tr>
+            <!-- <tr>
                 <td class="font-bold">Total Quantity</td>
                 <td class="font-bold">{{ props.total_qty.toLocaleString("id") }}</td>
             </tr>
             <tr>
                 <td class="font-bold">Harga</td>
                 <td class="font-bold">Rp {{ props.price.toLocaleString("id") }}</td>
-            </tr>
+            </tr> -->
             <tr>
                 <td class="font-bold">Total Harga</td>
                 <td class="font-bold">Rp {{ props.total_price.toLocaleString("id") }}</td>
