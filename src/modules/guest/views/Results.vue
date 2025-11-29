@@ -14,6 +14,11 @@ import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const Data = ref<ResultsInterface[]>([
   {
+    id: 1,
+    uuid: "budget_activity",
+    manpower: "Budget Activity",
+  },
+  {
     id: 2,
     uuid: "scope",
     manpower: "Scope",
@@ -39,14 +44,14 @@ const breadcrumb = ref<BreadcrumbType[]>([]);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const is_loading = ref<string | null>(null);
-console.log(route.params)
+
 //--- DOWNLOAD BUDGET ACTIVITY
 const { refetch: refetchDownloadBudgetActivity } = useQuery({
   queryKey: ["downloadResultBudgetActivity"],
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultBudgetActivity(
-        route.params.id_project as string
+        route.params.id_inspection as string
       );
       is_loading.value = null;
 
