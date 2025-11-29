@@ -16,7 +16,7 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push("/login");
+  router.push({ name: 'login' });
 };
 
 const login = () => {
@@ -45,7 +45,8 @@ const toMonitoring = () => {
           Generate Scope
         </button>
         <button class="menu-button" :class="{ active: route.path.includes('project-monitoring') }"
-          v-show="authStore.users" @click="toMonitoring">
+          v-show="authStore.users && ['planner', 'approval'].some((role) => role == authStore.users?.role)"
+          @click="toMonitoring">
           Monitoring
         </button>
         <button v-if="authStore.users?.role === 'planner'" class="menu-button" @click="router.push('/master/user')">

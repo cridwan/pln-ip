@@ -33,6 +33,10 @@ const props = defineProps({
   dataForm: {
     type: Object as PropType<ConsumableMaterialStdCreateModelInterface | null>,
   },
+  isAdditional: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const modelUpload = ref<File | null>(null);
@@ -317,8 +321,8 @@ defineExpose({ refetchConsumableMaterial })
 
 <template>
   <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue
-    ? 'Ubah Consumable Material Standart'
-    : 'Tambah Consumable Material Standart'
+    ? `Ubah Consumable Material ${isAdditional ? '' : 'Standart'}`
+    : `Tambah Consumable Material ${isAdditional ? '' : 'Standart'}`
     " v-model="modelValue">
     <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
       @submit.prevent="handleSubmit">

@@ -21,7 +21,6 @@ import { useMasterStore } from "../stores/MasterStore";
 import type { SequenceInterface } from "../types/SequenceTypes";
 import FormSequence from "../components/FormSequence.vue";
 import { ColumnSequence } from "../constants/SequenceConstant";
-import ButtonGroup from "../components/ButtonGroup.vue";
 
 const masterStore = useMasterStore();
 const total_item = ref(0);

@@ -32,6 +32,14 @@ export interface ScopeInterface {
   children: EquipmentInterface[];
 }
 
+export interface ScopeInterfaceTable {
+  uuid: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  children: EquipmentInterface[];
+}
+
 interface Category {
   uuid: string;
   note: string;

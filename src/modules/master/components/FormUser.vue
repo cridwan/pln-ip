@@ -381,7 +381,7 @@ watch(
         v-model:model-search="params_roles.search" :search="true" :loading="is_loading_roles"
         :loading-next-page="isFetchingNextPageRoles" :rules="rules.roles" :options="options_roles" @scroll="scrollRoles"
         @search="searchRoles" />
-      <Select v-model="model.area_uuid" label="Area" options_label="label" options_value="value"
+      <Select v-model="model.area_uuid" star label="Area" options_label="label" options_value="value"
         v-model:model-search="params_area.search" :search="true" :loading="is_loading_area"
         :loading-next-page="isFetchingNextPageArea" :rules="rules.area_uuid" :options="options_area"
         @scroll="scrollArea" @search="searchArea" />

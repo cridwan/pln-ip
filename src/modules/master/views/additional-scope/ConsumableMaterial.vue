@@ -313,16 +313,21 @@ onMounted(() => {
       as_link: false,
       url: "",
     },
+    {
+      name: String(route.query?.addScope),
+      as_link: false,
+      url: "",
+    },
   ];
 });
 </script>
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.consmat?.name} / ${selected_item?.consmat?.name}`"
+    :loading="isLoadingDelete" @delete="onDelete" />
   <div class="relative w-full">
-    <div class="flex items-center gap-2 absolute right-0 top-0">
+    <div class="flex items-center gap-2 absolute right-0 top-10">
       <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
         :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
         @import="handleImport" />
@@ -336,7 +341,7 @@ onMounted(() => {
           :loading="isLoadingMatStd" />
       </div>
       <div class="w-full">
-        <Breadcrumb :items="breadcrumb" />
+        <Breadcrumb :items="breadcrumb" class="mb-6" />
         <Table label-create="User" :columns="ColumnConsumableMaterialStd" :entities="dataMatStd?.data || []"
           :loading="isLoadingMatStd" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
@@ -360,8 +365,8 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormConsumableMaterialStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item"
-      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess"
+    <FormConsumableMaterialStd :is-additional="true" :data-form="dataForm" v-model="open_form"
+      :selected-value="selected_item" @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess"
       ref="formConsumableMaterialStd" />
   </div>
 </template>

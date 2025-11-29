@@ -305,11 +305,10 @@ onMounted(() => {
       <div class="w-full">
         <Table label-create="Unit" :columns="ColumnsUnit" :entities="dataUnit?.data || []" :loading="isLoadingUnit"
           :pagination="pagination" :is-create="false" v-model:model-search="params.search" @change-page="changePage"
-          @change-limit="changeLimit" @search="searchTable">
+          :is-action="dataForm?.location_uuid != undefined" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
-                v-if="dataForm?.location_uuid" />
+              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
               <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
             </div>
           </template>
@@ -327,5 +326,6 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.name} / ${selected_item?.location?.name}`"
+    :loading="isLoadingDelete" @delete="onDelete" />
 </template>

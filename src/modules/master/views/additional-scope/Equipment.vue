@@ -312,6 +312,11 @@ onMounted(() => {
       as_link: false,
       url: "",
     },
+    {
+      name: String(route.query?.addScope),
+      as_link: false,
+      url: "",
+    },
   ];
 });
 </script>
@@ -321,7 +326,7 @@ onMounted(() => {
   <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 
   <div class="relative w-full">
-    <div class="flex items-center gap-2 absolute right-0 top-0">
+    <div class="flex items-center gap-2 absolute right-0 top-10">
       <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
         :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
         @import="handleImport" />
@@ -334,7 +339,7 @@ onMounted(() => {
         <FilterAdEquipment @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingEquipment" />
       </div>
       <div class="w-full">
-        <Breadcrumb :items="breadcrumb" />
+        <Breadcrumb :items="breadcrumb" class="mb-6" />
         <Table label-create="Sub Bidang" :columns="ColumnsEquipment" :entities="dataEquipment?.data || []"
           :loading="isLoadingEquipment" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable">

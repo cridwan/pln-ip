@@ -33,7 +33,7 @@ const getMenuActive = computed(() => {
   // } else {
   //   return route.params.menu;
   // }
-  return String(route.query.inspection).toUpperCase();
+  return String(route.params?.menu).toUpperCase();
 });
 </script>
 

@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
-
-import { Loading, Table } from "@/components";
+import { Breadcrumb, Loading, Table } from "@/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import type { ResultsInterface } from "../types/ResultsType";
-import { ColumnsResults } from "../constants/ResultsConstant";
+import { ColumnsResultsGuest } from "../constants/ResultsConstant";
 import { useTransactionStore } from "../stores/TransactionStore";
-console.log
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
+
 const Data = ref<ResultsInterface[]>([
   {
     id: 2,
@@ -35,8 +35,7 @@ const Data = ref<ResultsInterface[]>([
   },
 ]);
 
-const authStore = useAuthStore();
-const { access_token } = storeToRefs(authStore);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const is_loading = ref<string | null>(null);
@@ -270,13 +269,44 @@ const handleDownload = (item: ResultsInterface) => {
       break;
   }
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "RESULTS",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
   <p class="text-center w-full font-bold text-2xl text-blue-900 mb-10">
     REPORT
   </p>
-  <Table :is-create="false" :is-search="false" :is-action="false" :columns="ColumnsResults" :entities="Data"
+  <Breadcrumb :items="breadcrumb" />
+  <Table :is-create="false" :is-search="false" :is-action="false" :columns="ColumnsResultsGuest" :entities="Data"
     :is_logging="false" :is-pagination="false">
     <template #column_download="{ entity }">
       <div class="flex justify-center">

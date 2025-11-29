@@ -33,6 +33,10 @@ const props = defineProps({
   dataForm: {
     type: Object as PropType<ManpowerStdCreateModelInterface | null>,
   },
+  isAdditional: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const modelUpload = ref<File | null>(null);
@@ -314,8 +318,8 @@ defineExpose({ refetchManpower })
 
 <template>
   <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue
-    ? 'Ubah Manpower Standart'
-    : 'Tambah Manpower Standart'
+    ? `Ubah Manpower ${isAdditional ? '' : 'Standart'}`
+    : `Tambah Manpower ${isAdditional ? '' : 'Standart'}`
     " v-model="modelValue">
     <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
       @submit.prevent="handleSubmit">

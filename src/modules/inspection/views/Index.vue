@@ -94,8 +94,6 @@ const { mutate: deleteActivity, isPending: isLoadingDelete } = useMutation({
 //--- GET MACHINE
 const {
   data: dataMachine,
-  isFetching: isLoadingMachine,
-  refetch: refetchMachine,
 } = useQuery({
   queryKey: ["getMachine"],
   queryFn: async () => {
@@ -121,8 +119,6 @@ const {
 //--- GET INSPECTION TYPE
 const {
   data: dataInspectionType,
-  isFetching: isLoadingInspectionType,
-  refetch: refetchInspectionType,
 } = useQuery({
   queryKey: ["getInspectionType"],
   queryFn: async () => {
@@ -228,25 +224,30 @@ const {
 //--- END
 
 watch(dataMachine, (value) => {
+  const data = value?.data[0];
   breadcrumb.value = [
-    // {
-    //   name: `UBP ${value?.[0]?.unit?.name}`,
-    //   as_link: false,
-    //   url: "",
-    // },
-    // {
-    //   name: value?.[0]?.name || "",
-    //   as_link: false,
-    //   url: "",
-    // },
     {
       name: "Scope Overhaul",
       as_link: false,
       url: "",
     },
+    {
+      name: String(data?.unit?.location?.name || ""),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(data?.unit?.name || ""),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(data?.name || ""),
+      as_link: false,
+      url: "",
+    },
   ];
-  // titleHeader.value = convertToOriginalFormat(route.params.id_unit as string);
-});
+}, { deep: true, immediate: true });
 
 watch(
   [dataMachine, dataInspectionType],
@@ -338,7 +339,15 @@ const onDelete = () => {
 
 const selectInspection = (item: TInspection) => {
   if (authStore.users && authStore.users.role === UserEnum.GUEST) {
-    router.push(`/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.name}/undefined/${item.uuid}/scope`)
+    router.push({
+      path: `/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.name}/undefined/${item.uuid}/scope`,
+      query: {
+        inspection: item.name,
+        machine: item.machine?.name,
+        unit: item.machine?.unit?.name,
+        location: item.machine?.unit?.location?.name,
+      }
+    })
   } else {
     toScope(item);
   }

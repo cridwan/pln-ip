@@ -291,7 +291,7 @@ watch(
       <Textarea v-model="model.description" label="Deskripsi" :rules="rules.description" :rows="3" />
       <Select v-model="model.color" label="Jenis Pembangkit" options_label="label" options_value="value" star
         :rules="rules.color" :options="OptionsType" />
-      <Select v-model="model.sub_area_uuid" label="Sub Area" options_label="label" options_value="value"
+      <Select v-model="model.sub_area_uuid" star label="Sub Area" options_label="label" options_value="value"
         v-model:model-search="params_sub_area.search" :search="true" :loading="is_loading_sub_area"
         :loading-next-page="isFetchingNextPageSubArea" :rules="rules.sub_area_uuid" :options="options_area"
         @scroll="scrollSubArea" @search="searchSubArea" />

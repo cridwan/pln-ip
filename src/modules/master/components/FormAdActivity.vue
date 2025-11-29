@@ -171,6 +171,7 @@ const resetValue = () => {
     equipment_uuid: props.dataForm?.equipment_uuid || "",
   };
   uploadProgress.value = 0;
+  documentValues.value = null
 };
 
 watch(modelValue, (value) => {

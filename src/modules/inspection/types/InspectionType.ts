@@ -1,7 +1,10 @@
+import type { MachineInterface } from "@/modules/master/types/MachineType";
+
 export interface TInspection {
   uuid: string;
   name: string;
   machine_uuid: string;
+  machine?: MachineInterface,
   created_at: string;
   updated_at: string;
   day: number;

@@ -230,6 +230,12 @@ export const MenusGuest: MenuInterface[] = [
     icon: "home",
   },
   {
+    id: 2,
+    name: "Sequence",
+    url: "/sequence",
+    icon: "forward-message",
+  },
+  {
     id: 5,
     name: "Scope",
     url: "/scope",
@@ -321,7 +327,7 @@ export const MenusAddScope: MenuInterface[] = [
 export const MenusGuestAddScope: MenuInterface[] = [
   {
     id: 1,
-    name: "Additional Scope",
+    name: "Main Menu",
     url: "/",
     icon: "out",
   },
@@ -537,12 +543,6 @@ export const MenusMaster: MenuInterface[] = [
 ];
 
 export const MenuAdditional: MenuInterface[] = [
-  {
-    id: 1,
-    name: "Additional Scope",
-    url: "/",
-    icon: "out",
-  },
   {
     id: 5,
     name: "Scope",

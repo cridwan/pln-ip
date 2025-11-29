@@ -8,12 +8,6 @@ export const ColumnsConsMat: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "price",
-    label: "Harga",
-    align: "left",
-    sort: false,
-  },
-  {
     key: "merk",
     label: "Merk",
     align: "left",
@@ -25,4 +19,10 @@ export const ColumnsConsMat: TableColumnType[] = [
     align: "left",
     sort: false,
   },
+  {
+    key: "price",
+    label: "Harga",
+    align: "left",
+    sort: false,
+  }
 ];

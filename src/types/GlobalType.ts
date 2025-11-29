@@ -11,6 +11,7 @@ export interface IPagination<T> {
   prev_page_url: null | number;
   to: number;
   total: number;
+  summary?: Record<string, any>
 }
 
 export interface ProjectCardInterface {

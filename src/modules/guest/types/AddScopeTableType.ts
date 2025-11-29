@@ -3,6 +3,7 @@ import type { ResponseDocumentInterface } from "@/types/GlobalType";
 
 import type { TColor } from "./ScopeType";
 import type { InspectionTypeInterface } from "@/modules/master/types/InspectionType";
+import type { SequenceInterface } from "@/modules/master/types/SequenceTypes";
 
 interface WithFileInterface {
   note: string;
@@ -76,6 +77,15 @@ export interface ResponseAddScopeInterface {
   sequence_animation: ResponseSequenceAnimationInterface;
   animation: string;
   original_uuid: string;
+}
+
+export interface AddScopeInterfaceTable {
+  uuid: string;
+  name: string;
+  sequence: SequenceInterface;
+  inspection_type: InspectionTypeInterface;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CreateAddScopeInterface {

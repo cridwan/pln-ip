@@ -10,7 +10,7 @@ import {
   Table,
   Toast,
 } from "@/components";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
@@ -357,6 +357,7 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
+  <ModalDelete v-model="open_delete"
+    :title="`${selected_item?.consmat?.name} / ${selected_item?.consmat?.global_unit?.name}`" :loading="isLoadingDelete"
     @delete="onDelete" />
 </template>

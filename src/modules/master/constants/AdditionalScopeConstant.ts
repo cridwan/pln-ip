@@ -13,4 +13,10 @@ export const ColumnsAdditionalScope: TableColumnType[] = [
     align: "left",
     sort: false,
   },
+  {
+    key: "sequence_video",
+    label: "Video",
+    align: "left",
+    sort: false,
+  },
 ];

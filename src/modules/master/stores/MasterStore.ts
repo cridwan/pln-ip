@@ -647,7 +647,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Global Unit.xlsx`;
+          a.download = `Satuan.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -681,7 +681,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Global Unit Template.xlsx`;
+          a.download = `Satuan Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -778,7 +778,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Scope Standart.xlsx`;
+          a.download = `${prefix != '' ? 'Detail Scope Tambahan' : 'Scope Standart'}.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -812,7 +812,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Scope Standart Template.xlsx`;
+          a.download = `${prefix != '' ? 'Detail Scope Tambahan Template' : 'Scope Standart Template'}.xlsx`;
 
           document.body.appendChild(a);
           a.click();

@@ -2,18 +2,11 @@
 import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
-import { storeToRefs } from "pinia";
-
 import {
   Breadcrumb,
-  Button,
-  Icon,
-  // Icon,
-  ModalDelete,
   Table,
-  Toast,
 } from "@/components";
-import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type {
   ConsumableMaterialStdInterface,
@@ -21,22 +14,10 @@ import type {
 } from "@/modules/master/types/ConsumableMaterialStdType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 import { ColumnsConsumableMaterial } from "@/modules/guest/constants/ConsumableMaterialConstant";
-import { useTransactionStore } from "@/modules/guest/stores/TransactionStore";
-// import FormConsumableMaterialStd from "@/modules/guest/components/FormConsumableMaterialStd.vue";
 import FilterConsumableMaterialStd from "@/modules/guest/components/add-scope/FilterConsumableMaterialStd.vue";
 import { numberFormat } from "@/helpers/global";
-import { useAuthStore } from "@/modules/auth/stores/AuthStore";
-
-import type { ProjectInterface } from "../../types/ProjectType";
-import FormConsumableMaterialStd from "../../components/FormConsumableMaterialStd.vue";
-import FormQuantity from "../../components/FormQuantity.vue";
-import type { UpdateConsMatInterface } from "../../types/ConsumableMaterialType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
-// import FormAdCosumableMaterial from "../../components/add-scope/FormAdCosumableMaterial.vue";
 
-const authStore = useAuthStore();
-const { access_token } = storeToRefs(authStore);
-const transactionStore = useTransactionStore();
 const masterStore = useMasterStore();
 const route = useRoute();
 const params = reactive({
@@ -54,31 +35,10 @@ const params = reactive({
   perPage: 10,
 });
 const total_item = ref(0);
-const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const dataForm = ref<FilterConsumableMaterialStdInterface | null>(null);
-const selected_item = ref<ConsumableMaterialStdInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
-const open_form = ref(false);
-const open_delete = ref(false);
 const is_loading_filter = ref(false);
-const quantity = ref<any>(null);
-
-//--- GET STATUS APPROVAL
-const { data: dataApproval } = useQuery({
-  queryKey: ["getApprovalAtConsMatDetailAddScope"],
-  queryFn: async () => {
-    const { data } = await transactionStore.getProject(
-      route.params.id_project as string
-    );
-    const response = data.data.data as ProjectInterface;
-
-    return response;
-  },
-  retry: 0,
-  refetchOnWindowFocus: false,
-});
-//--- END
 
 //--- GET CONSMAT STD
 const {
@@ -103,62 +63,6 @@ const {
     }
   },
   refetchOnWindowFocus: false,
-});
-//--- END
-
-//--- DELETE CONSMAT STD
-const { mutate: deleteConsMatStd, isPending: isLoadingDelete } = useMutation({
-  mutationFn: async (id: string) => {
-    return await transactionStore.deleteConsMatStd(id);
-  },
-  onSuccess: () => {
-    toastRef.value?.showToast({
-      title: "Success",
-      description: "Deleted successfully",
-      type: "success",
-    });
-    open_delete.value = false;
-    refetchConsMat();
-  },
-  onError: (error: any) => {
-    console.log(error);
-    toastRef.value?.showToast({
-      title: "Error",
-      description: error?.response?.data?.message || "Something went wrong",
-      type: "error",
-    });
-  },
-});
-//--- END
-
-//--- UPDATE CONSUMABLE MATERIAL
-const { mutate: updateConsMat, isPending: isLoadingUpdate } = useMutation({
-  mutationFn: async ({
-    payload,
-    id,
-  }: {
-    payload: UpdateConsMatInterface;
-    id: string;
-  }) => {
-    return await transactionStore.updateConsMat(payload, id);
-  },
-  onSuccess: async () => {
-    refetchConsMat();
-    quantity.value.modelOpenInputData = false;
-    toastRef.value?.showToast({
-      title: "Success",
-      description: "Saved successfully",
-      type: "success",
-    });
-  },
-  onError: (error: any) => {
-    console.log(error);
-    toastRef.value?.showToast({
-      title: "Error",
-      description: error?.response?.data?.message || "Something went wrong",
-      type: "error",
-    });
-  },
 });
 //--- END
 
@@ -188,43 +92,6 @@ function searchTable() {
     refetchConsMat();
   }, 1000);
 }
-
-const handleSuccess = () => {
-  toastRef.value?.showToast({
-    title: "Success",
-    description: "Saved successfully",
-    type: "success",
-  });
-  params.currentPage = 1;
-  refetchConsMat();
-};
-
-const handleError = (error: any) => {
-  toastRef.value?.showToast({
-    title: "Error",
-    description: error?.response?.data?.message || "Something went wrong",
-    type: "error",
-  });
-};
-
-const handleCreate = () => {
-  selected_item.value = null;
-  open_form.value = true;
-};
-
-const handleUpdate = (item: ConsumableMaterialStdInterface) => {
-  selected_item.value = item;
-  open_form.value = true;
-};
-
-const handleDelete = (item: ConsumableMaterialStdInterface) => {
-  selected_item.value = item;
-  open_delete.value = true;
-};
-
-const onDelete = () => {
-  deleteConsMatStd(selected_item.value?.uuid as string);
-};
 
 const setFilter = () => {
   params.filters = [
@@ -268,24 +135,6 @@ const handleResetFilter = () => {
   refetchConsMat();
 };
 
-const handleRemoveSuccess = () => {
-  refetchConsMat();
-};
-
-const saveQuantity = (
-  e: { quantity: string },
-  entity: ConsumableMaterialStdInterface
-) => {
-  updateConsMat({
-    id: entity.uuid,
-    payload: {
-      name: entity.consmat.name,
-      qty: parseFloat(e.quantity),
-      global_unit_uuid: entity.consmat.global_unit_uuid,
-    },
-  });
-};
-
 onMounted(() => {
   breadcrumb.value = [
     {
@@ -319,12 +168,6 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <!-- <Button v-if="
-      dataForm?.activity_uuid &&
-      dataApproval?.status !== 'approve' &&
-      access_token
-    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" /> -->
-
     <div class="flex gap-8">
       <div class="basis-1/5">
         <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
@@ -336,15 +179,7 @@ onMounted(() => {
           <Table label-create="Material" :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []"
             :loading="isLoadingConsMat" :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
             v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
-            <template #column_action="{ entity }">
-              <div class="flex items-center justify-center gap-4">
-                <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
-                  v-if="dataForm?.activity_uuid" />
-                <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                  v-if="dataForm?.activity_uuid" />
-              </div>
-            </template>
+            :is_logging="false" @search="searchTable">
             <template #column_material="{ entity }">
               <p class="text-base text-neutral-50 text-left min-w-[100px]">
                 {{ entity.consmat?.name ?? "-" }}
@@ -354,17 +189,6 @@ onMounted(() => {
               <p class="text-base text-neutral-50 text-left">
                 {{ entity.consmat?.merk ?? "-" }}
               </p>
-            </template>
-            <template #column_total_qty="{ entity }">
-              <p v-if="
-                (dataApproval?.status === 'approve' && !entity.total_qty) ||
-                (!access_token && !entity.total_qty)
-              ">
-                -
-              </p>
-              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''"
-                :label="entity.consmat?.name" :loading="isLoadingUpdate" :disabled="true"
-                @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity }">
               <p v-if="!entity.consmat?.price">-</p>
@@ -393,12 +217,4 @@ onMounted(() => {
       </div>
     </div>
   </div>
-
-  <Toast ref="toastRef" />
-  <FormConsumableMaterialStd :is-additional="true" v-model="open_form" :data-form="dataForm"
-    :selected-value="selected_item" @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
-  <!-- <FormAdCosumableMaterial v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
-    @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" /> -->
-  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
 </template>
