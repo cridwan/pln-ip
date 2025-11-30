@@ -14,7 +14,7 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push("/login");
+  router.push({ name: 'login' });
 };
 
 const login = () => {
@@ -27,11 +27,7 @@ const login = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <button
-          v-if="authStore.users"
-          class="user-info"
-          :class="{ active: route.path.includes('profile') }"
-        >
+        <button v-if="authStore.users" class="user-info" :class="{ active: route.path.includes('profile') }">
           <p>User : {{ authStore.users?.email }}</p>
         </button>
         <button class="menu-button" @click="router.go(-1)">Kembali</button>

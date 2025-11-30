@@ -16,7 +16,7 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push("/login");
+  router.push({ name: 'login' });
 };
 
 const login = () => {
