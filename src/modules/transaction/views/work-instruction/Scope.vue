@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
@@ -9,7 +9,7 @@ import type {
   IPagination,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
-import { Button, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, ModalDelete, Table, Toast } from "@/components";
 // import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 // import { useGlobalStore } from "@/stores/GlobalStore";
@@ -30,10 +30,12 @@ import ButtonPreview from "../../components/ButtonPreview.vue";
 // import FormOnlyUploadFile from "../../components/FormOnlyUploadFile.vue";
 import type { ProjectInterface } from "../../types/ProjectType";
 import TableEquipment from "../../components/scope/TableEquipment.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 // const attachment = ref<any>(null);
 const open_form = ref(false);
 const authStore = useAuthStore();
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const { access_token } = storeToRefs(authStore);
 const entitiesScope = ref<ScopeInterface[]>([]);
 const selected_item = ref<ScopeInterface>();
@@ -530,6 +532,36 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     }
   });
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "SCOPE",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
@@ -551,6 +583,7 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     </div>
     <div class="flex-1 overflow-auto">
       <div class="max-w-full min-w-full">
+        <Breadcrumb :items="breadcrumb" />
         <Table label-create="Asset" :columns="ColumnsWorkInstruction" :entities="entitiesScope"
           :loading="isLoadingScope" :pagination="pagination" :is-create="false" :isAction="false"
           v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"

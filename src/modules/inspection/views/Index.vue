@@ -185,7 +185,10 @@ const { mutate: generate, isPending: isLoadingGenerate } = useMutation({
     router.push({
       path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${data?.data?.data?.uuid}/${scopeSelected.value}/scope`,
       query: {
-        inspection
+        inspection,
+        machine: find_item?.machine?.name,
+        unit: find_item?.machine?.unit?.name,
+        location: find_item?.machine?.unit?.location?.name,
       }
     });
   },
@@ -466,7 +469,10 @@ const toTransaction = (item: ResponseProject) => {
     {
       path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${item.uuid}/${scopeSelected.value}/scope`,
       query: {
-        inspection
+        inspection,
+        machine: find_item?.machine?.name,
+        unit: find_item?.machine?.unit?.name,
+        location: find_item?.machine?.unit?.location?.name,
       }
     }
   );

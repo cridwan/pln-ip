@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { AxiosError } from "axios";
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
@@ -20,9 +20,11 @@ import FormOnlyUploadFile from "../components/FormOnlyUploadFile.vue";
 import { useTransactionStore } from "../stores/TransactionStore";
 import type { ProjectInterface } from "../types/ProjectType";
 import FormCloneQcPlan from "../components/FormCloneQcPlan.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const authStore = useAuthStore();
 const open_form = ref(false);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_delete = ref(false);
 const selected_item = ref<QcPlanInterface | null>(null)
 const formCloneQcPlanm = ref<InstanceType<typeof FormCloneQcPlan> | null>(null)
@@ -284,11 +286,41 @@ const handleDelete = (item: QcPlanInterface) => {
   selected_item.value = item;
   open_delete.value = true;
 };
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "QC PLAN",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
   <Toast ref="toastRef" />
   <Button icon_only="plus" class="absolute right-10" size="sm" rounded="full" color="blue" @click="handleCreate" />
+  <Breadcrumb :items="breadcrumb" />
   <Table :is_logging="false" label-create="QC Plan Document" :columns="ColumnsQcPlan" :entities="entitiesQcPlan"
     :loading="isLoadingQcPlan" :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
       " v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"

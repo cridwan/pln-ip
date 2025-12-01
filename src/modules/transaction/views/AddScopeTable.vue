@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import type { AxiosError } from "axios";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
@@ -23,9 +23,11 @@ import FormWithUploadFile from "../components/FormWithUploadFile.vue";
 import { useTransactionStore } from "../stores/TransactionStore";
 import FormAdScope from "../components/FormAdScope.vue";
 import type { ProjectInterface } from "../types/ProjectType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const entitiesScope = ref<(AddScopeInterface & { original_uuid: string })[]>(
   []
@@ -454,6 +456,36 @@ const handleError = (error: any) => {
     type: "error",
   });
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "ADDITIONAL SCOPE",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
@@ -462,6 +494,7 @@ const handleError = (error: any) => {
     <ModalDelete v-model="open_delete" :title="selected_item?.asset" :loading="isLoadingDelete" @delete="onDelete" />
     <Button v-if="dataApproval?.status !== 'approve' && access_token" icon_only="plus" class="absolute right-0"
       size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <Breadcrumb :items="breadcrumb" />
     <Table :is_logging="false" label-create="Asset" :columns="ColumnsScope" :entities="entitiesScope"
       :loading="isLoadingScope" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
       @delete="handleDelete" @change-page="changePage" @change-limit="changeLimit" @search="searchTable">

@@ -309,7 +309,27 @@ const saveQuantity = (
 onMounted(() => {
   breadcrumb.value = [
     {
-      name: "Manpower Std",
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "MANPOWER",
       as_link: false,
       url: "",
     },

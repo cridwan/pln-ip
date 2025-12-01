@@ -310,7 +310,27 @@ const saveQuantity = (
 onMounted(() => {
   breadcrumb.value = [
     {
-      name: "Consumable Material Std",
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "CONSUMABLE MATERIAL",
       as_link: false,
       url: "",
     },

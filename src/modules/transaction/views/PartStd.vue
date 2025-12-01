@@ -320,7 +320,27 @@ const saveQuantity = (e: { quantity: string }, entity: PartStdTransactionInterfa
 onMounted(() => {
   breadcrumb.value = [
     {
-      name: "Part Std",
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "PART",
       as_link: false,
       url: "",
     },
