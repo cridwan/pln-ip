@@ -14,6 +14,7 @@ export interface ScopeInterface {
   id: string;
   original_uuid?: string;
   asset: string;
+  link?: string;
   asset_welness: {
     color: TColor;
     note: string;

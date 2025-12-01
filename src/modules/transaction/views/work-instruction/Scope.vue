@@ -559,13 +559,19 @@ const getData = (id: string, response: EquipmentInterface[]) => {
             <p v-if="!entity.document" class="text-white">No Document</p>
             <ButtonPreview v-else @click="preview(entity.document)" />
           </template>
+          <template #column_ik_link="{ entity }">
+            <a target="_blank" :href="entity.link" class="text-base text-neutral-50 text-left" v-if="entity.link">
+              {{ entity.link ?? '-' }}
+            </a>
+            <span v-else>-</span>
+          </template>
           <template #children="{ entity, index, parentActive }">
             <tr v-if="
               children_active.find((el) => el.id === entity.id)?.open === true
             ">
               <td :colspan="ColumnsWorkInstruction.length + 5">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
-                  <TableEquipment :is-action="false" :id="entity.id" :entity="entity.children"
+                  <TableEquipment :with-ik="true" :is-action="false" :id="entity.id" :entity="entity.children"
                     :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
                       " @get-data="getData" />
                 </div>

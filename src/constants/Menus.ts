@@ -19,6 +19,12 @@ export const Menus: MenuInterface[] = [
     icon: "home",
   },
   {
+    id: 1,
+    name: "Sequence",
+    url: "/sequence",
+    icon: "forward-message",
+  },
+  {
     id: 5,
     name: "Scope",
     url: "/scope",
@@ -70,7 +76,7 @@ export const Menus: MenuInterface[] = [
     id: 10,
     name: "HSE DOC",
     url: "/hse-doc",
-    icon: "mind-gear",
+    icon: "hse-doc",
   },
   {
     id: 12,
@@ -79,16 +85,16 @@ export const Menus: MenuInterface[] = [
     icon: "check-list",
   },
   {
-    id: 12,
-    name: "Request Approval",
-    url: "/request-approval",
-    icon: "check-list",
-  },
-  {
     id: 13,
     name: "Additional Scope",
     url: "/additional-scope",
     icon: "login",
+  },
+  {
+    id: 12,
+    name: "Request Approval",
+    url: "/request-approval",
+    icon: "check-list",
   },
   {
     id: 12,

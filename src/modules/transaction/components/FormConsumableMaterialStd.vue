@@ -19,7 +19,7 @@ import type {
   FilterConsumableMaterialStdInterface,
 } from "@/modules/master/types/ConsumableMaterialStdType";
 import { useTransactionStore } from "../stores/TransactionStore";
-import type { FormConsMatCloneInterface } from "../types/ConsumableMaterialStdType";
+import type { ConsumableMaterialStdTransactionInterface, FormConsMatCloneInterface } from "../types/ConsumableMaterialStdType";
 import { useRoute } from "vue-router";
 
 type OptionType = {
@@ -29,7 +29,7 @@ type OptionType = {
 
 const props = defineProps({
   selectedValue: {
-    type: Object as PropType<ConsumableMaterialStdInterface | null>,
+    type: Object as PropType<ConsumableMaterialStdTransactionInterface | null>,
   },
   dataForm: {
     type: Object as PropType<FilterConsumableMaterialStdInterface | null>,
@@ -223,12 +223,12 @@ watch(
       options_consumable_material.value = mergeArrays(
         [
           {
-            value: props.selectedValue?.cons_mat_uuid,
-            label: props.selectedValue?.consmat?.name,
+            value: props.selectedValue?.uuid,
+            label: props.selectedValue?.name,
           },
         ],
         new_data.filter(
-          (item) => item.value !== props.selectedValue?.cons_mat_uuid
+          (item) => item.value !== props.selectedValue?.uuid
         )
       );
     } else {

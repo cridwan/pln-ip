@@ -33,11 +33,13 @@ import type {
 } from "../types/InspectionType";
 import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 import { UserEnum } from "@/modules/auth/types/AuthType";
+import { useProjectStore } from "@/modules/auth/stores/ProjectStore";
 
 const videos = [Home0, Home1, Home2];
 
 const masterStore = useMasterStore();
 const authStore = useAuthStore();
+const projectStore = useProjectStore();
 const scopeStore = useInspectionStore();
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const router = useRouter();
@@ -179,6 +181,7 @@ const { mutate: generate, isPending: isLoadingGenerate } = useMutation({
       (item) => item.uuid === scopeSelected.value
     );
     const inspection = find_item?.name.toLowerCase();
+    projectStore.setProject(data?.data?.data as ResponseProject);
     router.push({
       path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${data?.data?.data?.uuid}/${scopeSelected.value}/scope`,
       query: {
@@ -453,14 +456,15 @@ const generateScope = () => {
   // );
 };
 
-const toTransaction = (uuid: string) => {
+const toTransaction = (item: ResponseProject) => {
   const find_item = dataInspectionType.value?.data.find(
     (item) => item.uuid === scopeSelected.value
   );
   const inspection = find_item?.name.toLowerCase();
+  projectStore.setProject(item)
   router.push(
     {
-      path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${uuid}/${scopeSelected.value}/scope`,
+      path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${item.uuid}/${scopeSelected.value}/scope`,
       query: {
         inspection
       }
@@ -536,7 +540,7 @@ const toDelete = (item: ResponseProject) => {
             </p>
             <p v-else-if="!isLoadingProject && (dataProject || []).length > 0" v-for="(item, key) in dataProject"
               :key="key" class="px-4 hover:text-neutral-200 py-1 flex justify-between">
-              <span class="cursor-pointer" @click="toTransaction(item.uuid)">{{
+              <span class="cursor-pointer" @click="toTransaction(item)">{{
                 item.name
                 }}</span>
               <Icon v-if="item.status != 'approve' && authStore.users?.role !== 'approval'" name="trash"

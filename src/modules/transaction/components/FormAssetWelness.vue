@@ -177,7 +177,7 @@ defineExpose({
           </div>
         </div> -->
         <div class="popover-footer">
-          <Button text="Cancel" size="sm" rounded="full" color="grey" :disabled="loading" @click="cancel" />
+          <Button text="Cancel" size="sm" rounded="full" color="red" :disabled="loading" @click="cancel" />
           <Button text="Save" size="sm" rounded="full" color="blue" :disabled="loading" :loading="loading"
             @click="save" />
         </div>
@@ -200,9 +200,11 @@ defineExpose({
   .button-colors
     @apply flex items-center gap-2 mt-2
     > button
-      @apply min-w-[100px] rounded-lg bg-buttonGray py-1 px-3 text-[13px] text-neutral-50
+      @apply min-w-[100px] rounded-lg bg-black py-1 px-3 text-[13px] text-neutral-50
     .button-red
       @apply hover:bg-red-500
+    .button-black
+      @apply hover:bg-neutral-900
     .button-yellow
       @apply hover:bg-yellow-400
     .button-green

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AxiosError } from "axios";
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
@@ -31,6 +31,7 @@ import type { ProjectInterface } from "../types/ProjectType";
 import FormQuantity from "../components/FormQuantity.vue";
 import type { UpdatePartInterface } from "../types/PartType";
 import TableSummary from "@/components/tables/TableSummary.vue";
+import type { PartStdTransactionInterface } from "../types/PartStdType";
 
 const original_uuid = ref<string | undefined>(undefined)
 const formPartStd = ref<InstanceType<typeof FormPartStd> | null>(null)
@@ -62,7 +63,7 @@ const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const dataForm = ref<FilterPartStdInterface | null>(null);
 const dataActivity = ref<ActivityInterface | null>(null);
-const selected_item = ref<PartStdInterface | null>(null);
+const selected_item = ref<PartStdTransactionInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
@@ -103,7 +104,7 @@ const {
         price: summary.price,
         total_qty: summary.total_qty
       }
-      const response = data as IPagination<PartStdInterface[]>;
+      const response = data as IPagination<PartStdTransactionInterface[]>;
       total_item.value = response.total;
       is_loading_filter.value = false;
 
@@ -240,7 +241,7 @@ const handleCreate = () => {
 //   edit_id.value = index;
 // };
 
-const handleDelete = (item: PartStdInterface) => {
+const handleDelete = (item: PartStdTransactionInterface) => {
   selected_item.value = item;
   open_delete.value = true;
 };
@@ -307,13 +308,11 @@ const handleRemoveSuccess = () => {
 //   edit_qty.value = false;
 // };
 
-const saveQuantity = (e: { quantity: string }, entity: PartStdInterface) => {
+const saveQuantity = (e: { quantity: string }, entity: PartStdTransactionInterface) => {
   updatePart({
     id: entity.uuid,
     payload: {
       qty: parseFloat(e.quantity),
-      global_unit_uuid: entity.part.global_unit_uuid,
-      name: entity.part.name,
     },
   });
 };
@@ -344,8 +343,8 @@ onMounted(() => {
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
-            :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+          <Table :is_logging="false" label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []"
+            :loading="isLoadingPart" :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
               " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
             @search="searchTable">
             <template #column_action="{ entity }">
@@ -357,7 +356,7 @@ onMounted(() => {
 
             <template #column_part="{ entity }">
               <p class="text-neutral-50">
-                {{ entity.part?.name ?? "-" }}
+                {{ entity.name ?? "-" }}
               </p>
             </template>
 
@@ -379,23 +378,24 @@ onMounted(() => {
               >
                 {{ Number(entity.total_qty)?.toLocaleString("id") ?? "-" }}
               </p> -->
-              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity.part?.name"
-                :loading="isLoadingUpdate" :disabled="dataApproval?.status === 'approve' || !access_token"
+              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity.name"
+                :loading="isLoadingUpdate"
+                :disabled="dataApproval?.status === 'approve' || !access_token || !dataForm?.activity_uuid"
                 @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity, index }">
-              <p v-if="!entity.part?.price">-</p>
+              <p v-if="!entity.price">-</p>
               <!-- <InputQty
                 v-else-if="edit_qty && edit_id == index"
                 :qty="Number(entity.total_qty)"
                 @change="handleEdit"
               /> -->
               <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
-                Rp. {{ Number(entity.part.price)?.toLocaleString("id") ?? "-" }}
+                Rp. {{ Number(entity.price)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity, index }">
-              <p v-if="!entity.total_qty && !entity.part?.price">-</p>
+              <p v-if="!entity.total_qty && !entity.price">-</p>
               <!-- <InputQty
                 v-else-if="edit_qty && edit_id == index"
                 :qty="Number(entity.total_qty)"
@@ -405,7 +405,7 @@ onMounted(() => {
                 Rp.
                 {{
                   (
-                    Number(entity.part.price) * Number(entity.total_qty)
+                    Number(entity.price) * Number(entity.total_qty)
                   ).toLocaleString("id")
                 }}
               </p>
@@ -413,13 +413,13 @@ onMounted(() => {
 
             <template #column_unit="{ entity }">
               <p class="text-base text-neutral-50 text-left">
-                {{ entity.part?.global_unit?.name ?? "-" }}
+                {{ entity.unit ?? "-" }}
               </p>
             </template>
 
             <template #column_number_drawing="{ entity }">
               <p class="text-base text-neutral-50 text-left">
-                {{ entity.part?.no_drawing ?? "-" }}
+                {{ entity.no_drawing ?? "-" }}
               </p>
             </template>
           </Table>
@@ -433,5 +433,6 @@ onMounted(() => {
   <Toast ref="toastRef" />
   <FormPartStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
     :original_uuid="original_uuid" @error="handleError" @removeSucess="handleRemoveSuccess" ref="formPartStd" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.name} / ${selected_item?.unit}`"
+    :loading="isLoadingDelete" @delete="onDelete" />
 </template>

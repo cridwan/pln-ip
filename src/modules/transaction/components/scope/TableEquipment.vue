@@ -45,6 +45,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  withIk: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const emit = defineEmits(["getData"]);
@@ -247,8 +251,9 @@ watch(
     <div v-if="statusApproval !== 'approve' && access_token" class="flex justify-end">
       <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" v-show="props.isAction" />
     </div>
-    <Table :columns="ColumnsEquipment" :entities="entity || []" :pagination="pagination" :loading="isLoading"
-      :is-create="false" :is-search="false" :is-action="true" @change-page="changePage" @change-limit="changeLimit">
+    <Table :columns="ColumnsEquipment" :is_logging="false" :entities="entity || []" :pagination="pagination"
+      :loading="isLoading" :is-create="false" :is-search="false" :is-action="true" @change-page="changePage"
+      @change-limit="changeLimit">
       <template #column_action="{ entity: element }">
         <div class="flex items-center justify-center gap-4">
           <Icon name="eye" class="icon-action-table" @click="handleDetail(element)" />
@@ -271,7 +276,8 @@ watch(
 
   <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 
-  <ModalActivity :is-additional="props.isAdditional" v-model="open_detail" :id="selected_item?.uuid"
-    :original_uuid="selected_item?.original_uuid" :status-approval="statusApproval" :is-action="props.isAction" />
+  <ModalActivity :with-ik="withIk" :is-additional="props.isAdditional" v-model="open_detail" :id="selected_item?.uuid"
+    :scope_name="selected_item?.scope_standart?.name" :original_uuid="selected_item?.original_uuid"
+    :status-approval="statusApproval" :is-action="props.isAction" />
   <Toast ref="toastRef" />
 </template>

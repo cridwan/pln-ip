@@ -4,7 +4,7 @@ import { computed, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
-import { Table, Toast } from "@/components";
+import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
@@ -19,9 +19,14 @@ import type {
   HseDocInterface,
   ResponseHseDocInterface,
 } from "../types/HseDocType";
+import FormCloneHseDoc from "../components/FormCloneHseDoc.vue";
 
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
+const open_form = ref(false);
+const open_delete = ref(false);
+const selected_item = ref<HseDocInterface | null>(null);
+const formCloneHse = ref<InstanceType<typeof FormCloneHseDoc> | null>(null)
 const entitiesHseDoc = ref<HseDocInterface[]>([]);
 const transactionStore = useTransactionStore();
 const globalStore = useGlobalStore();
@@ -45,6 +50,35 @@ const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const attachment = ref<any>(null);
 const timeout = ref(0);
 const is_loading_create = ref(false);
+
+//--- DELETE HSE DOC
+const { mutate: deleteHseDoc, isPending: isLoadingDelete } = useMutation({
+  mutationFn: async (id: string) => {
+    return await transactionStore.deleteHse(id);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Deleted successfully",
+      type: "success",
+    });
+    open_delete.value = false;
+    refetchHseDoc();
+    if (formCloneHse.value?.refetchHseDoc) {
+      formCloneHse.value.refetchHseDoc()
+    }
+  },
+  onError: (error: any) => {
+    console.log(error);
+    toastRef.value?.showToast({
+      title: "Error",
+      description: error?.response?.data?.message || "Something went wrong",
+      type: "error",
+    });
+  },
+  retry: 0,
+});
+//--- END
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
@@ -88,8 +122,7 @@ const { isFetching: isLoadingHseDoc, refetch: refetchHseDoc } = useQuery({
             }
             : null,
           document_original: item.document,
-          hse_doc_uuid: item.hse_doc_uuid,
-          parent: item.parent,
+          name: item.name,
           project_uuid: item.project_uuid,
           updated_at: item.updated_at,
           uuid: item.uuid,
@@ -208,15 +241,62 @@ function searchTable() {
     refetchHseDoc();
   }, 1000);
 }
+
+
+const handleSuccess = () => {
+  toastRef.value?.showToast({
+    title: "Success",
+    description: "Saved successfully",
+    type: "success",
+  });
+  params.currentPage = 1;
+  refetchHseDoc();
+
+  if (formCloneHse.value?.refetchHseDoc) {
+    formCloneHse.value.refetchHseDoc()
+  }
+};
+
+const handleError = (error: any) => {
+  toastRef.value?.showToast({
+    title: "Error",
+    description: error?.response?.data?.message || "Something went wrong",
+    type: "error",
+  });
+};
+
+const handleRemoveSuccess = () => {
+  refetchHseDoc();
+};
+
+const handleCreate = () => {
+  open_form.value = true
+}
+
+const onDelete = () => {
+  deleteHseDoc(selected_item.value?.uuid as string);
+};
+
+const handleDelete = (item: HseDocInterface) => {
+  selected_item.value = item;
+  open_delete.value = true;
+};
 </script>
 
 <template>
   <Toast ref="toastRef" />
+  <Button icon_only="plus" class="absolute right-10" size="sm" rounded="full" color="blue" @click="handleCreate" />
   <Table :is_logging="false" :columns="ColumnsHse" :entities="entitiesHseDoc" :loading="isLoadingHseDoc"
-    :pagination="pagination" :is-create="false" :is-action="false" v-model:model-search="params.search"
-    @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+    :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+      " v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+    @search="searchTable">
+    <template #column_action="{ entity }">
+      <div class="flex items-center justify-center gap-4">
+        <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+      </div>
+    </template>
     <template #column_name="{ entity }">
-      <span class="text-white">{{ entity.parent?.name ?? "" }}</span>
+      <span class="text-white">{{ entity?.name ?? "" }}</span>
     </template>
     <template #column_attachment="{ entity }">
       <div class="w-full flex justify-center">
@@ -226,7 +306,7 @@ function searchTable() {
         ">
           -
         </p>
-        <FormOnlyUploadFile v-else ref="attachment" :value="entity.document" :label="entity.parent.name"
+        <FormOnlyUploadFile v-else ref="attachment" :value="entity.document" :label="entity.name"
           :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
           @save="(e) => saveFile(e, entity)" />
       </div>
@@ -242,4 +322,7 @@ function searchTable() {
       <div v-else class="text-center">-</div>
     </template>
   </Table>
+  <FormCloneHseDoc ref="formCloneHse" v-model="open_form" @success="handleSuccess" @error="handleError"
+    @removeSucess="handleRemoveSuccess" />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.name}`" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

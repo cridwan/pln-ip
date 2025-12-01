@@ -8,9 +8,16 @@ export const ColumnsWorkInstruction: TableColumnType[] = [
     sort: false,
   },
   {
+    key: "ik_link",
+    label: "Ik Online",
+    align: "left",
+    sort: false,
+    width: "150",
+  },
+  {
     key: "preview",
     label: "Preview",
-    align: "center",
+    align: "left",
     sort: false,
     width: "150",
   },

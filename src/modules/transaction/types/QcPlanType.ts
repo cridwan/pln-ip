@@ -20,3 +20,8 @@ export interface ResponseQcPlanInterface {
   updated_at: string;
   document: ResponseDocumentInterface | null;
 }
+
+export interface FormCloneQcPlan {
+  uuid: string;
+  project_uuid?: string;
+}

@@ -15,13 +15,14 @@ import type { UpdateManPowerInterface } from "../types/ManpowerType";
 import type { UpdatePartInterface } from "../types/PartType";
 import type { CreateAddScopeInterface } from "../types/AddScopeTableType";
 import type { UpdateToolsInterface } from "../types/ToolsType";
-import type { CreateHseInterface } from "../types/HseType";
+import type { CreateHseInterface, FormCloneHseDoc } from "../types/HseType";
 import type { FormEquipmentCloneInterface } from "../types/EquipmentType";
 import type { FormActivityInterfaceClone } from "../types/ActivityType";
 import type { FormPartCloneInterface } from "../types/PartStdType";
 import type { FormConsMatCloneInterface } from "../types/ConsumableMaterialStdType";
 import type { FormManpowerCloneInterface } from "../types/ManpowerStdType";
 import type { FormApprovalInterface, FormRequestApprovalInterface } from "../types/ApprovalType";
+import type { FormCloneQcPlan } from "../types/QcPlanType";
 
 export const useTransactionStore = defineStore(
   "transaction",
@@ -479,11 +480,70 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getHseSelect = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/hse/resource/select/options`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const cloneHse = async (payload: FormCloneHseDoc) => {
+      return await api
+        .post(`/transaction/hse/resource/clone`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const getQcPlan = async (payload: IParams) => {
       return await api
         .get(`/transaction/qc-plan/resource/pagination`, {
           params: payload,
         })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getQcPlanSelect = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/qc-plan/resource/select/options`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const cloneQcPlan = async (payload: FormCloneQcPlan) => {
+      return await api
+        .post(`/transaction/qc-plan/resource/clone`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteQcPlan = async (uuid: string) => {
+      return await api
+        .delete(`/transaction/qc-plan/${uuid}`)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -907,6 +967,11 @@ export const useTransactionStore = defineStore(
       getHseDoc,
       getDownloadResultBudgetActivity,
       requestApproveProject,
+      getQcPlanSelect,
+      cloneQcPlan,
+      deleteQcPlan,
+      getHseSelect,
+      cloneHse
     };
   },
   {

@@ -14,7 +14,7 @@ import type {
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
 
-import type { FormPartCloneInterface } from "../types/PartStdType";
+import type { FormPartCloneInterface, PartStdTransactionInterface } from "../types/PartStdType";
 import { useTransactionStore } from "../stores/TransactionStore";
 
 type OptionType = {
@@ -24,7 +24,7 @@ type OptionType = {
 
 const props = defineProps({
   selectedValue: {
-    type: Object as PropType<PartStdInterface | null>,
+    type: Object as PropType<PartStdTransactionInterface | null>,
   },
   dataForm: {
     type: Object as PropType<FilterPartStdInterface | null>,
@@ -212,7 +212,7 @@ watch(
         [
           {
             value: props.selectedValue?.part_uuid,
-            label: props.selectedValue?.part?.name,
+            label: props.selectedValue?.name,
           },
         ],
         new_data.filter((item) => item.value !== props.selectedValue?.part_uuid)

@@ -7,8 +7,12 @@ import { Menus } from "@/constants/Menus";
 import { Icon } from "@/components";
 import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 import { UserEnum } from "@/modules/auth/types/AuthType";
+import { useProjectStore } from "@/modules/auth/stores/ProjectStore";
+import { dateToYear } from "@/helpers/global";
 
 const authStore = useAuthStore();
+const projectStore = useProjectStore();
+const { projects } = storeToRefs(projectStore)
 const { users } = storeToRefs(authStore);
 const route = useRoute();
 const selected_menu = ref<number | null>(null);
@@ -51,6 +55,10 @@ const isActive = (item: { id: number; name: string; url: string }) => {
       last_path.startsWith("/work-instruction"))
   );
 };
+
+const projectDetails = computed(() => {
+  return `${projects.value?.name} Tahun ${dateToYear(projects.value?.created_at as string)} ${projects.value?.inspection_type?.machine?.unit?.location?.name} (Created By ${projects.value?.generate_by?.user?.name})`;
+});
 </script>
 
 <template>
@@ -68,11 +76,11 @@ const isActive = (item: { id: number; name: string; url: string }) => {
               ? { sequence: route?.params?.id_inspection }
               : route.query,
         }" replace :class="item.url === '/'
-              ? ''
-              : route.path.includes(item.url)
-                ? 'menu-active'
-                : ''
-            " class="menu-item" @click="selected_menu = null">
+          ? ''
+          : route.path.includes(item.url)
+            ? 'menu-active'
+            : ''
+          " class="menu-item" @click="selected_menu = null">
           <Icon :name="item.icon" class="menu-icon" />
           <p class="menu-title">{{ item.name }}</p>
         </RouterLink>
@@ -84,13 +92,13 @@ const isActive = (item: { id: number; name: string; url: string }) => {
           </div>
           <div v-if="isActive(item)" class="pl-5 flex flex-col gap-2">
             <RouterLink v-for="(element, index) in item.children" :key="index" :to="item.url === '/'
-                ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}?sequence=${route?.params?.id_inspection}`
-                : `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}${element.url}`
+              ? `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}?sequence=${route?.params?.id_inspection}`
+              : `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}${element.url}`
               " :class="item.url === '/'
-                  ? ''
-                  : route.path.includes(element.url)
-                    ? 'menu-active'
-                    : ''
+                ? ''
+                : route.path.includes(element.url)
+                  ? 'menu-active'
+                  : ''
                 " class="menu-item">
               <p class="menu-title">{{ element.name }}</p>
             </RouterLink>
@@ -98,6 +106,7 @@ const isActive = (item: { id: number; name: string; url: string }) => {
         </div>
       </div>
     </div>
+    <p class="sidebar-main--description">{{ projectDetails }}</p>
   </div>
 </template>
 
@@ -106,6 +115,8 @@ const isActive = (item: { id: number; name: string; url: string }) => {
   @apply w-[240px] z-[2] fixed top-[80px] bottom-[10px] left-[10px] bg-blue-900 rounded-lg px-6 py-4
   &--title
     @apply text-lg font-bold text-neutral-50
+  &--description
+    @apply mt-11 text-neutral-200 text-sm
   &--menus
     @apply flex flex-col gap-2 mt-6
     .menu-active
