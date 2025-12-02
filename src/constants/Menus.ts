@@ -431,6 +431,12 @@ export const MenusMaster: MenuInterface[] = [
         icon: "location-pin",
       },
       {
+        id: 18,
+        name: "Jenis Pembangkit",
+        url: "/generator-type",
+        icon: "generator",
+      },
+      {
         id: 2,
         name: "Unit",
         url: "/unit",

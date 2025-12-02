@@ -3,7 +3,7 @@ import type { GlobalUnitInterface } from "./GlobalUnitType";
 export interface PartInterface {
   uuid: string;
   name: string;
-  price: number;
+  price: string;
   merk: string;
   no_drawing: string;
   global_unit_uuid: string;

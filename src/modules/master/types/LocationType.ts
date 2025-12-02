@@ -1,3 +1,4 @@
+import type { GeneratorTypeInterface } from "./GeneratorType";
 import type { SubAreaInterface } from "./SubAreaType";
 
 export interface LocationInterface {
@@ -12,6 +13,8 @@ export interface LocationInterface {
   description: string;
   sub_area_uuid: string;
   sub_area: SubAreaInterface;
+  generator_type: GeneratorTypeInterface;
+  generator_type_uuid: string;
 }
 
 export interface LocationCreateInterface {
@@ -20,6 +23,6 @@ export interface LocationCreateInterface {
   lon: string;
   slug: string;
   description: string;
-  color: string;
+  generator_type_uuid: string;
   sub_area_uuid: string;
 }

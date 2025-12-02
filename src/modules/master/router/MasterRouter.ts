@@ -6,12 +6,26 @@ export const routeMaster = [
     path: "/master/monitoring-project",
     name: "master monitoring project",
     component: () => import("@/modules/master/views/MonitoringProject.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: ["superuser", "planner"] },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/location",
     name: "master location",
     component: () => import("@/modules/master/views/Location.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
+    path: "/master/generator-type",
+    name: "master generator type",
+    component: () => import("@/modules/master/views/Generator.vue"),
     meta: {
       layout: MasterLayout,
       requireAuth: true,

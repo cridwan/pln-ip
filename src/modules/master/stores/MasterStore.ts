@@ -39,6 +39,7 @@ import type {
 import type { QCPlanCreateInterface } from "../types/QcPlanType";
 import type { AreaCreateInterface } from "../types/AreaType";
 import type { SubAreaCreateInterface } from "../types/SubAreaType";
+import type { GeneratorTypeCreateInterface } from "../types/GeneratorType";
 
 export const useMasterStore = defineStore(
   "master",
@@ -759,7 +760,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const downloadScope = async (params?: AxiosRequestConfig["params"], prefix: string = "") => {
+    const downloadScope = async (
+      params?: AxiosRequestConfig["params"],
+      prefix: string = ""
+    ) => {
       return await api
         .post(
           `${prefix}/scope-standart/export`,
@@ -794,15 +798,14 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateScope = async (prefix: string = "", payload: Record<string, any> = {}) => {
+    const templateScope = async (
+      prefix: string = "",
+      payload: Record<string, any> = {}
+    ) => {
       return await api
-        .post(
-          `${prefix}/scope-standart/template`,
-          payload,
-          {
-            responseType: "blob",
-          }
-        )
+        .post(`${prefix}/scope-standart/template`, payload, {
+          responseType: "blob",
+        })
         .then((resp) => {
           const url = window.URL.createObjectURL(
             new Blob([resp.data], {
@@ -2567,7 +2570,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const downloadActivity = async (params?: AxiosRequestConfig["params"], prefix: string = "") => {
+    const downloadActivity = async (
+      params?: AxiosRequestConfig["params"],
+      prefix: string = ""
+    ) => {
       return await api
         .post(
           `${prefix}/activity/export`,
@@ -2602,15 +2608,14 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateActivity = async (prefix: string = "", payload: Record<string, any> = {}) => {
+    const templateActivity = async (
+      prefix: string = "",
+      payload: Record<string, any> = {}
+    ) => {
       return await api
-        .post(
-          `${prefix}/activity/template`,
-          payload,
-          {
-            responseType: "blob",
-          }
-        )
+        .post(`${prefix}/activity/template`, payload, {
+          responseType: "blob",
+        })
         .then((resp) => {
           const url = window.URL.createObjectURL(
             new Blob([resp.data], {
@@ -2701,7 +2706,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const downloadEquipment = async (params?: AxiosRequestConfig["params"], prefix: string = "") => {
+    const downloadEquipment = async (
+      params?: AxiosRequestConfig["params"],
+      prefix: string = ""
+    ) => {
       return await api
         .post(
           `${prefix}/equipment/export`,
@@ -2736,15 +2744,14 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateEquipment = async (prefix: string = "", payload: Record<string, any> = {}) => {
+    const templateEquipment = async (
+      prefix: string = "",
+      payload: Record<string, any> = {}
+    ) => {
       return await api
-        .post(
-          `${prefix}/equipment/template`,
-          payload,
-          {
-            responseType: "blob",
-          }
-        )
+        .post(`${prefix}/equipment/template`, payload, {
+          responseType: "blob",
+        })
         .then((resp) => {
           const url = window.URL.createObjectURL(
             new Blob([resp.data], {
@@ -2835,7 +2842,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const downloadPartStd = async (params?: AxiosRequestConfig["params"], prefix: string = "") => {
+    const downloadPartStd = async (
+      params?: AxiosRequestConfig["params"],
+      prefix: string = ""
+    ) => {
       return await api
         .post(
           `${prefix}/part-std/export`,
@@ -2904,7 +2914,7 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const importPartStd = async (payload: File, prefix: string = '') => {
+    const importPartStd = async (payload: File, prefix: string = "") => {
       const formData = new FormData();
       formData.append("file", payload);
 
@@ -3007,15 +3017,14 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateManpowerStd = async (prefix: string = "", payload: Record<string, any> = {}) => {
+    const templateManpowerStd = async (
+      prefix: string = "",
+      payload: Record<string, any> = {}
+    ) => {
       return await api
-        .post(
-          `${prefix}/manpower-std/template`,
-          payload,
-          {
-            responseType: "blob",
-          }
-        )
+        .post(`${prefix}/manpower-std/template`, payload, {
+          responseType: "blob",
+        })
         .then((resp) => {
           const url = window.URL.createObjectURL(
             new Blob([resp.data], {
@@ -3057,7 +3066,10 @@ export const useMasterStore = defineStore(
     // END
 
     // CONSUMABLE MATERIAL STD
-    const getConsumableMaterialStd = async (payload: IParams, prefix: string = "") => {
+    const getConsumableMaterialStd = async (
+      payload: IParams,
+      prefix: string = ""
+    ) => {
       return await api
         .get(`${prefix}/cons-mat-std`, {
           params: payload,
@@ -3097,7 +3109,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const deleteConsumableMaterialStd = async (id: string, prefix: string = '') => {
+    const deleteConsumableMaterialStd = async (
+      id: string,
+      prefix: string = ""
+    ) => {
       return await api
         .delete(`${prefix}/cons-mat-std/${id}`)
         .then((res) => {
@@ -3146,15 +3161,14 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const templateConsumableMaterialStd = async (prefix: string = "", payload: Record<string, any> = {}) => {
+    const templateConsumableMaterialStd = async (
+      prefix: string = "",
+      payload: Record<string, any> = {}
+    ) => {
       return await api
-        .post(
-          `${prefix}/cons-mat-std/template`,
-          payload,
-          {
-            responseType: "blob",
-          }
-        )
+        .post(`${prefix}/cons-mat-std/template`, payload, {
+          responseType: "blob",
+        })
         .then((resp) => {
           const url = window.URL.createObjectURL(
             new Blob([resp.data], {
@@ -3180,7 +3194,10 @@ export const useMasterStore = defineStore(
         });
     };
 
-    const importConsumableMaterialStd = async (payload: File, prefix: string = "") => {
+    const importConsumableMaterialStd = async (
+      payload: File,
+      prefix: string = ""
+    ) => {
       const formData = new FormData();
       formData.append("file", payload);
 
@@ -3325,6 +3342,141 @@ export const useMasterStore = defineStore(
         });
     };
     // END
+
+    // --- GENERATOR TYPE
+    const getGeneratorType = async (payload: IParams) => {
+      return await api
+        .get(`/generator-type`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const createGeneratorType = async (
+      payload: GeneratorTypeCreateInterface
+    ) => {
+      return await api
+        .post(`/generator-type`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const updateGeneratorType = async (
+      id: string,
+      payload: GeneratorTypeCreateInterface
+    ) => {
+      return await api
+        .put(`/generator-type/${id}`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteGeneratorType = async (id: string) => {
+      return await api
+        .delete(`/generator-type/${id}`)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const downloadGeneratorType = async () => {
+      return await api
+        .post(
+          `/generator-type/export`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Jenis Pembangkit.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const templateGeneratorType = async () => {
+      return await api
+        .post(
+          `/generator-type/template`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Jenis Pembangkit Template.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const importGeneratorType = async (payload: File) => {
+      const formData = new FormData();
+      formData.append("file", payload);
+
+      return await api
+        .post(`/generator-type/import`, formData)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+    // --- END
 
     return {
       getLocation,
@@ -3506,6 +3658,13 @@ export const useMasterStore = defineStore(
       downloadSubArea,
       templateSubArea,
       importSubArea,
+      getGeneratorType,
+      createGeneratorType,
+      updateGeneratorType,
+      deleteGeneratorType,
+      downloadGeneratorType,
+      templateGeneratorType,
+      importGeneratorType,
     };
   },
   {
