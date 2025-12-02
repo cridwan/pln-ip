@@ -12,6 +12,7 @@ import type { IPagination } from "@/types/GlobalType";
 import type { UnitInterface } from "@/modules/master/types/UnitType";
 import type { MachineInterface } from "@/modules/master/types/MachineType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
+import type { LocationInterface } from "@/modules/master/types/LocationType";
 
 const imgBlok1 = new URL("@/assets/images/bg-blok1.png", import.meta.url).href;
 const imgBlok3 = new URL("@/assets/images/bg-blok3.png", import.meta.url).href;
@@ -26,7 +27,7 @@ const route = useRoute();
 const locationId = route.params.id;
 const breadcrumb = ref([
   {
-    name: "UBP Priok",
+    name: "Loading...",
     as_link: false,
     url: "",
   },
@@ -40,69 +41,6 @@ const breadcrumb = ref([
 const bgActive = ref<number>(0);
 const masterStore = useMasterStore();
 const unit_active = ref<string | null>(null);
-
-// const data = ref([
-//   {
-//     id: 1,
-//     name: "Blok 1/2",
-//     children: [
-//       {
-//         name: "GT 1.1 ABB 13E1",
-//       },
-//       {
-//         name: "GT 1.2 ABB 13E1",
-//       },
-//       {
-//         name: "GT 1.3 ABB 13E1",
-//       },
-//       {
-//         name: "GT 1.4 ABB 13E1",
-//       },
-//       {
-//         name: "GT 2.1 ABB 13E1",
-//       },
-//       {
-//         name: "GT 2.2 ABB 13E1",
-//       },
-//       {
-//         name: "GT 2.3 ABB 13E1",
-//       },
-//       {
-//         name: "GT 2.4 ABB 13E1",
-//       },
-//     ],
-//   },
-//   {
-//     id: 2,
-//     name: "Blok 3",
-//     children: [
-//       {
-//         name: "GT 3.1 MHI 701F3",
-//       },
-//       {
-//         name: "GT 3.2 MHI 701F3",
-//       },
-//       {
-//         name: "GT 3.3 MHI 701F3",
-//       },
-//     ],
-//   },
-//   {
-//     id: 3,
-//     name: "Blok 4",
-//     children: [
-//       {
-//         name: "GT 4.1 MHI 701F4",
-//       },
-//       {
-//         name: "GT 4.2 MHI 701F4",
-//       },
-//       {
-//         name: "GT 4.3 MHI 701F4",
-//       },
-//     ],
-//   },
-// ]);
 
 //--- GET UNIT
 const { data: dataUnit, isFetching: isLoadingUnit } = useQuery({
@@ -155,12 +93,51 @@ const {
 });
 //--- END
 
+// get location
+const { data: dataLocation } = useQuery({
+  queryKey: ["getLocation"],
+  queryFn: async () => {
+    try {
+      const { data } = await masterStore.getLocation({
+        search: "",
+        filter: `uuid,${route.params.id}`,
+        currentPage: 1,
+        perPage: 1000,
+      });
+      const response = data.data as IPagination<LocationInterface[]>;
+      return response;
+    } catch (error: any) {
+      const err = error as AxiosError;
+      throw err.response;
+    }
+  },
+  refetchOnWindowFocus: false,
+});
+// get location
+
 watch(dataUnit, (value) => {
   if ((value?.data || []).length > 0) {
     unit_active.value = value?.[0]?.uuid || "";
     refetchMachine();
   }
 });
+
+watch(dataLocation, (value) => {
+  if ((value?.data || []).length > 0) {
+    breadcrumb.value = [
+      {
+        name: value?.data?.[0]?.name || "",
+        as_link: false,
+        url: "",
+      },
+      {
+        name: "Unit",
+        as_link: false,
+        url: "",
+      },
+    ];
+  }
+}, { immediate: true, deep: true })
 
 const handleClick = (uuid: string, index: number) => {
   bgActive.value = index;
@@ -173,7 +150,9 @@ const handleClick = (uuid: string, index: number) => {
 };
 
 const toScope = (item: UnitInterface, element: MachineInterface) => {
-  router.push(`/${locationId}/create/unit/${item.uuid}/${element.uuid}`);
+  router.push({
+    path: `/${locationId}/create/unit/${item.uuid}/${element.uuid}`,
+  });
 };
 
 const handleBack = () => {
@@ -192,50 +171,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="w-full min-h-screen"
-    :style="{
-      backgroundImage: `url(${dataBg[bgActive]})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }"
-  >
+  <div class="w-full min-h-screen" :style="{
+    backgroundImage: `url(${dataBg[bgActive]})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }">
     <div class="container-unit">
       <Breadcrumb :items="breadcrumb" />
       <div class="content-unit">
         <div class="wrapper-button-unit">
-          <div
-            v-for="(item, key) in dataUnit?.data"
-            :key="key"
-            class="button-group"
-          >
-            <button
-              class="button-unit"
-              :class="{ 'button-active': item.uuid === unit_active }"
-              @click="handleClick(item.uuid, key)"
-            >
+          <div v-for="(item, key) in dataUnit?.data" :key="key" class="button-group">
+            <button class="button-unit" :class="{ 'button-active': item.uuid === unit_active }"
+              @click="handleClick(item.uuid, key)">
               {{ item.name }}
             </button>
-            <div
-              v-if="isLoadingMachine"
-              :class="[
-                item.uuid === unit_active ? 'flex' : 'hidden',
-                'w-full justify-center py-6',
-              ]"
-            >
+            <div v-if="isLoadingMachine" :class="[
+              item.uuid === unit_active ? 'flex' : 'hidden',
+              'w-full justify-center py-6',
+            ]">
               <p class="text-base font-bold text-neutral-950">Loading...</p>
             </div>
-            <div
-              class="button-group-gt"
-              :class="{ 'children-active': item.uuid === unit_active }"
-            >
-              <button
-                v-if="!isLoadingMachine"
-                v-for="(element, index) in dataMachine?.data"
-                :key="index"
-                class="button-gt"
-                @click="toScope(item, element)"
-              >
+            <div class="button-group-gt" :class="{ 'children-active': item.uuid === unit_active }">
+              <button v-if="!isLoadingMachine" v-for="(element, index) in dataMachine?.data" :key="index"
+                class="button-gt" @click="toScope(item, element)">
                 {{ element.name }}
               </button>
             </div>

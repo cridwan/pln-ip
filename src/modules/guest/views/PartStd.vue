@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import type { AxiosError } from "axios";
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
-import { storeToRefs } from "pinia";
 
 import {
   Breadcrumb,
-  Button,
-  Icon,
-  ModalDelete,
   Table,
-  Toast,
 } from "@/components";
-import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 import type {
@@ -20,21 +15,11 @@ import type {
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
 import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
-import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import { ColumnsPart } from "../constants/PartConstant";
-import { useTransactionStore } from "../stores/TransactionStore";
 import FilterPartStd from "../components/FilterPartStd.vue";
-import FormPartStd from "../components/FormPartStd.vue";
-import type { ProjectInterface } from "../types/ProjectType";
-// import InputQty from "../components/InputQty.vue";
-import FormQuantity from "../components/FormQuantity.vue";
-import type { UpdatePartInterface } from "../types/PartType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
 
-const authStore = useAuthStore();
-const { access_token } = storeToRefs(authStore);
-const transactionStore = useTransactionStore();
 const masterStore = useMasterStore();
 const route = useRoute();
 const params = reactive({
@@ -52,34 +37,11 @@ const params = reactive({
   perPage: 10,
 });
 const total_item = ref(0);
-const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const dataForm = ref<FilterPartStdInterface | null>(null);
 const dataActivity = ref<ActivityInterface | null>(null);
-const selected_item = ref<PartStdInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
-const open_form = ref(false);
-const open_delete = ref(false);
-// const edit_qty = ref(false);
-// const edit_id = ref<number | null>(null);
 const is_loading_filter = ref(false);
-const quantity = ref<any>(null);
-
-//--- GET STATUS APPROVAL
-const { data: dataApproval } = useQuery({
-  queryKey: ["getApprovalAtPartStandart"],
-  queryFn: async () => {
-    const { data } = await transactionStore.getProject(
-      route.params.id_project as string
-    );
-    const response = data.data.data as ProjectInterface;
-
-    return response;
-  },
-  retry: 0,
-  refetchOnWindowFocus: false,
-});
-//--- END
 
 //--- GET PART STD
 const {
@@ -104,63 +66,6 @@ const {
   },
   retry: 0,
   refetchOnWindowFocus: false,
-});
-//--- END
-
-//--- DELETE PART STD
-const { mutate: deletePartStd, isPending: isLoadingDelete } = useMutation({
-  mutationFn: async (id: string) => {
-    return await transactionStore.deletePartStd(id);
-  },
-  onSuccess: () => {
-    toastRef.value?.showToast({
-      title: "Success",
-      description: "Deleted successfully",
-      type: "success",
-    });
-    open_delete.value = false;
-    refetchPart();
-  },
-  onError: (error: any) => {
-    console.log(error);
-    toastRef.value?.showToast({
-      title: "Error",
-      description: error?.response?.data?.message || "Something went wrong",
-      type: "error",
-    });
-  },
-  retry: 0,
-});
-//--- END
-
-//--- UPDATE PART
-const { mutate: updatePart, isPending: isLoadingUpdate } = useMutation({
-  mutationFn: async ({
-    payload,
-    id,
-  }: {
-    payload: UpdatePartInterface;
-    id: string;
-  }) => {
-    return await transactionStore.updatePart(payload, id);
-  },
-  onSuccess: async () => {
-    refetchPart();
-    quantity.value.modelOpenInputData = false;
-    toastRef.value?.showToast({
-      title: "Success",
-      description: "Saved successfully",
-      type: "success",
-    });
-  },
-  onError: (error: any) => {
-    console.log(error);
-    toastRef.value?.showToast({
-      title: "Error",
-      description: error?.response?.data?.message || "Something went wrong",
-      type: "error",
-    });
-  },
 });
 //--- END
 
@@ -190,38 +95,6 @@ function searchTable() {
     refetchPart();
   }, 1000);
 }
-
-const handleSuccess = () => {
-  toastRef.value?.showToast({
-    title: "Success",
-    description: "Saved successfully",
-    type: "success",
-  });
-  params.currentPage = 1;
-  refetchPart();
-};
-
-const handleError = (error: any) => {
-  toastRef.value?.showToast({
-    title: "Error",
-    description: error?.response?.data?.message || "Something went wrong",
-    type: "error",
-  });
-};
-
-const handleCreate = () => {
-  selected_item.value = null;
-  open_form.value = true;
-};
-
-const handleDelete = (item: PartStdInterface) => {
-  selected_item.value = item;
-  open_delete.value = true;
-};
-
-const onDelete = () => {
-  deletePartStd(selected_item.value?.uuid as string);
-};
 
 const setFilter = () => {
   params.filters = [
@@ -270,25 +143,30 @@ const handleResetFilter = () => {
   refetchPart();
 };
 
-const handleRemoveSuccess = () => {
-  refetchPart();
-};
-
-const saveQuantity = (e: { quantity: string }, entity: PartStdInterface) => {
-  updatePart({
-    id: entity.uuid,
-    payload: {
-      qty: parseFloat(e.quantity),
-      global_unit_uuid: entity.part.global_unit_uuid,
-      name: entity.part.name,
-    },
-  });
-};
-
 onMounted(() => {
   breadcrumb.value = [
     {
-      name: "Part Std",
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "PART STANDART",
       as_link: false,
       url: "",
     },
@@ -298,12 +176,6 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <!-- <Button v-if="
-      dataForm?.activity_uuid &&
-      dataApproval?.status !== 'approve' &&
-      access_token
-    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" /> -->
-
     <div class="flex gap-8">
       <div class="basis-1/5">
         <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
@@ -312,52 +184,33 @@ onMounted(() => {
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
           <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
-            :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
+            :is_logging="false" :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
             v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
             @search="searchTable">
-            <template #column_action="{ entity }">
-              <div class="flex items-center justify-center gap-4">
-                <Icon v-if="dataForm?.activity_uuid" name="trash" class="icon-action-table"
-                  @click="handleDelete(entity)" />
-              </div>
-            </template>
-
             <template #column_part="{ entity }">
               <p class="text-neutral-50">
                 {{ entity.part?.name ?? "-" }}
               </p>
             </template>
 
-            <template #column_total_qty="{ entity, index }">
-              <p v-if="
-                (dataApproval?.status === 'approve' && !entity.total_qty) ||
-                (!access_token && !entity.total_qty)
-              ">
-                -
-              </p>
-              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity.part?.name"
-                :loading="isLoadingUpdate" :disabled="true" @save="(e) => saveQuantity(e, entity)" />
+            <template #column_total_qty="{ entity }">
+              <span class="text-base text-neutral-50 text-left">{{ entity.total_qty }}</span>
             </template>
 
             <template #column_unit="{ entity }">
-              <p class="text-base text-neutral-50 text-left">
+              <span class="text-base text-neutral-50 text-left">
                 {{ entity.part?.global_unit?.name ?? "-" }}
-              </p>
+              </span>
             </template>
 
             <template #column_number_drawing="{ entity }">
-              <p class="text-base text-neutral-50 text-left">
+              <span class="text-base text-neutral-50 text-left">
                 {{ entity.part?.no_drawing ?? "-" }}
-              </p>
+              </span>
             </template>
           </Table>
         </div>
       </div>
     </div>
   </div>
-
-  <Toast ref="toastRef" />
-  <FormPartStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-    @error="handleError" @removeSucess="handleRemoveSuccess" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

@@ -83,22 +83,19 @@ defineExpose({
 <template>
   <PopoverRoot v-model:open="modelOpenInputData">
     <PopoverTrigger>
-      <button
-        class="button-trigger"
-        :class="[
-          {
-            'button-trigger-active': modelOpenInputData === true,
-          },
-          (value && value?.file?.length > 0) ||
+      <button class="button-trigger" :class="[
+        {
+          'button-trigger-active': modelOpenInputData === true,
+        },
+        (value && value?.file?.length > 0) ||
           (value && value?.note !== '' && value && value?.note !== null)
-            ? 'button-trigger-active'
-            : '',
-          disabled ? 'cursor-default' : 'cursor-pointer',
-        ]"
-      >
+          ? 'button-trigger-active'
+          : '',
+        disabled ? 'cursor-default' : 'cursor-pointer',
+      ]">
         {{
           (value && value?.file?.length > 0) ||
-          (value && value?.note !== "" && value && value?.note !== null)
+            (value && value?.note !== "" && value && value?.note !== null)
             ? "Active"
             : "Add"
         }}
@@ -139,23 +136,9 @@ defineExpose({
           <Upload v-model="modelUpload" />
         </div>
         <div class="popover-footer">
-          <Button
-            text="Cancel"
-            size="sm"
-            rounded="full"
-            color="grey"
-            :disabled="loading"
-            @click="cancel"
-          />
-          <Button
-            text="Save"
-            size="sm"
-            rounded="full"
-            color="blue"
-            :disabled="loading"
-            :loading="loading"
-            @click="save"
-          />
+          <Button text="Cancel" size="sm" rounded="full" color="red" :disabled="loading" @click="cancel" />
+          <Button text="Save" size="sm" rounded="full" color="blue" :disabled="loading" :loading="loading"
+            @click="save" />
         </div>
       </PopoverContent>
     </PopoverPortal>

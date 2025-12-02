@@ -29,6 +29,12 @@ function formatToFloat(input: string) {
   return parseFloat(number);
 }
 
+function dateToYear(date: string) {
+  const dateInstance = new Date(date)
+
+  return dateInstance.getFullYear();
+}
+
 function numberFormat(inputNumber: number | string, isCurrency = false) {
   const number =
     typeof inputNumber === "string" ? parseInt(inputNumber, 10) : inputNumber;
@@ -132,5 +138,6 @@ export {
   character_search,
   dateFormatId,
   formatToFloat,
-  parsedUrl
+  parsedUrl,
+  dateToYear
 };

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
@@ -9,7 +9,7 @@ import type {
     IPagination,
     ResponseDocumentInterface,
 } from "@/types/GlobalType";
-import { Button, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, ModalDelete, Table, Toast } from "@/components";
 // import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 // import { useGlobalStore } from "@/stores/GlobalStore";
@@ -30,6 +30,7 @@ import ButtonPreview from "../../components/ButtonPreview.vue";
 // import FormOnlyUploadFile from "../../components/FormOnlyUploadFile.vue";
 import type { ProjectInterface } from "../../types/ProjectType";
 import TableEquipment from "../../components/scope/TableEquipment.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 // const attachment = ref<any>(null);
 const open_form = ref(false);
@@ -39,6 +40,7 @@ const entitiesScope = ref<ScopeInterface[]>([]);
 const selected_item = ref<ScopeInterface>();
 const dataForm = ref<FilterScopeInterface | null>(null);
 const transactionStore = useTransactionStore();
+const breadcrumb = ref<BreadcrumbType[]>([]);
 // const globalStore = useGlobalStore();
 const route = useRoute();
 const params = reactive({
@@ -91,7 +93,7 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
     queryKey: ["getScopeTransactionAtWorkInstruction"],
     queryFn: async () => {
         try {
-            const { data } = await transactionStore.getScopeStandar(params);
+            const { data } = await transactionStore.getScopeStandar(params, '/add-scope/detail');
             const response = data.data as IPagination<ResponseScopeInterface[]>;
             total_item.value = response.total;
             const new_arr: ScopeInterface[] =
@@ -530,6 +532,36 @@ const getData = (id: string, response: EquipmentInterface[]) => {
         }
     });
 };
+
+onMounted(() => {
+    breadcrumb.value = [
+        {
+            name: route.query?.location as string,
+            as_link: false,
+            url: "",
+        },
+        {
+            name: route.query?.unit as string,
+            as_link: false,
+            url: "",
+        },
+        {
+            name: route.query?.machine as string,
+            as_link: false,
+            url: "",
+        },
+        {
+            name: route.query?.inspection as string,
+            as_link: false,
+            url: "",
+        },
+        {
+            name: route.query?.scope as string,
+            as_link: false,
+            url: "",
+        },
+    ];
+});
 </script>
 
 <template>
@@ -551,13 +583,21 @@ const getData = (id: string, response: EquipmentInterface[]) => {
         </div>
         <div class="flex-1 overflow-auto">
             <div class="max-w-full min-w-full">
-                <Table label-create="Asset" :columns="ColumnsWorkInstruction" :entities="entitiesScope"
-                    :loading="isLoadingScope" :pagination="pagination" :is-create="false" :isAction="false"
-                    v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-                    @search="searchTable" @open-children="openChildren">
+                <Breadcrumb :items="breadcrumb" />
+                <Table label-create="Asset" :is_logging="false" :columns="ColumnsWorkInstruction"
+                    :entities="entitiesScope" :loading="isLoadingScope" :pagination="pagination" :is-create="false"
+                    :isAction="false" v-model:model-search="params.search" @change-page="changePage"
+                    @change-limit="changeLimit" @search="searchTable" @open-children="openChildren">
                     <template #column_preview="{ entity }">
                         <p v-if="!entity.document" class="text-white">No Document</p>
                         <ButtonPreview v-else @click="preview(entity.document)" />
+                    </template>
+                    <template #column_ik_link="{ entity }">
+                        <a target="_blank" :href="entity.link" class="text-base text-neutral-50 text-left"
+                            v-if="entity.link">
+                            {{ entity.link ?? '-' }}
+                        </a>
+                        <span v-else>-</span>
                     </template>
                     <template #children="{ entity, index, parentActive }">
                         <tr v-if="
@@ -566,7 +606,8 @@ const getData = (id: string, response: EquipmentInterface[]) => {
                             <td :colspan="ColumnsWorkInstruction.length + 1">
                                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
                                     <TableEquipment :is-action="false" :id="entity.id" :entity="entity.children"
-                                        :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
+                                        :with-ik="true" :is-additional="true" :status-approval="dataApproval?.status"
+                                        :open="children_active.find((el) => el.id === entity.id)?.open
                                             " @get-data="getData" />
                                 </div>
                             </td>

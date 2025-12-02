@@ -121,48 +121,18 @@ watch(modelValue, (value) => {
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Global Unit' : 'Tambah Global Unit'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Input
-        v-model="model.name"
-        star
-        :rules="rules.name"
-        :custom_symbols="all_characters"
-        label="Nama"
-      />
-      <Input
-        v-model="model.slug"
-        star
-        :rules="rules.slug"
-        :custom_symbols="all_characters"
-        label="Singkatan"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Satuan' : 'Tambah Satuan'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Input v-model="model.name" star :rules="rules.name" :custom_symbols="all_characters" label="Nama" />
+      <Input v-model="model.slug" star :rules="rules.slug" :custom_symbols="all_characters" label="Singkatan" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate" />
       </div>
     </form>
   </Modal>

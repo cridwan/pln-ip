@@ -14,7 +14,7 @@ import type {
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
 
-import type { FormPartCloneInterface } from "../types/PartStdType";
+import type { FormPartCloneInterface, PartStdTransactionInterface } from "../types/PartStdType";
 import { useTransactionStore } from "../stores/TransactionStore";
 
 type OptionType = {
@@ -24,7 +24,7 @@ type OptionType = {
 
 const props = defineProps({
   selectedValue: {
-    type: Object as PropType<PartStdInterface | null>,
+    type: Object as PropType<PartStdTransactionInterface | null>,
   },
   dataForm: {
     type: Object as PropType<FilterPartStdInterface | null>,
@@ -79,7 +79,7 @@ const params_part = reactive({
   ...(props.isAdditional
     ? {
       activity_uuid: props.dataForm?.activity_uuid as string,
-      additional_scope_uuid: route.params.id_scope as string,
+      additional_scope_uuid: route.query.original_uuid as string,
     }
     : {
       activity_uuid: props.dataForm?.activity_uuid as string,
@@ -100,7 +100,7 @@ const {
       const { data } = await transactionStore.getPartSelect({
         ...params_part,
         currentPage: pageParam,
-      });
+      }, props.isAdditional ? '/add-scope/detail' : '');
 
       const response = data as IPagination<PartStdInterface[]>;
 
@@ -123,7 +123,7 @@ const {
 //--- CREATE PART
 const { mutate: createPartStd, isPending: isLoadingCreate } = useMutation({
   mutationFn: async (payload: FormPartCloneInterface) => {
-    return await transactionStore.clonePartStd(payload);
+    return await transactionStore.clonePartStd(payload, props.isAdditional ? '/add-scope/detail' : '');
   },
   onSuccess: (data) => {
     modelValue.value = false;
@@ -212,7 +212,7 @@ watch(
         [
           {
             value: props.selectedValue?.part_uuid,
-            label: props.selectedValue?.part?.name,
+            label: props.selectedValue?.name,
           },
         ],
         new_data.filter((item) => item.value !== props.selectedValue?.part_uuid)
@@ -222,7 +222,7 @@ watch(
         newPart?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: item.part.name };
+            return { value: item.uuid, label: `${item.part.name} / ${item.part?.global_unit?.name}` };
           }) || [];
       options_part.value = new_data;
     }

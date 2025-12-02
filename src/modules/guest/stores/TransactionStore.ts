@@ -584,11 +584,11 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getDownloadResultBudgetActivity = async (project_uuid: string) => {
+    const getDownloadResultBudgetActivity = async (inspection_type_uuid: string) => {
       return await api
-        .get(`/transaction/result/resource/export/budget-activity`, {
+        .get(`/result/export/budget-activity`, {
           params: {
-            project_uuid,
+            inspection_type_uuid,
           },
           responseType: "blob",
         })

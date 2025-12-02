@@ -33,7 +33,7 @@ const { data: dataLocation, isFetching: isLoadingLocation } = useQuery({
       });
       const response = data.data as IPagination<LocationInterface[]>;
 
-      titleHeader.value = `UBP ${response.data?.[0]?.name}`;
+      titleHeader.value = `${response.data?.[0]?.name}`;
 
       return response.data;
     } catch (error: any) {
@@ -60,16 +60,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="w-full min-h-screen"
-    :style="{
-      backgroundImage: `url(${imgUrl})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }"
-  >
+  <div class="w-full min-h-screen" :style="{
+    backgroundImage: `url(${imgUrl})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }">
     <div class="trapezoid">
-      <p>UBP {{ dataLocation?.[0]?.name }}</p>
+      <p>{{ dataLocation?.[0]?.name }}</p>
       <p>
         {{ dataLocation?.[0]?.description }}
       </p>

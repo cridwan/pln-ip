@@ -129,49 +129,20 @@ watch(modelValue, (value) => {
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Input
-        v-model="model.name"
-        star
-        label="Nama Manpower"
-        :rules="rules.name"
-        :custom_symbols="all_characters"
-      />
-      <Input
-        v-model="model.price"
-        star
-        label="Harga"
-        :rules="rules.price"
-        :custom_symbols="numbers_positive"
-        :is_currency="true"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Input v-model="model.name" :disabled="Number(props.selectedValue?.has_transaction || 0) > 0" star
+        label="Nama Manpower" :rules="rules.name" :custom_symbols="all_characters" />
+      <Input v-model="model.price" star label="Harga" :rules="rules.price" :custom_symbols="numbers_positive"
+        :is_currency="true" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate" />
       </div>
     </form>
   </Modal>

@@ -9,7 +9,7 @@ export const ColumnsManpower: TableColumnType[] = [
   },
   {
     key: "price",
-    label: "Harga",
+    label: "Harga (Harian)",
     align: "left",
     sort: false,
   },

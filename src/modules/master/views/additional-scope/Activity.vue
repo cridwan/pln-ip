@@ -309,6 +309,11 @@ onMounted(() => {
       as_link: false,
       url: "",
     },
+    {
+      name: String(route.query?.addScope),
+      as_link: false,
+      url: "",
+    },
   ];
 });
 </script>
@@ -318,7 +323,7 @@ onMounted(() => {
   <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 
   <div class="relative w-full">
-    <div class="flex items-center gap-2 absolute right-0 top-0">
+    <div class="flex items-center gap-2 absolute right-0 top-10">
       <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
         :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
         @import="handleImport" />
@@ -331,14 +336,15 @@ onMounted(() => {
         <FilterAdActivity @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingActivity" />
       </div>
       <div class="w-full">
-        <Breadcrumb :items="breadcrumb" />
+        <Breadcrumb :items="breadcrumb" class="mb-6" />
         <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
           :loading="isLoadingActivity" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0" />
             </div>
           </template>
           <template #column_equipment="{ entity }">

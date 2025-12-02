@@ -223,6 +223,7 @@ const resetValue = () => {
   };
   model_details.value = [{ name: "", id: "0" }];
   uploadProgress.value = 0;
+  documentValues.value = null;
 };
 
 watch(modelValue, (value) => {
@@ -262,7 +263,7 @@ const removeSuccess = () => {
   <Modal width="440" height="200" :showButtonClose="false" title="Tambah Scope" v-model="modelValue">
     <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
       @submit.prevent="handleSubmit">
-      <Input v-model="model.name" star label="Nama Scope Standart" :rules="rules.name"
+      <Input v-model="model.name" star label="Nama Scope Tambahan" :rules="rules.name"
         :custom_symbols="all_characters" />
       <Input v-model="model.link" label="IK Online ex. (http://google.com)" :custom_symbols="all_characters" />
       <UploadStream label="File IK" :progress="uploadProgress" :selectedValues="documentValues"

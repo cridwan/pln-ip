@@ -4,8 +4,7 @@ import type { ResponseDocumentInterface } from "@/types/GlobalType";
 
 export interface HseDocInterface {
     uuid: string;
-    hse_doc_uuid: string;
-    parent: HseDocCreateInterface;
+    name: string;
     project_uuid: string;
     created_at: string;
     updated_at: string;
@@ -17,8 +16,7 @@ export interface HseDocInterface {
 
 export interface ResponseHseDocInterface {
     uuid: string;
-    hse_doc_uuid: string;
-    parent: HseDocCreateInterface;
+    name: string;
     project_uuid: string;
     created_at: string;
     updated_at: string;

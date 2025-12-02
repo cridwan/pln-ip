@@ -15,7 +15,7 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push("/login");
+  router.push({ name: 'login' });
 };
 </script>
 
@@ -24,9 +24,6 @@ const logout = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <div class="user-info">
-          <p>{{ route.params.name }}</p>
-        </div>
         <button class="user-info" @click="router.push('/profile')">
           <p>User : superadmin@gmail.com</p>
         </button>

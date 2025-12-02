@@ -20,14 +20,14 @@ export const ColumnsPart: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "price",
-    label: "Harga",
+    key: "global_unit",
+    label: "Satuan",
     align: "left",
     sort: false,
   },
   {
-    key: "global_unit",
-    label: "Unit",
+    key: "price",
+    label: "Harga",
     align: "left",
     sort: false,
   },

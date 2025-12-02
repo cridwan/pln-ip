@@ -14,10 +14,20 @@ export const ColumnsResults: TableColumnType[] = [
     sort: false,
     width: 200,
   },
-  // {
-  //   key: "note",
-  //   label: "Note",
-  //   align: "left",
-  //   sort: false,
-  // },
+];
+
+export const ColumnsResultsGuest: TableColumnType[] = [
+  {
+    key: "manpower",
+    label: "",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "download",
+    label: "",
+    align: "center",
+    sort: false,
+    width: 200,
+  },
 ];

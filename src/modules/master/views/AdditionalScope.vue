@@ -12,7 +12,7 @@ import {
   Toast,
 } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
-import type { IPagination, IParams } from "@/types/GlobalType";
+import type { IPagination, IParams, ResponseDocumentInterface } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 import { ColumnsAdditionalScope } from "../constants/AdditionalScopeConstant";
@@ -32,8 +32,10 @@ import {
   TooltipRoot,
   TooltipTrigger,
 } from "radix-vue";
+import ModalPlay from "@/components/overlays/ModalPlay.vue";
 
 const masterStore = useMasterStore();
+const documentRef = ref<ResponseDocumentInterface | undefined>(undefined)
 const total_item = ref(0);
 const params = reactive<IParams>({
   search: "",
@@ -51,6 +53,7 @@ const params = reactive<IParams>({
 });
 const open_form = ref(false);
 const open_delete = ref(false);
+const open_play = ref(false);
 const selected_item = ref<AdditionalScopeInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
@@ -246,6 +249,7 @@ const handleShow = (item: AdditionalScopeInterface) => {
       unit: item.inspection_type?.machine?.unit?.name ?? '',
       machine: item.inspection_type?.machine?.name ?? '',
       inspectionType: item.inspection_type.name ?? '',
+      addScope: item.name
     }
   });
 };
@@ -309,6 +313,11 @@ onMounted(() => {
     },
   ];
 });
+
+const openModalPlay = (document: ResponseDocumentInterface) => {
+  documentRef.value = document
+  open_play.value = true;
+}
 </script>
 
 <template>
@@ -350,8 +359,14 @@ onMounted(() => {
                 </TooltipRoot>
               </TooltipProvider>
               <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0" />
             </div>
+          </template>
+          <template #column_sequence_video="{ entity }">
+            <span class="text-white cursor-pointer underline" @click="openModalPlay(entity.sequence?.document)"
+              v-if="entity.sequence.document">{{ entity.sequence?.document?.document_name }}</span>
+            <span v-else class="text-white">{{ '-' }}</span>
           </template>
         </Table>
       </div>
@@ -362,5 +377,6 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
+  <ModalPlay v-model="open_play" :document="documentRef" />
   <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

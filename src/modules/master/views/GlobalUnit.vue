@@ -230,7 +230,7 @@ onMounted(() => {
       url: "",
     },
     {
-      name: "Global Unit",
+      name: "Satuan",
       as_link: false,
       url: "",
     },

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { AxiosError } from "axios";
 
 import {
@@ -10,7 +10,7 @@ import {
   Table,
   Toast,
 } from "@/components";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQuery } from "@tanstack/vue-query";
 import type {
   IPagination,
   ResponseDocumentInterface,
@@ -351,7 +351,8 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0" />
             </div>
           </template>
           <template #column_document="{ entity }">

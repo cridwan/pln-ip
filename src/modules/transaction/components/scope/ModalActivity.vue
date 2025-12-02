@@ -4,7 +4,6 @@ import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
 
 import { Modal, Table, Button, Icon, Toast, ModalDelete } from "@/components";
-import { ColumnsActivity } from "@/modules/master/constants/ActivityConstant";
 import type { IPagination } from "@/types/GlobalType";
 import type {
   ActivityInterface,
@@ -16,6 +15,7 @@ import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 import { useTransactionStore } from "../../stores/TransactionStore";
 import FormActivity from "../../components/FormActivity.vue";
 import { parsedUrl } from "@/helpers/global";
+import { ColumnsActivityTransaction } from "../../types/ActivityType";
 
 const props = defineProps({
   modelValue: {
@@ -42,6 +42,14 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  scope_name: {
+    type: String,
+    default: ''
+  },
+  withIk: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -85,6 +93,22 @@ const model = computed({
   },
 });
 
+const columnActivity = computed(() => {
+  return props.withIk ? ColumnsActivityTransaction.concat([{
+
+    key: "ik_link",
+    label: "IK Link",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "ik_doc",
+    label: "IK Doc",
+    align: "left",
+    sort: false,
+  }]) : ColumnsActivityTransaction;
+})
+
 //--- GET ACTIVITY
 const {
   data: dataActivity,
@@ -94,7 +118,7 @@ const {
   queryKey: [`getActivityTransactionDetail${props.id}`],
   queryFn: async () => {
     try {
-      const { data } = await transactionStore.getActivity(params);
+      const { data } = await transactionStore.getActivity(params, props.isAdditional ? '/add-scope/detail' : '');
       const response = data.data as IPagination<ActivityInterface[]>;
 
       total_item.value = response.total;
@@ -216,15 +240,15 @@ watch(model, (value) => {
 </script>
 
 <template>
-  <Modal width="1000" height="500" :showButtonClose="false" :title="'Data Activity'" v-model="model">
+  <Modal width="1000" height="500" :showButtonClose="false" :title="`Data Activity > ${scope_name}`" v-model="model">
     <div class="flex flex-col">
       <div v-if="statusApproval !== 'approve' && access_token" class="flex justify-end">
         <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" v-show="props.isAction" />
       </div>
-      <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
-        :loading="isLoading" :pagination="pagination" :is-create="false" :is-search="false"
-        :is-action="props.isAction && (statusApproval !== 'approve' && access_token !== '')" class="mt-6"
-        @change-page="changePage" @change-limit="changeLimit">
+      <Table label-create="Sub Bidang" :is_logging="false" :columns="columnActivity"
+        :entities="dataActivity?.data || []" :loading="isLoading" :pagination="pagination" :is-create="false"
+        :is-search="false" :is-action="props.isAction && (statusApproval !== 'approve' && access_token !== '')"
+        class="mt-6" @change-page="changePage" @change-limit="changeLimit">
         <template #column_action="{ entity }">
           <div class="flex items-center justify-center gap-4">
             <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />

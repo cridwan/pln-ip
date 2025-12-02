@@ -23,6 +23,7 @@ import { useMasterStore } from "../stores/MasterStore";
 import FormInspectionType from "../components/FormInspectionType.vue";
 import FilterInspectionType from "../components/FilterInspectionType.vue";
 import ButtonGroup from "../components/ButtonGroup.vue";
+import { parsedUrl } from "@/helpers/global";
 
 const dataForm = ref<InspectionTypeModelCreateInterface | null>(null);
 const masterStore = useMasterStore();
@@ -306,13 +307,21 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                v-show="Number(entity?.has_transaction || 0) == 0" />
             </div>
           </template>
           <template #column_sequence="{ entity }">
             <p class="text-base text-neutral-50 text-left">
               {{ entity.sequence?.name || "-" }}
             </p>
+          </template>
+          <template #column_video="{ entity }">
+            <a target="_blank" :href="parsedUrl(entity.sequence?.document?.document_link)"
+              class="text-base text-neutral-50 text-left" v-if="entity.sequence?.document">
+              {{ entity.sequence.document?.document_name }}
+            </a>
+            <span v-else>-</span>
           </template>
         </Table>
       </div>

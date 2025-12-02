@@ -276,5 +276,6 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.name} / ${selected_item?.global_unit?.name}`"
+    :loading="isLoadingDelete" @delete="onDelete" />
 </template>

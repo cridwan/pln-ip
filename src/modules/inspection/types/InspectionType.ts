@@ -1,7 +1,11 @@
+import type { MachineInterface } from "@/modules/master/types/MachineType";
+import type { UserInterface } from "@/modules/master/types/UserType";
+
 export interface TInspection {
   uuid: string;
   name: string;
   machine_uuid: string;
+  machine?: MachineInterface,
   created_at: string;
   updated_at: string;
   day: number;
@@ -13,6 +17,16 @@ export interface TCreateGenerate {
   inspection_type_uuid: string;
 }
 
+export interface TGenerateBy {
+  uuid: string;
+  project_uuid: string;
+  user_id: string;
+  activity: string;
+  created_at: string;
+  updated_at: string;
+  user?: UserInterface;
+}
+
 export interface ResponseProject {
   uuid: string;
   name: string;
@@ -22,4 +36,5 @@ export interface ResponseProject {
   updated_at: string;
   inspection_type: TInspection;
   status: string;
+  generate_by: TGenerateBy;
 }

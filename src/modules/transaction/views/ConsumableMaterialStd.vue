@@ -31,6 +31,7 @@ import FormQuantity from "../components/FormQuantity.vue";
 import type { UpdateConsMatInterface } from "../types/ConsumableMaterialType";
 import TableSummary from "@/components/tables/TableSummary.vue";
 import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
+import type { ConsumableMaterialStdTransactionInterface } from "../types/ConsumableMaterialStdType";
 
 const dataSummary = ref<{ total_price: Number, price: Number, total_qty: Number }>({
   total_price: 0,
@@ -61,7 +62,7 @@ const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const dataForm = ref<FilterConsumableMaterialStdInterface | null>(null);
-const selected_item = ref<ConsumableMaterialStdInterface | null>(null);
+const selected_item = ref<ConsumableMaterialStdTransactionInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
@@ -100,7 +101,7 @@ const {
         price: summary.price,
         total_qty: summary.total_qty
       }
-      const response = data as IPagination<ConsumableMaterialStdInterface[]>;
+      const response = data as IPagination<ConsumableMaterialStdTransactionInterface[]>;
 
       total_item.value = response.total;
       is_loading_filter.value = false;
@@ -232,12 +233,12 @@ const handleCreate = () => {
   open_form.value = true;
 };
 
-const handleUpdate = (item: ConsumableMaterialStdInterface) => {
+const handleUpdate = (item: ConsumableMaterialStdTransactionInterface) => {
   selected_item.value = item;
   open_form.value = true;
 };
 
-const handleDelete = (item: ConsumableMaterialStdInterface) => {
+const handleDelete = (item: ConsumableMaterialStdTransactionInterface) => {
   selected_item.value = item;
   open_delete.value = true;
 };
@@ -296,14 +297,12 @@ const handleRemoveSuccess = () => {
 
 const saveQuantity = (
   e: { quantity: string },
-  entity: ConsumableMaterialStdInterface
+  entity: ConsumableMaterialStdTransactionInterface
 ) => {
   updateConsMat({
     id: entity.uuid,
     payload: {
-      name: entity.consmat.name,
       qty: parseFloat(e.quantity),
-      global_unit_uuid: entity.consmat.global_unit_uuid,
     },
   });
 };
@@ -311,7 +310,27 @@ const saveQuantity = (
 onMounted(() => {
   breadcrumb.value = [
     {
-      name: "Consumable Material Std",
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "CONSUMABLE MATERIAL",
       as_link: false,
       url: "",
     },
@@ -335,7 +354,7 @@ onMounted(() => {
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Material" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+          <Table :is_logging="false" label-create="Material" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
             " :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []" :loading="isLoadingConsMat"
             :pagination="pagination" :is-create="false" class="mt-6" v-model:model-search="params.search"
             @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
@@ -349,12 +368,12 @@ onMounted(() => {
             </template>
             <template #column_material="{ entity }">
               <p class="text-base text-neutral-50 text-left min-w-[100px]">
-                {{ entity.consmat?.name ?? "-" }}
+                {{ entity?.name ?? "-" }}
               </p>
             </template>
             <template #column_merk="{ entity }">
               <p class="text-base text-neutral-50 text-left">
-                {{ entity.consmat?.merk ?? "-" }}
+                {{ entity?.merk ?? "-" }}
               </p>
             </template>
             <template #column_total_qty="{ entity }">
@@ -364,31 +383,31 @@ onMounted(() => {
               ">
                 -
               </p>
-              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''"
-                :label="entity.consmat?.name" :loading="isLoadingUpdate"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity?.name"
+                :loading="isLoadingUpdate"
+                :disabled="dataApproval?.status === 'approve' || !access_token || !dataForm?.activity_uuid"
                 @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity }">
-              <p v-if="!entity.consmat?.price">-</p>
+              <p v-if="!entity?.price">-</p>
               <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
-                Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
+                Rp. {{ numberFormat(entity?.price) ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity }">
-              <p v-if="!entity.total_qty && !entity.consmat?.price">-</p>
+              <p v-if="!entity.total_qty && !entity?.price">-</p>
               <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
                 Rp.
                 {{
                   numberFormat(
-                    entity.consmat?.price * Number(entity?.total_qty || 0)
+                    entity?.price * Number(entity?.total_qty || 0)
                   ) ?? "-"
                 }}
               </p>
             </template>
             <template #column_unit="{ entity }">
               <p class="text-base text-neutral-50 text-left">
-                {{ entity.consmat?.global_unit?.name ?? "-" }}
+                {{ entity.unit ?? "-" }}
               </p>
             </template>
           </Table>
@@ -403,6 +422,6 @@ onMounted(() => {
   <FormConsumableMaterialStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item"
     @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" ref="formConsumableMaterial"
     :original_uuid="original_uuid" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.consmat?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.name} / ${selected_item?.unit}`"
+    :loading="isLoadingDelete" @delete="onDelete" />
 </template>

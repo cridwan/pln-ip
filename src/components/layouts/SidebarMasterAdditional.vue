@@ -37,20 +37,20 @@ const handleBack = () => {
   <div class="sidebar-master">
     <p class="sidebar-master--title flex items-center gap-2">
       <Icon name="logout" class="cursor-pointer size-6" @click="handleBack" />
-      ADDITIONAL MENU
+      MAIN MENU
     </p>
     <div class="sidebar-master--menus">
       <div v-for="(item, key) in MenuAdditional" :key="key" class="flex flex-col gap-2">
         <RouterLink v-if="!item.children" :to="{
           path: `${item.url === '/'
-              ? '/master/additional-scope'
-              : item.url
-                .replace(':id', String(route.params?.id))
-                .replace(':name', String(route.params?.name))
+            ? '/master/additional-scope'
+            : item.url
+              .replace(':id', String(route.params?.id))
+              .replace(':name', String(route.params?.name))
             }`,
           query: route.query
         }" replace :class="item.url === '/' ? '' : isMenuActive(item) ? 'menu-active' : ''
-            " class="menu-item" @click="selected_menu = null">
+          " class="menu-item" @click="selected_menu = null">
           <Icon :name="item.icon" class="menu-icon" />
           <p class="menu-title">{{ item.name }}</p>
         </RouterLink>

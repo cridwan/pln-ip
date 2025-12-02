@@ -14,6 +14,17 @@ export const routeTransaction = [
     },
   },
   {
+    path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/sequence",
+    name: "guest sequence",
+    component: () => import("@/modules/guest/views/Sequence.vue"),
+    meta: {
+      layout: GuestLayout,
+      requireAuth: true,
+      role: ["guest"],
+      except: ["superuser"],
+    },
+  },
+  {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/work-instruction",
     name: "guest scope ika",
     component: () => import("@/modules/guest/views/work-instruction/Scope.vue"),

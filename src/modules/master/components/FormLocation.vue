@@ -65,7 +65,7 @@ const model = ref<LocationCreateInterface>({
   lon: "",
   slug: "",
   description: "",
-  color: "",
+  generator_type_uuid: "",
   sub_area_uuid: "",
 });
 const v$_form = reactive(useVuelidate());
@@ -89,7 +89,7 @@ const rules = computed(() => {
         requiredIf(false)
       ),
     },
-    color: {
+    generator_type_uuid: {
       required: helpers.withMessage(`This field is required`, required),
     },
     sub_area_uuid: {
@@ -238,7 +238,7 @@ const setValue = () => {
     lon: props.selectedValue?.lon || "",
     slug: props.selectedValue?.slug || "",
     description: props.selectedValue?.description || "",
-    color: props.selectedValue?.color || "",
+    generator_type_uuid: props.selectedValue?.generator_type_uuid || "",
     sub_area_uuid: props.selectedValue?.sub_area_uuid || "",
   };
 };
@@ -250,7 +250,7 @@ const resetValue = () => {
     lon: "",
     slug: "",
     description: "",
-    color: "",
+    generator_type_uuid: "",
     sub_area_uuid: "",
   };
 };
@@ -389,97 +389,30 @@ watch(
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Lokasi' : 'Tambah Lokasi'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Input
-        v-model="model.name"
-        star
-        :rules="rules.name"
-        :custom_symbols="all_characters"
-        label="Nama"
-      />
-      <Input
-        v-model="model.lat"
-        star
-        :rules="rules.lat"
-        :custom_symbols="all_characters"
-        label="Latitude"
-      />
-      <Input
-        v-model="model.lon"
-        star
-        :rules="rules.lon"
-        :custom_symbols="all_characters"
-        label="Longitude"
-      />
-      <Input
-        v-model="model.slug"
-        star
-        :rules="rules.slug"
-        :custom_symbols="all_characters"
-        label="Kode"
-      />
-      <Textarea
-        v-model="model.description"
-        label="Deskripsi"
-        :rules="rules.description"
-        :rows="3"
-      />
-      <Select
-        v-model="model.color"
-        label="Jenis Pembangkit"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_generator_type.search"
-        :search="true"
-        :loading="is_loading_generator_type"
-        :loading-next-page="isFetchingNextPageGeneratorType"
-        :rules="rules.color"
-        :options="options_generator_type"
-        @scroll="scrollGeneratorType"
-        @search="searchGeneratorType"
-        @select="selectGeneratorType"
-      />
-      <Select
-        v-model="model.sub_area_uuid"
-        label="Sub Area"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_sub_area.search"
-        :search="true"
-        :loading="is_loading_sub_area"
-        :loading-next-page="isFetchingNextPageSubArea"
-        :rules="rules.sub_area_uuid"
-        :options="options_area"
-        @scroll="scrollSubArea"
-        @search="searchSubArea"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Lokasi' : 'Tambah Lokasi'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Input v-model="model.name" star :rules="rules.name" :custom_symbols="all_characters" label="Nama" />
+      <Input v-model="model.lat" star :rules="rules.lat" :custom_symbols="all_characters" label="Latitude" />
+      <Input v-model="model.lon" star :rules="rules.lon" :custom_symbols="all_characters" label="Longitude" />
+      <Input v-model="model.slug" star :rules="rules.slug" :custom_symbols="all_characters" label="Kode" />
+      <Textarea v-model="model.description" label="Deskripsi" :rules="rules.description" :rows="3" />
+      <Select v-model="model.generator_type_uuid" star label="Jenis Pembangkit" options_label="label"
+        options_value="value" v-model:model-search="params_generator_type.search" :search="true"
+        :loading="is_loading_generator_type" :loading-next-page="isFetchingNextPageGeneratorType"
+        :rules="rules.generator_type_uuid" :options="options_generator_type" @scroll="scrollGeneratorType"
+        @search="searchGeneratorType" @select="selectGeneratorType" />
+      <Select v-model="model.sub_area_uuid" star label="Sub Area" options_label="label" options_value="value"
+        v-model:model-search="params_sub_area.search" :search="true" :loading="is_loading_sub_area"
+        :loading-next-page="isFetchingNextPageSubArea" :rules="rules.sub_area_uuid" :options="options_area"
+        @scroll="scrollSubArea" @search="searchSubArea" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate" />
       </div>
     </form>
   </Modal>

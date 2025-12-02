@@ -30,6 +30,7 @@ import type { UpdateManPowerInterface } from "../types/ManpowerType";
 import FormQuantity from "../components/FormQuantity.vue";
 import TableSummary from "@/components/tables/TableSummary.vue";
 import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
+import type { ManpowerStdTransactionInterface } from "../types/ManpowerStdType";
 
 const authStore = useAuthStore();
 const original_uuid = ref<string | undefined>(undefined)
@@ -60,7 +61,7 @@ const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const dataForm = ref<FilterManpowerStdInterface | null>(null);
-const selected_item = ref<ManpowerStdInterface | null>(null);
+const selected_item = ref<ManpowerStdTransactionInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
@@ -99,7 +100,7 @@ const {
         price: summary.price,
         total_qty: summary.total_qty
       }
-      const response = data as IPagination<ManpowerStdInterface[]>;
+      const response = data as IPagination<ManpowerStdTransactionInterface[]>;
 
       total_item.value = response.total;
       is_loading_filter.value = false;
@@ -231,12 +232,12 @@ const handleCreate = () => {
   open_form.value = true;
 };
 
-const handleUpdate = (item: ManpowerStdInterface) => {
+const handleUpdate = (item: ManpowerStdTransactionInterface) => {
   selected_item.value = item;
   open_form.value = true;
 };
 
-const handleDelete = (item: ManpowerStdInterface) => {
+const handleDelete = (item: ManpowerStdTransactionInterface) => {
   selected_item.value = item;
   open_delete.value = true;
 };
@@ -295,14 +296,12 @@ const handleRemoveSuccess = () => {
 
 const saveQuantity = (
   e: { quantity: string },
-  entity: ManpowerStdInterface
+  entity: ManpowerStdTransactionInterface
 ) => {
   updateCManPower({
     id: entity.uuid,
     payload: {
-      name: entity.manpower.name,
       qty: parseFloat(e.quantity),
-      type: "type",
     },
   });
 };
@@ -310,7 +309,27 @@ const saveQuantity = (
 onMounted(() => {
   breadcrumb.value = [
     {
-      name: "Manpower Std",
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "MANPOWER",
       as_link: false,
       url: "",
     },
@@ -333,8 +352,9 @@ onMounted(() => {
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Manpower" :columns="ColumnsManpower" :entities="dataManPower?.data || []"
-            :loading="isLoadingManPower" :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+          <Table label-create="Manpower" :is_logging="false" :columns="ColumnsManpower"
+            :entities="dataManPower?.data || []" :loading="isLoadingManPower" :pagination="pagination"
+            :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
               " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
             @search="searchTable">
             <template #column_action="{ entity }">
@@ -347,7 +367,7 @@ onMounted(() => {
             </template>
             <template #column_manpower="{ entity }">
               <p class="text-base text-neutral-50 text-left">
-                {{ entity.manpower?.name ?? "-" }}
+                {{ entity.name ?? "-" }}
               </p>
             </template>
             <template #column_total_qty="{ entity }">
@@ -357,25 +377,25 @@ onMounted(() => {
               ">
                 -
               </p>
-              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''"
-                :label="entity.manpower.name" :loading="isLoadingUpdate"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity.name"
+                :loading="isLoadingUpdate"
+                :disabled="dataApproval?.status === 'approve' || !access_token || !dataForm?.activity_uuid"
                 @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity }">
-              <p v-if="!entity.manpower?.price">-</p>
+              <p v-if="!entity?.price">-</p>
               <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
                 Rp.
-                {{ Number(entity.manpower.price)?.toLocaleString("id") ?? "-" }}
+                {{ Number(entity.price)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity }">
-              <p v-if="!entity.total_qty && !entity.manpower?.price">-</p>
+              <p v-if="!entity.total_qty && !entity?.price">-</p>
               <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
                 Rp.
                 {{
                   (
-                    Number(entity.manpower.price) * Number(entity.total_qty)
+                    Number(entity.price) * Number(entity.total_qty)
                   ).toLocaleString("id")
                 }}
               </p>
@@ -391,6 +411,5 @@ onMounted(() => {
   <Toast ref="toastRef" />
   <FormManpowerStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
     @error="handleError" @removeSucess="handleRemoveSuccess" ref="formManpowerStd" :original_uuid="original_uuid" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.manpower?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

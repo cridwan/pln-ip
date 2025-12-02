@@ -10,6 +10,7 @@ export interface ConsMatInterface {
   global_unit: GlobalUnitInterface;
   created_at: string;
   updated_at: string;
+  has_transaction?: number;
 }
 
 export interface ConsMatCreateInterface {

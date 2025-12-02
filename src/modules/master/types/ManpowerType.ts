@@ -6,6 +6,7 @@ export interface ManpowerInterface {
   price: string;
   created_at: string;
   updated_at: string;
+  has_transaction?: number;
 }
 
 export interface ManpowerCreateInterface {

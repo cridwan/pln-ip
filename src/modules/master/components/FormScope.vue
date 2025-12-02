@@ -228,6 +228,7 @@ const resetValue = () => {
     bidang_uuid: props.dataForm?.bidang_uuid || "",
   };
   model_details.value = [{ name: "", id: "0" }];
+  documentValues.value = null
   uploadProgress.value = 0;
 };
 

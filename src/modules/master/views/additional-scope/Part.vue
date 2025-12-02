@@ -303,15 +303,21 @@ onMounted(() => {
       as_link: false,
       url: "",
     },
+    {
+      name: String(route.query?.addScope),
+      as_link: false,
+      url: "",
+    },
   ];
 });
 </script>
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.part?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.part?.name} / ${selected_item?.part?.global_unit?.name}`"
+    :loading="isLoadingDelete" @delete="onDelete" />
   <div class="relative w-full">
-    <div class="flex items-center gap-2 absolute right-0">
+    <div class="flex items-center gap-2 absolute right-0 top-10">
       <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
       <Button text="Export Template" rounded="full" color="blue" /> -->
@@ -327,14 +333,15 @@ onMounted(() => {
         <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingPartStd" />
       </div>
       <div class="w-full">
-        <Breadcrumb :items="breadcrumb" />
+        <Breadcrumb :items="breadcrumb" class="mb-6" />
         <Table label-create="User" :columns="ColumnsPartStd" :entities="dataPartStd?.data || []"
           :loading="isLoadingPartStd" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
           @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0" />
             </div>
           </template>
           <template #column_part="{ entity }">
@@ -351,7 +358,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormPartStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" ref="formPartStd" />
+    <FormPartStd :is-additional="true" :data-form="dataForm" v-model="open_form" :selected-value="selected_item"
+      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" ref="formPartStd" />
   </div>
 </template>

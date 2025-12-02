@@ -15,13 +15,14 @@ import type { UpdateManPowerInterface } from "../types/ManpowerType";
 import type { UpdatePartInterface } from "../types/PartType";
 import type { CreateAddScopeInterface } from "../types/AddScopeTableType";
 import type { UpdateToolsInterface } from "../types/ToolsType";
-import type { CreateHseInterface } from "../types/HseType";
+import type { CreateHseInterface, FormCloneHseDoc } from "../types/HseType";
 import type { FormEquipmentCloneInterface } from "../types/EquipmentType";
 import type { FormActivityInterfaceClone } from "../types/ActivityType";
 import type { FormPartCloneInterface } from "../types/PartStdType";
 import type { FormConsMatCloneInterface } from "../types/ConsumableMaterialStdType";
 import type { FormManpowerCloneInterface } from "../types/ManpowerStdType";
 import type { FormApprovalInterface, FormRequestApprovalInterface } from "../types/ApprovalType";
+import type { FormCloneQcPlan } from "../types/QcPlanType";
 
 export const useTransactionStore = defineStore(
   "transaction",
@@ -39,9 +40,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getScopeStandar = async (payload: IParams) => {
+    const getScopeStandar = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/scope-standart/resource/pagination`, {
+        .get(`${prefix}/transaction/scope-standart/resource/pagination`, {
           params: payload,
         })
         .then((resp) => {
@@ -52,9 +53,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getSelectScopeStandar = async (payload: IParams) => {
+    const getSelectScopeStandar = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/scope-standart/resource/select/options`, {
+        .get(`${prefix}/transaction/scope-standart/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -65,9 +66,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const cloneScopeStandar = async (payload: FormScopeInterface) => {
+    const cloneScopeStandar = async (payload: FormScopeInterface, prefix: string = '') => {
       return await api
-        .post(`/transaction/scope-standart/resource/clone`, payload)
+        .post(`${prefix}/transaction/scope-standart/resource/clone`, payload)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -109,9 +110,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getActivity = async (payload: IParams) => {
+    const getActivity = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/activity/resource/pagination`, {
+        .get(`${prefix}/transaction/activity/resource/pagination`, {
           params: payload,
         })
         .then((resp) => {
@@ -122,9 +123,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getSelectActivity = async (payload: IParams) => {
+    const getSelectActivity = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/activity/resource/select/options`, {
+        .get(`${prefix}/transaction/activity/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -145,9 +146,9 @@ export const useTransactionStore = defineStore(
           return Promise.reject(err);
         });
     };
-    const createActivityClone = async (payload: FormActivityInterfaceClone) => {
+    const createActivityClone = async (payload: FormActivityInterfaceClone, prefix: string = '') => {
       return await api
-        .post(`/transaction/activity/resource/clone`, payload)
+        .post(`${prefix}/transaction/activity/resource/clone`, payload)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -167,9 +168,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getEquipment = async (payload: IParams) => {
+    const getEquipment = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/equipment/resource/pagination`, {
+        .get(`${prefix}/transaction/equipment/resource/pagination`, {
           params: payload,
         })
         .then((resp) => {
@@ -180,9 +181,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getSelectEquipment = async (payload: IParams) => {
+    const getSelectEquipment = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/equipment/resource/select/options`, {
+        .get(`${prefix}/transaction/equipment/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -204,9 +205,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const cloneEquipment = async (payload: FormEquipmentCloneInterface) => {
+    const cloneEquipment = async (payload: FormEquipmentCloneInterface, prefix: string = '') => {
       return await api
-        .post(`/transaction/equipment/resource/clone`, payload)
+        .post(`${prefix}/transaction/equipment/resource/clone`, payload)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -226,9 +227,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getConsMat = async (payload: IParams) => {
+    const getConsMat = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/consumable-material/resource/grouping`, {
+        .get(`${prefix}/transaction/consumable-material/resource/grouping`, {
           params: payload,
         })
         .then((resp) => {
@@ -239,9 +240,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getConsMatSelect = async (payload: IParams) => {
+    const getConsMatSelect = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/consumable-material/resource/select/options`, {
+        .get(`${prefix}/transaction/consumable-material/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -266,9 +267,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const cloneConsMatStd = async (payload: FormConsMatCloneInterface) => {
+    const cloneConsMatStd = async (payload: FormConsMatCloneInterface, prefix: string = '') => {
       return await api
-        .post(`/transaction/consumable-material/resource/clone`, payload)
+        .post(`${prefix}/transaction/consumable-material/resource/clone`, payload)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -288,9 +289,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getManPower = async (payload: IParams) => {
+    const getManPower = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/manpower/resource/grouping`, {
+        .get(`${prefix}/transaction/manpower/resource/grouping`, {
           params: payload,
         })
         .then((resp) => {
@@ -301,9 +302,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getManPowerSelect = async (payload: IParams) => {
+    const getManPowerSelect = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/manpower/resource/select/options`, {
+        .get(`${prefix}/transaction/manpower/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -328,9 +329,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const cloneManPowerStd = async (payload: FormManpowerCloneInterface) => {
+    const cloneManPowerStd = async (payload: FormManpowerCloneInterface, prefix: string = '') => {
       return await api
-        .post(`/transaction/manpower/resource/clone`, payload)
+        .post(`${prefix}/transaction/manpower/resource/clone`, payload)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -350,9 +351,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getPart = async (payload: IParams) => {
+    const getPart = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/part/resource/grouping`, {
+        .get(`${prefix}/transaction/part/resource/grouping`, {
           params: payload,
         })
         .then((resp) => {
@@ -363,9 +364,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getPartSelect = async (payload: IParams) => {
+    const getPartSelect = async (payload: IParams, prefix: string = '') => {
       return await api
-        .get(`/transaction/part/resource/select/options`, {
+        .get(`${prefix}/transaction/part/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -387,9 +388,9 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const clonePartStd = async (payload: FormPartCloneInterface) => {
+    const clonePartStd = async (payload: FormPartCloneInterface, prefix: string = '') => {
       return await api
-        .post(`/transaction/part/resource/clone`, payload)
+        .post(`${prefix}/transaction/part/resource/clone`, payload)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -479,11 +480,70 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getHseSelect = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/hse/resource/select/options`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const cloneHse = async (payload: FormCloneHseDoc) => {
+      return await api
+        .post(`/transaction/hse/resource/clone`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const getQcPlan = async (payload: IParams) => {
       return await api
         .get(`/transaction/qc-plan/resource/pagination`, {
           params: payload,
         })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getQcPlanSelect = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/qc-plan/resource/select/options`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const cloneQcPlan = async (payload: FormCloneQcPlan) => {
+      return await api
+        .post(`/transaction/qc-plan/resource/clone`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteQcPlan = async (uuid: string) => {
+      return await api
+        .delete(`/transaction/qc-plan/${uuid}`)
         .then((resp) => {
           return Promise.resolve(resp);
         })
@@ -508,6 +568,19 @@ export const useTransactionStore = defineStore(
     const getAddScope = async (payload: IParams) => {
       return await api
         .get(`/transaction/additional-scope/resource/pagination`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getAddScopeSelect = async (payload: IParams) => {
+      return await api
+        .get(`/transaction/additional-scope/resource/select/options`, {
           params: payload,
         })
         .then((resp) => {
@@ -907,6 +980,12 @@ export const useTransactionStore = defineStore(
       getHseDoc,
       getDownloadResultBudgetActivity,
       requestApproveProject,
+      getQcPlanSelect,
+      cloneQcPlan,
+      deleteQcPlan,
+      getHseSelect,
+      cloneHse,
+      getAddScopeSelect
     };
   },
   {

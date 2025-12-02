@@ -32,7 +32,7 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push("/login");
+  router.push({ name: 'login' });
 };
 
 const login = () => {
@@ -52,7 +52,7 @@ const login = () => {
               <Icon name="bell-alert" size="10" />
               <span v-if="dataNotification && dataNotification?.length > 0"
                 class="rounded-full size-3 text-[9px] flex items-center justify-center text-white bg-red-500 absolute top-0 right-0">{{
-                dataNotification.length }}</span>
+                  dataNotification.length }}</span>
             </div>
           </NotificationMap>
         </div>

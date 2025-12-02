@@ -5,7 +5,7 @@ import { RouterLink } from "vue-router";
 
 type Size = "lg" | "md" | "sm";
 type Variant = "primary" | "secondary" | "skin" | "danger";
-type Color = "default" | "green" | "blue" | "grey";
+type Color = "default" | "green" | "blue" | "grey" | "red";
 type Type = "button" | "submit" | "reset" | undefined;
 type Rounded = "none" | "default" | "sm" | "md" | "lg" | "xl" | "full";
 
@@ -28,7 +28,7 @@ const props = defineProps({
     type: String as PropType<Color>,
     default: "default",
     validator: function (value: string) {
-      return ["default", "green", "blue", "grey"].indexOf(value) !== -1;
+      return ["default", "green", "blue", "grey", "red"].indexOf(value) !== -1;
     },
   },
   text: {
@@ -165,7 +165,14 @@ const heightLoading = computed(() => {
 });
 
 const text = computed(() => {
-  return props.text == "Cancel" ? "Batal" : props.text;
+  let textButton = props.text
+  if (props.text == "Cancel") {
+    textButton = "Cancel";
+  } else if (props.text == "Save") {
+    textButton = "Simpan";
+  }
+
+  return textButton;
 })
 </script>
 
@@ -343,6 +350,14 @@ const text = computed(() => {
         @apply pointer-events-none shadow-none bg-blue-500 border-blue-500 text-neutral-50 #{!important}
       &--loading
         @apply border-blue-900 bg-blue-600 text-neutral-50
+    &--red
+      @apply bg-red-900 border-red-900 text-red-50
+      &:hover
+        @apply bg-red-950 border-red-950
+      &--disabled
+        @apply pointer-events-none shadow-none bg-red-500 border-red-500 text-neutral-50 #{!important}
+      &--loading
+        @apply border-red-900 bg-red-600 text-neutral-50
     &--grey
       @apply bg-[#a5a5a5] border-[#a5a5a5] text-neutral-50
       &:hover

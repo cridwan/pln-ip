@@ -33,11 +33,13 @@ import type {
 } from "../types/InspectionType";
 import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 import { UserEnum } from "@/modules/auth/types/AuthType";
+import { useProjectStore } from "@/modules/auth/stores/ProjectStore";
 
 const videos = [Home0, Home1, Home2];
 
 const masterStore = useMasterStore();
 const authStore = useAuthStore();
+const projectStore = useProjectStore();
 const scopeStore = useInspectionStore();
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const router = useRouter();
@@ -94,8 +96,6 @@ const { mutate: deleteActivity, isPending: isLoadingDelete } = useMutation({
 //--- GET MACHINE
 const {
   data: dataMachine,
-  isFetching: isLoadingMachine,
-  refetch: refetchMachine,
 } = useQuery({
   queryKey: ["getMachine"],
   queryFn: async () => {
@@ -121,8 +121,6 @@ const {
 //--- GET INSPECTION TYPE
 const {
   data: dataInspectionType,
-  isFetching: isLoadingInspectionType,
-  refetch: refetchInspectionType,
 } = useQuery({
   queryKey: ["getInspectionType"],
   queryFn: async () => {
@@ -183,10 +181,14 @@ const { mutate: generate, isPending: isLoadingGenerate } = useMutation({
       (item) => item.uuid === scopeSelected.value
     );
     const inspection = find_item?.name.toLowerCase();
+    projectStore.setProject(data?.data?.data as ResponseProject);
     router.push({
       path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${data?.data?.data?.uuid}/${scopeSelected.value}/scope`,
       query: {
-        inspection
+        inspection,
+        machine: find_item?.machine?.name,
+        unit: find_item?.machine?.unit?.name,
+        location: find_item?.machine?.unit?.location?.name,
       }
     });
   },
@@ -228,25 +230,30 @@ const {
 //--- END
 
 watch(dataMachine, (value) => {
+  const data = value?.data[0];
   breadcrumb.value = [
-    // {
-    //   name: `UBP ${value?.[0]?.unit?.name}`,
-    //   as_link: false,
-    //   url: "",
-    // },
-    // {
-    //   name: value?.[0]?.name || "",
-    //   as_link: false,
-    //   url: "",
-    // },
     {
       name: "Scope Overhaul",
       as_link: false,
       url: "",
     },
+    {
+      name: String(data?.unit?.location?.name || ""),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(data?.unit?.name || ""),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(data?.name || ""),
+      as_link: false,
+      url: "",
+    },
   ];
-  // titleHeader.value = convertToOriginalFormat(route.params.id_unit as string);
-});
+}, { deep: true, immediate: true });
 
 watch(
   [dataMachine, dataInspectionType],
@@ -338,7 +345,15 @@ const onDelete = () => {
 
 const selectInspection = (item: TInspection) => {
   if (authStore.users && authStore.users.role === UserEnum.GUEST) {
-    router.push(`/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.name}/undefined/${item.uuid}/scope`)
+    router.push({
+      path: `/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.name}/undefined/${item.uuid}/scope`,
+      query: {
+        inspection: item.name,
+        machine: item.machine?.name,
+        unit: item.machine?.unit?.name,
+        location: item.machine?.unit?.location?.name,
+      }
+    })
   } else {
     toScope(item);
   }
@@ -444,16 +459,20 @@ const generateScope = () => {
   // );
 };
 
-const toTransaction = (uuid: string) => {
+const toTransaction = (item: ResponseProject) => {
   const find_item = dataInspectionType.value?.data.find(
     (item) => item.uuid === scopeSelected.value
   );
   const inspection = find_item?.name.toLowerCase();
+  projectStore.setProject(item)
   router.push(
     {
-      path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${uuid}/${scopeSelected.value}/scope`,
+      path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${item.uuid}/${scopeSelected.value}/scope`,
       query: {
-        inspection
+        inspection,
+        machine: find_item?.machine?.name,
+        unit: find_item?.machine?.unit?.name,
+        location: find_item?.machine?.unit?.location?.name,
       }
     }
   );
@@ -527,7 +546,7 @@ const toDelete = (item: ResponseProject) => {
             </p>
             <p v-else-if="!isLoadingProject && (dataProject || []).length > 0" v-for="(item, key) in dataProject"
               :key="key" class="px-4 hover:text-neutral-200 py-1 flex justify-between">
-              <span class="cursor-pointer" @click="toTransaction(item.uuid)">{{
+              <span class="cursor-pointer" @click="toTransaction(item)">{{
                 item.name
                 }}</span>
               <Icon v-if="item.status != 'approve' && authStore.users?.role !== 'approval'" name="trash"

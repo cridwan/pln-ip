@@ -16,7 +16,7 @@ import type {
 } from "@/modules/master/types/ManpowerStdType";
 
 import { useTransactionStore } from "../stores/TransactionStore";
-import type { FormManpowerCloneInterface } from "../types/ManpowerStdType";
+import type { FormManpowerCloneInterface, ManpowerStdTransactionInterface } from "../types/ManpowerStdType";
 
 type OptionType = {
   label: string;
@@ -25,7 +25,7 @@ type OptionType = {
 
 const props = defineProps({
   selectedValue: {
-    type: Object as PropType<ManpowerStdInterface | null>,
+    type: Object as PropType<ManpowerStdTransactionInterface | null>,
   },
   dataForm: {
     type: Object as PropType<FilterManpowerStdInterface | null>,
@@ -207,12 +207,12 @@ watch(
       options_manpower.value = mergeArrays(
         [
           {
-            value: props.selectedValue?.manpower_uuid,
-            label: props.selectedValue?.manpower?.name,
+            value: props.selectedValue?.uuid,
+            label: props.selectedValue?.name,
           },
         ],
         new_data.filter(
-          (item) => item.value !== props.selectedValue?.manpower_uuid
+          (item) => item.value !== props.selectedValue?.uuid
         )
       );
     } else {

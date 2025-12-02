@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
 
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
-import { Button, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 import { useGlobalStore } from "@/stores/GlobalStore";
@@ -27,8 +27,11 @@ import FilterScope from "../components/FilterScope.vue";
 import FormScope from "../components/FormScope.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 import TableEquipment from "../components/scope/TableEquipment.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const open_form = ref(false);
+const dataDuration = ref(0);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const formScope = ref<InstanceType<typeof FormScope> | null>(null)
 const entitiesScope = ref<ScopeInterface[]>([]);
 const selected_item = ref<ScopeInterface>();
@@ -91,6 +94,7 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
       const { data } = await transactionStore.getScopeStandar(params);
       const response = data.data as IPagination<ResponseScopeInterface[]>;
       total_item.value = response.total;
+      dataDuration.value = response?.summary?.days || 0 as number;
       const new_arr: ScopeInterface[] =
         response?.data?.map((item) => {
           return {
@@ -208,32 +212,6 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
 });
 //--- END
 
-//--- GET TOTAL DURATION
-const params_duration = reactive({
-  project_uuid: route.params.id_project,
-});
-const {
-  data: dataDuration,
-  isFetching: isLoadingDuration,
-  refetch: refetchDuration,
-} = useQuery({
-  queryKey: ["getTotalDurationAtScope"],
-  queryFn: async () => {
-    try {
-      const { data } = await transactionStore.getTotalDurationScope(
-        params_duration
-      );
-      return data.data.data;
-    } catch (error: any) {
-      const err = error as AxiosError;
-      throw err.response;
-    }
-  },
-  retry: 0,
-  refetchOnWindowFocus: false,
-});
-//--- END
-
 //--- CREATE SCOPE
 const { mutate: createScope } = useMutation({
   mutationFn: async (payload: CreateScopeInterface) => {
@@ -242,7 +220,6 @@ const { mutate: createScope } = useMutation({
   onSuccess: async (data) => {
     if (file.value === null && file_deleted.value === "") {
       refetchScope();
-      refetchDuration();
       asset_welness.value.modelOpenInputData = false;
       toastRef.value?.showToast({
         title: "Success",
@@ -257,7 +234,6 @@ const { mutate: createScope } = useMutation({
           await globalStore.deleteDocument([file_deleted.value]);
 
           refetchScope();
-          refetchDuration();
           asset_welness.value.modelOpenInputData = false;
           toastRef.value?.showToast({
             title: "Success",
@@ -305,7 +281,6 @@ const { mutate: createDocument } = useMutation({
   },
   onSuccess: () => {
     refetchScope();
-    refetchDuration();
     oh_recom.value.modelOpenInputData = false;
     wo_priority.value.modelOpenInputData = false;
     history.value.modelOpenInputData = false;
@@ -340,7 +315,6 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
   },
   onSuccess: () => {
     refetchScope();
-    refetchDuration();
     if (formScope.value?.refetchScope) {
       formScope.value.refetchScope();
     }
@@ -548,13 +522,43 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     }
   });
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "SCOPE",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
   <Toast ref="toastRef" />
   <ModalDelete v-model="open_delete" :title="selected_item?.asset" :loading="isLoadingDelete" @delete="onDelete" />
   <div class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1">
-    <span v-if="isLoadingDuration">Loading...</span>
+    <span v-if="isLoadingScope">Loading...</span>
     <span v-else>{{ dataDuration }} Days</span>
   </div>
   <!-- v-if="dataForm?.sub_bidang_uuid && dataApproval?.status !== 'approve'" -->
@@ -570,8 +574,9 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     </div>
     <div class="flex-1 overflow-auto">
       <div class="max-w-full min-w-full">
+        <Breadcrumb :items="breadcrumb" />
         <Table label-create="Asset" :columns="ColumnsScope" :entities="entitiesScope" :loading="isLoadingScope"
-          :pagination="pagination" :is-create="false"
+          :is_logging="false" :pagination="pagination" :is-create="false"
           :is-action="dataApproval?.status !== 'approve' && access_token !== ''" v-model:model-search="params.search"
           @delete="handleDelete" @change-page="changePage" @change-limit="changeLimit" @search="searchTable"
           @open-children="openChildren">
@@ -660,8 +665,8 @@ const getData = (id: string, response: EquipmentInterface[]) => {
             ">
               <td :colspan="ColumnsScope.length + 5">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
-                  <TableEquipment :id="entity.id" :original_uuid="entity.original_uuid" :entity="entity.children"
-                    :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
+                  <TableEquipment :with-ik="false" :id="entity.id" :original_uuid="entity.original_uuid"
+                    :entity="entity.children" :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
                       " @get-data="getData" />
                 </div>
               </td>

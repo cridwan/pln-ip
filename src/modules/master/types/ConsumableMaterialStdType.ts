@@ -12,6 +12,7 @@ export interface ConsumableMaterialStdInterface {
   total_qty?: number;
   created_at: string;
   updated_at: string;
+  has_transaction?: number;
 }
 
 export interface ConsumableMaterialStdCreateInterface {

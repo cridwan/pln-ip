@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { AxiosError } from "axios";
 
-import { Button, Select, Toast } from "@/components";
+import { Breadcrumb, Button, Select, Toast } from "@/components";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination, IParams } from "@/types/GlobalType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
@@ -15,12 +15,14 @@ import { useTransactionStore } from "../stores/TransactionStore";
 import FormApproval from "../components/FormApproval.vue";
 import type { ProjectInterface } from "../types/ProjectType";
 import type { FormRequestApprovalInterface } from "../types/ApprovalType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 type OptionType = {
   value: number;
   label: string;
 };
 const v$_form = reactive(useVuelidate());
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const transactionStore = useTransactionStore();
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const route = useRoute();
@@ -199,9 +201,40 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "REQUEST APPROVAL",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
+  <Breadcrumb :items="breadcrumb" class="mb-10" />
   <div class="w-full flex items-center justify-center bg-white p-4 shadow-md rounded-sm">
     <div class="flex flex-col items-center gap-3">
       <h1 class="text-blue-950 font-semibold">Request Approve Project</h1>

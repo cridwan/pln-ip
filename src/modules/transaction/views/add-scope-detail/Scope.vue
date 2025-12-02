@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
 
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
-import { Button, ModalDelete, Table, Toast } from "@/components";
+import { Breadcrumb, Button, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 import { useGlobalStore } from "@/stores/GlobalStore";
@@ -29,10 +29,12 @@ import type { ProjectInterface } from "../../types/ProjectType";
 // import FormAdScopeDetail from "../../components/add-scope/FormAdScopeDetail.vue";
 import TableEquipment from "../../components/scope/TableEquipment.vue";
 import FormScope from "../../components/FormScope.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
 const open_form = ref(false);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const entitiesScope = ref<ScopeInterface[]>([]);
 const selected_item = ref<ScopeInterface>();
 const dataForm = ref<FilterScopeInterface | null>(null);
@@ -54,6 +56,7 @@ const params = reactive({
 });
 const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
+const formScope = ref<InstanceType<typeof FormScope> | null>(null)
 const asset_welness = ref<any>(null);
 const oh_recom = ref<any>(null);
 const wo_priority = ref<any>(null);
@@ -93,7 +96,7 @@ const {
   queryKey: ["getScopeAtScopeDetailAddScope"],
   queryFn: async () => {
     try {
-      const { data } = await transactionStore.getScopeStandar(params);
+      const { data } = await transactionStore.getScopeStandar(params, '/add-scope/detail');
       const response = data.data as IPagination<ResponseScopeInterface[]>;
       total_item.value = response.total;
       const new_arr: ScopeInterface[] =
@@ -102,98 +105,99 @@ const {
             id: item.uuid,
             asset: item.name || "",
             children: [],
+            original_uuid: item.original_uuid,
             asset_welness: item.asset_welnes
               ? {
-                  color: item.asset_welnes?.color,
-                  note: item.asset_welnes?.note,
-                  file: item.asset_welnes?.document
-                    ? [
-                        {
-                          id: item.asset_welnes.document.uuid,
-                          name: item.asset_welnes.document
-                            .document_original_name,
-                          size: item.asset_welnes.document.document_size,
-                          file: item.asset_welnes.document.document_link,
-                        },
-                      ]
-                    : [],
-                }
+                color: item.asset_welnes?.color,
+                note: item.asset_welnes?.note,
+                file: item.asset_welnes?.document
+                  ? [
+                    {
+                      id: item.asset_welnes.document.uuid,
+                      name: item.asset_welnes.document
+                        .document_original_name,
+                      size: item.asset_welnes.document.document_size,
+                      file: item.asset_welnes.document.document_link,
+                    },
+                  ]
+                  : [],
+              }
               : null,
             oh_recom: item.oh_recom
               ? {
-                  note: item.oh_recom?.note,
-                  file: item.oh_recom?.document
-                    ? [
-                        {
-                          id: item.oh_recom.document.uuid,
-                          name: item.oh_recom.document.document_original_name,
-                          size: item.oh_recom.document.document_size,
-                          file: item.oh_recom.document.document_link,
-                        },
-                      ]
-                    : [],
-                }
+                note: item.oh_recom?.note,
+                file: item.oh_recom?.document
+                  ? [
+                    {
+                      id: item.oh_recom.document.uuid,
+                      name: item.oh_recom.document.document_original_name,
+                      size: item.oh_recom.document.document_size,
+                      file: item.oh_recom.document.document_link,
+                    },
+                  ]
+                  : [],
+              }
               : null,
             wo_priority: item.wo_priority
               ? {
-                  note: item.wo_priority?.note,
-                  file: item.wo_priority?.document
-                    ? [
-                        {
-                          id: item.wo_priority.document.uuid,
-                          name: item.wo_priority.document
-                            .document_original_name,
-                          size: item.wo_priority.document.document_size,
-                          file: item.wo_priority.document.document_link,
-                        },
-                      ]
-                    : [],
-                }
+                note: item.wo_priority?.note,
+                file: item.wo_priority?.document
+                  ? [
+                    {
+                      id: item.wo_priority.document.uuid,
+                      name: item.wo_priority.document
+                        .document_original_name,
+                      size: item.wo_priority.document.document_size,
+                      file: item.wo_priority.document.document_link,
+                    },
+                  ]
+                  : [],
+              }
               : null,
             history: item.history
               ? {
-                  note: item.history?.note,
-                  file: item.history?.document
-                    ? [
-                        {
-                          id: item.history.document.uuid,
-                          name: item.history.document.document_original_name,
-                          size: item.history.document.document_size,
-                          file: item.history.document.document_link,
-                        },
-                      ]
-                    : [],
-                }
+                note: item.history?.note,
+                file: item.history?.document
+                  ? [
+                    {
+                      id: item.history.document.uuid,
+                      name: item.history.document.document_original_name,
+                      size: item.history.document.document_size,
+                      file: item.history.document.document_link,
+                    },
+                  ]
+                  : [],
+              }
               : null,
             rla: item.rla
               ? {
-                  note: item.rla?.note,
-                  file: item.rla?.document
-                    ? [
-                        {
-                          id: item.rla.document.uuid,
-                          name: item.rla.document.document_original_name,
-                          size: item.rla.document.document_size,
-                          file: item.rla.document.document_link,
-                        },
-                      ]
-                    : [],
-                }
+                note: item.rla?.note,
+                file: item.rla?.document
+                  ? [
+                    {
+                      id: item.rla.document.uuid,
+                      name: item.rla.document.document_original_name,
+                      size: item.rla.document.document_size,
+                      file: item.rla.document.document_link,
+                    },
+                  ]
+                  : [],
+              }
               : null,
             ncr: item.ncr
               ? {
-                  note: item.ncr?.note,
-                  file: item.ncr?.document
-                    ? [
-                        {
-                          id: item.ncr.document.uuid,
-                          name: item.ncr.document.document_original_name,
-                          size: item.ncr.document.document_size,
-                          file: item.ncr.document.document_link,
-                        },
-                      ]
-                    : [],
-                }
+                note: item.ncr?.note,
+                file: item.ncr?.document
+                  ? [
+                    {
+                      id: item.ncr.document.uuid,
+                      name: item.ncr.document.document_original_name,
+                      size: item.ncr.document.document_size,
+                      file: item.ncr.document.document_link,
+                    },
+                  ]
+                  : [],
+              }
               : null,
             // children: item.details.map((el) => {
             //     return {
@@ -354,6 +358,10 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       type: "success",
     });
     open_delete.value = false;
+
+    if (formScope.value?.refetchScope) {
+      formScope.value.refetchScope();
+    }
   },
   onError: (error: any) => {
     console.log(error);
@@ -516,6 +524,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchScope();
+
+  if (formScope.value?.refetchScope) {
+    formScope.value.refetchScope();
+  }
 };
 
 const handleError = (error: any) => {
@@ -547,204 +559,150 @@ const getData = (id: string, response: EquipmentInterface[]) => {
     }
   });
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.scope as string,
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.asset"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
-  <div
-    class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1"
-  >
+  <ModalDelete v-model="open_delete" :title="selected_item?.asset" :loading="isLoadingDelete" @delete="onDelete" />
+  <div class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1">
     <span v-if="isLoadingDuration">Loading...</span>
     <span v-else>{{ dataDuration }} Days</span>
   </div>
-  <Button
-    v-if="
-      dataForm?.sub_bidang_uuid &&
-      dataApproval?.status !== 'approve' &&
-      access_token
-    "
-    icon_only="plus"
-    class="absolute right-[9rem] top-[6.5rem]"
-    size="sm"
-    rounded="full"
-    color="blue"
-    @click="handleCreate"
-  />
+  <Button v-if="
+    dataForm?.sub_bidang_uuid &&
+    dataApproval?.status !== 'approve' &&
+    access_token
+  " icon_only="plus" class="absolute right-[9rem] top-[6.5rem]" size="sm" rounded="full" color="blue"
+    @click="handleCreate" />
   <div class="flex gap-8">
     <div class="basis-1/5">
-      <FilterScope
-        @filter="handleOnFilter"
-        @reset-filter="handleResetFilter"
-        :loading="is_loading_filter"
-      />
+      <FilterScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
     </div>
     <div class="flex-1 overflow-auto">
       <div class="max-w-full min-w-full">
-        <Table
-          label-create="Asset"
-          :columns="ColumnsScope"
-          :entities="entitiesScope"
-          :loading="isLoadingScope"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          @delete="handleDelete"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-          @open-children="openChildren"
-        >
+        <Breadcrumb :items="breadcrumb" />
+        <Table label-create="Asset" :is_logging="false" :columns="ColumnsScope" :entities="entitiesScope"
+          :loading="isLoadingScope" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+          @delete="handleDelete" @change-page="changePage" @change-limit="changeLimit" @search="searchTable"
+          @open-children="openChildren">
           <template #column_asset_welness="{ entity }">
             <div class="w-full flex justify-center">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' &&
-                    !entity.asset_welness) ||
-                  (!access_token && !entity.asset_welness)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' &&
+                  !entity.asset_welness) ||
+                (!access_token && !entity.asset_welness)
+              ">
                 -
               </p>
-              <FormAssetWelness
-                v-else
-                ref="asset_welness"
-                :value="entity.asset_welness"
-                :label="entity.asset"
-                :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveAssetWelness(e, entity)"
-              />
+              <FormAssetWelness v-else ref="asset_welness" :value="entity.asset_welness" :label="entity.asset"
+                :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveAssetWelness(e, entity)" />
             </div>
           </template>
           <template #column_oh_recom="{ entity }">
             <div class="w-full flex justify-center">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' && !entity.oh_recom) ||
-                  (!access_token && !entity.oh_recom)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' && !entity.oh_recom) ||
+                (!access_token && !entity.oh_recom)
+              ">
                 -
               </p>
-              <FormWithUploadFile
-                v-else
-                ref="oh_recom"
-                :value="entity.oh_recom"
-                :label="entity.asset"
-                :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')"
-              />
+              <FormWithUploadFile v-else ref="oh_recom" :value="entity.oh_recom" :label="entity.asset"
+                :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')" />
             </div>
           </template>
           <template #column_wo_priority="{ entity }">
             <div class="w-full flex justify-center">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' && !entity.wo_priority) ||
-                  (!access_token && !entity.wo_priority)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' && !entity.wo_priority) ||
+                (!access_token && !entity.wo_priority)
+              ">
                 -
               </p>
-              <FormWithUploadFile
-                v-else
-                ref="wo_priority"
-                :value="entity.wo_priority"
-                :label="entity.asset"
-                :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')"
-              />
+              <FormWithUploadFile v-else ref="wo_priority" :value="entity.wo_priority" :label="entity.asset"
+                :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')" />
             </div>
           </template>
           <template #column_history="{ entity }">
             <div class="w-full flex justify-center">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' && !entity.history) ||
-                  (!access_token && !entity.history)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' && !entity.history) ||
+                (!access_token && !entity.history)
+              ">
                 -
               </p>
-              <FormWithUploadFile
-                v-else
-                ref="history"
-                :value="entity.history"
-                :label="entity.asset"
-                :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveFieldWithFile(e, entity, 'history')"
-              />
+              <FormWithUploadFile v-else ref="history" :value="entity.history" :label="entity.asset"
+                :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveFieldWithFile(e, entity, 'history')" />
             </div>
           </template>
           <template #column_rla="{ entity }">
             <div class="w-full flex justify-center">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' && !entity.rla) ||
-                  (!access_token && !entity.rla)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' && !entity.rla) ||
+                (!access_token && !entity.rla)
+              ">
                 -
               </p>
-              <FormWithUploadFile
-                v-else
-                ref="rla"
-                :value="entity.rla"
-                :label="entity.asset"
-                :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveFieldWithFile(e, entity, 'rla')"
-              />
+              <FormWithUploadFile v-else ref="rla" :value="entity.rla" :label="entity.asset"
+                :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveFieldWithFile(e, entity, 'rla')" />
             </div>
           </template>
           <template #column_ncr="{ entity }">
             <div class="w-full flex justify-center">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' && !entity.ncr) ||
-                  (!access_token && !entity.ncr)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' && !entity.ncr) ||
+                (!access_token && !entity.ncr)
+              ">
                 -
               </p>
-              <FormWithUploadFile
-                v-else
-                ref="ncr"
-                :value="entity.ncr"
-                :label="entity.asset"
-                :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
-              />
+              <FormWithUploadFile v-else ref="ncr" :value="entity.ncr" :label="entity.asset"
+                :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
+                @save="(e) => saveFieldWithFile(e, entity, 'ncr')" />
             </div>
           </template>
           <template #children="{ entity, index, parentActive }">
-            <tr
-              v-if="
-                children_active.find((el) => el.id === entity.id)?.open === true
-              "
-            >
+            <tr v-if="
+              children_active.find((el) => el.id === entity.id)?.open === true
+            ">
               <td :colspan="ColumnsScope.length + 1">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
-                  <TableEquipment
-                    :is-additional="true"
-                    :id="entity.id"
-                    :entity="entity.children"
-                    :status-approval="dataApproval?.status"
-                    :open="
-                      children_active.find((el) => el.id === entity.id)?.open
-                    "
-                    @get-data="getData"
-                  />
+                  <TableEquipment :is-additional="true" :id="entity.id" :entity="entity.children"
+                    :original_uuid="entity.original_uuid" :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
+                      " @get-data="getData" />
                 </div>
               </td>
             </tr>
@@ -760,13 +718,7 @@ const getData = (id: string, response: EquipmentInterface[]) => {
       @success="handleSuccess"
       @error="handleError"
     /> -->
-    <FormScope
-      :is-additional="true"
-      v-model="open_form"
-      :dataForm="dataForm"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-    />
+    <FormScope ref="formScope" :is-additional="true" v-model="open_form" :dataForm="dataForm"
+      :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
   </div>
 </template>

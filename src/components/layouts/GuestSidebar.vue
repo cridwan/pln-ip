@@ -59,7 +59,7 @@ const isActive = (item: { id: number; name: string; url: string }) => {
                             : `/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${route?.params?.menu}/${route?.params?.id_project}/${route?.params?.id_inspection}${item.url}`,
                     query:
                         item.url === '/'
-                            ? { sequence: route?.params?.id_inspection }
+                            ? {}
                             : route.query,
                 }" replace :class="item.url === '/'
                     ? ''

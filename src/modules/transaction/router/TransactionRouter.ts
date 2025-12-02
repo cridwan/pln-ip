@@ -14,6 +14,17 @@ export const routeTransaction = [
     },
   },
   {
+    path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/sequence",
+    name: "transaction sequence",
+    component: () => import("@/modules/transaction/views/Sequence.vue"),
+    meta: {
+      layout: MainLayout,
+      requireAuth: true,
+      role: ["planner", "approval"],
+      except: ["superuser"],
+    },
+  },
+  {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/work-instruction",
     name: "transaction scope ika",
     component: () =>

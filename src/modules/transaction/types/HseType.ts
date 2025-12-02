@@ -29,3 +29,14 @@ export interface CreateHseInterface {
   project_uuid: string;
   type: string;
 }
+
+export interface FormCloneHseDoc {
+  uuid: string;
+  project_uuid?: string;
+}
+
+export interface FormCloneHseDoc {
+  uuid: string;
+  project_uuid?: string;
+}
+

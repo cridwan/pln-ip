@@ -16,7 +16,7 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push("/login");
+  router.push({ name: 'login' });
 };
 
 const login = () => {
@@ -33,7 +33,7 @@ const getMenuActive = computed(() => {
   // } else {
   //   return route.params.menu;
   // }
-  return String(route.query.inspection).toUpperCase();
+  return String(route.params?.menu).toUpperCase();
 });
 </script>
 

@@ -33,6 +33,10 @@ const props = defineProps({
   dataForm: {
     type: Object as PropType<PartStdCreateModelInterface | null>,
   },
+  isAdditional: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const modelUpload = ref<File | null>(null);
@@ -320,7 +324,8 @@ defineExpose({ refetchPart })
 
 <template>
   <Modal width="440" height="200" :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Part Standart' : 'Tambah Part Standart'" v-model="modelValue">
+    :title="props.selectedValue ? `Ubah Part ${isAdditional ? '' : 'Standart'}` : `Tambah Part ${isAdditional ? '' : 'Standart'}`"
+    v-model="modelValue">
     <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
       @submit.prevent="handleSubmit">
       <Select v-model="model.part_uuid" star label="Part" options_label="label" options_value="value"

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { AxiosError } from "axios";
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
-import { Table, Toast } from "@/components";
+import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
@@ -19,8 +19,15 @@ import type {
 import FormOnlyUploadFile from "../components/FormOnlyUploadFile.vue";
 import { useTransactionStore } from "../stores/TransactionStore";
 import type { ProjectInterface } from "../types/ProjectType";
+import FormCloneQcPlan from "../components/FormCloneQcPlan.vue";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const authStore = useAuthStore();
+const open_form = ref(false);
+const breadcrumb = ref<BreadcrumbType[]>([]);
+const open_delete = ref(false);
+const selected_item = ref<QcPlanInterface | null>(null)
+const formCloneQcPlanm = ref<InstanceType<typeof FormCloneQcPlan> | null>(null)
 const { access_token } = storeToRefs(authStore);
 const entitiesQcPlan = ref<QcPlanInterface[]>([]);
 const transactionStore = useTransactionStore();
@@ -59,6 +66,35 @@ const { data: dataApproval } = useQuery({
   },
   retry: 0,
   refetchOnWindowFocus: false,
+});
+//--- END
+
+//--- DELETE QC PLAN
+const { mutate: deleteQcPlan, isPending: isLoadingDelete } = useMutation({
+  mutationFn: async (id: string) => {
+    return await transactionStore.deleteQcPlan(id);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Deleted successfully",
+      type: "success",
+    });
+    open_delete.value = false;
+    refetchQcPlan();
+    if (formCloneQcPlanm.value?.refetchQcPlan) {
+      formCloneQcPlanm.value.refetchQcPlan()
+    }
+  },
+  onError: (error: any) => {
+    console.log(error);
+    toastRef.value?.showToast({
+      title: "Error",
+      description: error?.response?.data?.message || "Something went wrong",
+      type: "error",
+    });
+  },
+  retry: 0,
 });
 //--- END
 
@@ -211,13 +247,89 @@ function searchTable() {
     refetchQcPlan();
   }, 1000);
 }
+
+const handleSuccess = () => {
+  toastRef.value?.showToast({
+    title: "Success",
+    description: "Saved successfully",
+    type: "success",
+  });
+  params.currentPage = 1;
+  refetchQcPlan();
+
+  if (formCloneQcPlanm.value?.refetchQcPlan) {
+    formCloneQcPlanm.value.refetchQcPlan()
+  }
+};
+
+const handleError = (error: any) => {
+  toastRef.value?.showToast({
+    title: "Error",
+    description: error?.response?.data?.message || "Something went wrong",
+    type: "error",
+  });
+};
+
+const handleRemoveSuccess = () => {
+  refetchQcPlan();
+};
+
+const handleCreate = () => {
+  open_form.value = true
+}
+
+const onDelete = () => {
+  deleteQcPlan(selected_item.value?.id as string);
+};
+
+const handleDelete = (item: QcPlanInterface) => {
+  selected_item.value = item;
+  open_delete.value = true;
+};
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "QC PLAN",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
   <Toast ref="toastRef" />
+  <Button icon_only="plus" class="absolute right-10" size="sm" rounded="full" color="blue" @click="handleCreate" />
+  <Breadcrumb :items="breadcrumb" />
   <Table :is_logging="false" label-create="QC Plan Document" :columns="ColumnsQcPlan" :entities="entitiesQcPlan"
-    :loading="isLoadingQcPlan" :pagination="pagination" :is-create="false" :is-action="false"
-    v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+    :loading="isLoadingQcPlan" :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+      " v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+    @search="searchTable">
+    <template #column_action="{ entity }">
+      <div class="flex items-center justify-center gap-4">
+        <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+      </div>
+    </template>
     <template #column_attachment="{ entity }">
       <div class="w-full flex justify-center">
         <p v-if="
@@ -242,4 +354,7 @@ function searchTable() {
       <div v-else class="text-center">-</div>
     </template>
   </Table>
+  <FormCloneQcPlan ref="formCloneQcPlanm" v-model="open_form" @success="handleSuccess" @error="handleError"
+    @removeSucess="handleRemoveSuccess" />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.name}`" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

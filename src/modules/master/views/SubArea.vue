@@ -308,9 +308,9 @@ onMounted(() => {
             </div>
             <div class="w-full">
                 <Table label-create="Sub Area" :columns="ColumnsSubArea" :entities="dataSubArea?.data || []"
-                    :loading="isLoadingSubArea" :pagination="pagination" :is-create="false"
-                    v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-                    @search="searchTable">
+                    :is-action="dataForm?.uuid != undefined" :loading="isLoadingSubArea" :pagination="pagination"
+                    :is-create="false" v-model:model-search="params.search" @change-page="changePage"
+                    @change-limit="changeLimit" @search="searchTable">
                     <template #column_action="{ entity }">
                         <div class="flex items-center justify-center gap-4">
                             <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
