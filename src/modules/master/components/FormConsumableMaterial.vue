@@ -177,7 +177,7 @@ const handleSubmit = async () => {
 
 const setValue = () => {
   model.value.name = props.selectedValue?.name || "";
-  model.value.price = props.selectedValue?.price?.toString() || "";
+  model.value.price = (parseFloat(props.selectedValue?.price || "0"))?.toString() || "";
   model.value.merk = props.selectedValue?.merk || "";
 
   model.value.global_unit_uuid = props.selectedValue?.global_unit_uuid || "";

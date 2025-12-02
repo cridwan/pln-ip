@@ -9,6 +9,8 @@ import App from "./App.vue";
 import router from "./router";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 import VueAwesomePaginate from "vue-awesome-paginate";
+import Vue3ColorPicker from "vue3-colorpicker";
+import "vue3-colorpicker/style.css";
 
 // @ts-nocheck
 import HighchartsMapModule from "highcharts/modules/map";
@@ -19,6 +21,7 @@ const pinia = createPinia();
 
 pinia.use(piniaPluginPersistedstate);
 app.use(VueAwesomePaginate);
+app.use(Vue3ColorPicker);
 app.use(VueQueryPlugin);
 app.use(router);
 app.use(pinia);

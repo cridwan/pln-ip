@@ -5,30 +5,27 @@ import { Button, Input, Modal } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { useMutation } from "@tanstack/vue-query";
-import { all_characters, formatToFloat, numbers_positive } from "@/helpers/global";
+import { all_characters } from "@/helpers/global";
 
 import { useMasterStore } from "../stores/MasterStore";
 import type {
-  ManpowerCreateInterface,
-  ManpowerCreateModelInterface,
-  ManpowerInterface,
-} from "../types/ManpowerType";
+  GeneratorTypeCreateInterface,
+  GeneratorTypeInterface,
+} from "../types/GeneratorType";
 
 const props = defineProps({
   selectedValue: {
-    type: Object as PropType<ManpowerInterface | null>,
+    type: Object as PropType<GeneratorTypeInterface | null>,
   },
 });
 
 const emit = defineEmits(["success", "error"]);
-
 const masterStore = useMasterStore();
-
 const modelValue = defineModel<boolean>({ default: false });
 
-const model = ref<ManpowerCreateModelInterface>({
+const model = ref<GeneratorTypeCreateInterface>({
   name: "",
-  price: "",
+  color: "#ffffff",
 });
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
@@ -36,48 +33,49 @@ const rules = computed(() => {
     name: {
       required: helpers.withMessage(`This field is required`, required),
     },
-    price: {
-      required: helpers.withMessage(`This field is required`, required),
-    },
   };
 });
 
-//--- CREATE MANPOWER
-const { mutate: createManpower, isPending: isLoadingCreate } = useMutation({
-  mutationFn: async (payload: ManpowerCreateInterface) => {
-    return await masterStore.createManpower(payload);
-  },
-  onSuccess: () => {
-    modelValue.value = false;
-    emit("success");
-  },
-  onError: (error) => {
-    console.log(error);
-    emit("error", error);
-  },
-});
+//--- CREATE GENERATOR TYPE
+const { mutate: createGeneratorType, isPending: isLoadingCreate } = useMutation(
+  {
+    mutationFn: async (payload: GeneratorTypeCreateInterface) => {
+      return await masterStore.createGeneratorType(payload);
+    },
+    onSuccess: () => {
+      modelValue.value = false;
+      emit("success");
+    },
+    onError: (error) => {
+      console.log(error);
+      emit("error", error);
+    },
+  }
+);
 //--- END
 
-//--- UPDATE MANPOWER
-const { mutate: updateManpower, isPending: isLoadingUpdate } = useMutation({
-  mutationFn: async ({
-    id,
-    payload,
-  }: {
-    id: string;
-    payload: ManpowerCreateInterface;
-  }) => {
-    return await masterStore.updateManpower(id, payload);
-  },
-  onSuccess: async () => {
-    modelValue.value = false;
-    emit("success");
-  },
-  onError: (error) => {
-    console.log(error);
-    emit("error", error);
-  },
-});
+//--- UPDATE GENERATOR TYPE
+const { mutate: updateGeneratorType, isPending: isLoadingUpdate } = useMutation(
+  {
+    mutationFn: async ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: GeneratorTypeCreateInterface;
+    }) => {
+      return await masterStore.updateGeneratorType(id, payload);
+    },
+    onSuccess: async () => {
+      modelValue.value = false;
+      emit("success");
+    },
+    onError: (error) => {
+      console.log(error);
+      emit("error", error);
+    },
+  }
+);
 //--- END
 
 const handleSubmit = async () => {
@@ -86,30 +84,26 @@ const handleSubmit = async () => {
   if (!isValid) return;
 
   if (props.selectedValue) {
-    updateManpower({
+    updateGeneratorType({
       id: props.selectedValue?.uuid,
-      payload: {
-        name: model.value.name,
-        price: formatToFloat(model.value.price),
-      },
+      payload: model.value,
     });
   } else {
-    createManpower({
-      name: model.value.name,
-      price: formatToFloat(model.value.price),
-    });
+    createGeneratorType(model.value);
   }
 };
 
 const setValue = () => {
-  model.value.name = props.selectedValue?.name || "";
-  model.value.price = (parseFloat(props.selectedValue?.price || "0"))?.toString() || "";
+  model.value = {
+    name: props.selectedValue?.name || "",
+    color: props.selectedValue?.color || "",
+  };
 };
 
 const resetValue = () => {
   model.value = {
     name: "",
-    price: "",
+    color: "",
   };
 };
 
@@ -133,7 +127,9 @@ watch(modelValue, (value) => {
     width="440"
     height="200"
     :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'"
+    :title="
+      props.selectedValue ? 'Ubah Jenis Pembangkit' : 'Tambah Jenis Pembangkit'
+    "
     v-model="modelValue"
   >
     <form
@@ -143,18 +139,20 @@ watch(modelValue, (value) => {
       <Input
         v-model="model.name"
         star
-        label="Nama Manpower"
         :rules="rules.name"
         :custom_symbols="all_characters"
+        label="Nama"
       />
-      <Input
-        v-model="model.price"
-        star
-        label="Harga"
-        :rules="rules.price"
-        :custom_symbols="numbers_positive"
-        :is_currency="true"
-      />
+      <div class="flex items-center justify-center">
+        <color-picker
+          is-widget
+          picker-type="fk"
+          disable-alpha
+          format="hex"
+          class="w-full"
+          v-model:pureColor="model.color"
+        />
+      </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button
@@ -176,3 +174,5 @@ watch(modelValue, (value) => {
     </form>
   </Modal>
 </template>
+
+<style lang="sass"></style>
