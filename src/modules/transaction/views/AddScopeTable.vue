@@ -33,6 +33,7 @@ const entitiesScope = ref<(AddScopeInterface & { original_uuid: string })[]>(
   []
 );
 const selected_item = ref<AddScopeInterface>();
+const formAdScope = ref<InstanceType<typeof FormAdScope> | null>(null)
 const transactionStore = useTransactionStore();
 const globalStore = useGlobalStore();
 const router = useRouter();
@@ -220,6 +221,10 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       type: "success",
     });
     open_delete.value = false;
+
+    if (formAdScope.value?.refetchScope) {
+      formAdScope.value.refetchScope()
+    }
   },
   onError: (error: any) => {
     console.log(error);
@@ -406,9 +411,16 @@ const saveFieldWithFile = (
   });
 };
 
-const toDetail = (id: string, original_uuid: string) => {
+const toDetail = (id: string, entity: AddScopeInterface & { original_uuid: string }) => {
   router.push(
-    `/${route.params.id}/create/unit/${route.params.id_unit}/${route.params.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/add-scope/${id}/scope?original_uuid=${original_uuid}`
+    {
+      path: `/${route.params.id}/create/unit/${route.params.id_unit}/${route.params.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/add-scope/${id}/scope`,
+      query: {
+        ...route.query,
+        original_uuid: entity.original_uuid,
+        scope: entity.asset
+      }
+    }
   );
 };
 
@@ -447,6 +459,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchScope();
+
+  if (formAdScope.value?.refetchScope) {
+    formAdScope.value.refetchScope()
+  }
 };
 
 const handleError = (error: any) => {
@@ -584,13 +600,14 @@ onMounted(() => {
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-2">
           <!-- <ButtonDots :day="entity.day" @detail="toDetail(entity.id)" @squence="toSquence(entity)" /> -->
-          <Icon name="eye" class="cursor-pointer text-white" @click="toDetail(entity.id, entity.original_uuid)" />
+          <Icon name="eye" class="cursor-pointer text-white" @click="toDetail(entity.id, entity)" />
           <Icon v-if="dataApproval?.status !== 'approve' && access_token" name="trash" class="cursor-pointer text-white"
             @click="handleDelete(entity)" />
         </div>
       </template>
     </Table>
 
-    <FormAdScope v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
+    <FormAdScope ref="formAdScope" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
+      @error="handleError" />
   </div>
 </template>

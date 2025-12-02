@@ -9,7 +9,7 @@ import {
     useMutation,
 } from "@tanstack/vue-query";
 import type { IPagination, IParams, ResponseDocumentInterface } from "@/types/GlobalType";
-import type { FilterScopeInterface, FormAdScopeInterface, FormScopeInterface } from "../types/ScopeType";
+import type { FormAdScopeInterface } from "../types/ScopeType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
 import type { ScopeInterface } from "@/modules/master/types/ScopeType";
 import Select from "@/components/fields/Select.vue";
@@ -96,14 +96,13 @@ watch(modelValue, (value) => {
 });
 
 //--- GET SCOPE
-const params_scope = reactive<IParams & { from_transaction: boolean, project_uuid: string }>({
+const params_scope = reactive<IParams & { inspection_type_uuid: string }>({
     search: "",
     filter: "",
     filters: [],
     currentPage: 1,
     perPage: 10,
-    from_transaction: true,
-    project_uuid: route.params.id_project as string
+    inspection_type_uuid: route.params.id_inspection as string
 });
 const {
     data: dataScope,
@@ -116,7 +115,7 @@ const {
     enabled: !is_loading_scope.value,
     queryFn: async ({ pageParam = 1 }) => {
         try {
-            const { data } = await masterStore.getAdditionalScope({
+            const { data } = await transactionStore.getAddScopeSelect({
                 ...params_scope,
                 currentPage: pageParam,
             });
@@ -174,6 +173,8 @@ watch(
     },
     { deep: true, immediate: true }
 );
+
+defineExpose({ refetchScope })
 </script>
 
 <template>

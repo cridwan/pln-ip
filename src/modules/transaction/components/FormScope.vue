@@ -83,7 +83,7 @@ const resetValue = () => {
 
 const { mutate: createScope, isPending: isLoadingScope } = useMutation({
   mutationFn: async (payload: FormScopeInterface) => {
-    return transactionStore.cloneScopeStandar(payload);
+    return transactionStore.cloneScopeStandar(payload, props.isAdditional ? '/add-scope/detail' : '');
   },
   onSuccess: (data) => {
     modelValue.value = false;
@@ -104,7 +104,7 @@ const params_scope = reactive({
   ...(props.isAdditional
     ? {
       sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string,
-      additional_scope_uuid: route.params.id_scope as string,
+      additional_scope_uuid: route.query?.original_uuid as string,
     }
     : {
       inspection_type_uuid: route.params.id_inspection as string,
@@ -125,7 +125,7 @@ const {
       const { data } = await transactionStore.getSelectScopeStandar({
         ...params_scope,
         currentPage: pageParam,
-      });
+      }, props.isAdditional ? '/add-scope/detail' : '');
 
       const response = data.data as IPagination<ScopeInterface[]>;
 

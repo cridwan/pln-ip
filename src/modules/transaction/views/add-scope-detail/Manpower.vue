@@ -29,6 +29,9 @@ import type { ProjectInterface } from "../../types/ProjectType";
 import FormAdManpower from "../../components/add-scope/FormAdManpower.vue";
 import type { UpdateManPowerInterface } from "../../types/ManpowerType";
 import FormQuantity from "../../components/FormQuantity.vue";
+import type { ManpowerStdTransactionInterface } from "../../types/ManpowerStdType";
+import type { ActivitySelectInterface } from "../../types/ActivityType";
+import TableSummary from "@/components/tables/TableSummary.vue";
 
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
@@ -48,11 +51,18 @@ const params = reactive({
   currentPage: 1,
   perPage: 10,
 });
+const dataSummary = ref<{ total_price: Number, price: Number, total_qty: Number }>({
+  total_price: 0,
+  price: 0,
+  total_qty: 0
+});
 const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
+const original_uuid = ref('');
+const fromManpower = ref<InstanceType<typeof FormAdManpower> | null>(null);
 const timeout = ref(0);
 const dataForm = ref<FilterManpowerStdInterface | null>(null);
-const selected_item = ref<ManpowerStdInterface | null>(null);
+const selected_item = ref<ManpowerStdTransactionInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
@@ -84,9 +94,14 @@ const {
   queryKey: ["getManPowerAtManpowerDetailAddScope"],
   queryFn: async () => {
     try {
-      const { data } = await transactionStore.getManPower(params);
-      const response = data as IPagination<ManpowerStdInterface[]>;
-
+      const { data } = await transactionStore.getManPower(params, '/add-scope/detail');
+      const response = data as IPagination<ManpowerStdTransactionInterface[]>;
+      const summary = data.summary;
+      dataSummary.value = {
+        total_price: summary.total_price,
+        price: summary.price,
+        total_qty: summary.total_qty
+      }
       total_item.value = response.total;
       is_loading_filter.value = false;
 
@@ -114,6 +129,10 @@ const { mutate: deleteManpowerStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchManPower();
+
+    if (fromManpower.value?.refetchManpower) {
+      fromManpower.value.refetchManpower();
+    }
   },
   onError: (error: any) => {
     console.log(error);
@@ -192,6 +211,10 @@ const handleSuccess = () => {
   });
   params.currentPage = 1;
   refetchManPower();
+
+  if (fromManpower.value?.refetchManpower) {
+    fromManpower.value.refetchManpower();
+  }
 };
 
 const handleError = (error: any) => {
@@ -207,12 +230,12 @@ const handleCreate = () => {
   open_form.value = true;
 };
 
-const handleUpdate = (item: ManpowerStdInterface) => {
+const handleUpdate = (item: ManpowerStdTransactionInterface) => {
   selected_item.value = item;
   open_form.value = true;
 };
 
-const handleDelete = (item: ManpowerStdInterface) => {
+const handleDelete = (item: ManpowerStdTransactionInterface) => {
   selected_item.value = item;
   open_delete.value = true;
 };
@@ -256,9 +279,10 @@ const resetFilter = () => {
   ];
 };
 
-const handleOnFilter = (data: FilterManpowerStdInterface) => {
+const handleOnFilter = (data: FilterManpowerStdInterface, activity: ActivitySelectInterface) => {
   is_loading_filter.value = true;
   dataForm.value = data;
+  original_uuid.value = activity.original_uuid;
   setFilter();
   refetchManPower();
 };
@@ -275,14 +299,12 @@ const handleRemoveSuccess = () => {
 
 const saveQuantity = (
   e: { quantity: string },
-  entity: ManpowerStdInterface
+  entity: ManpowerStdTransactionInterface
 ) => {
   updateCManPower({
     id: entity.uuid,
     payload: {
-      name: entity.manpower.name,
       qty: parseFloat(e.quantity),
-      type: "type",
     },
   });
 };
@@ -290,7 +312,27 @@ const saveQuantity = (
 onMounted(() => {
   breadcrumb.value = [
     {
-      name: "Manpower Std",
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.inspection as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.scope as string,
       as_link: false,
       url: "",
     },
@@ -300,129 +342,76 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="
-        dataForm?.activity_uuid &&
-        dataApproval?.status !== 'approve' &&
-        access_token
-      "
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <Button v-if="
+      dataForm?.activity_uuid &&
+      dataApproval?.status !== 'approve' &&
+      access_token
+    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterManpowerStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterManpowerStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table
-            label-create="Manpower"
-            :columns="ColumnsManpower"
-            :entities="dataManPower?.data || []"
-            :loading="isLoadingManPower"
-            :pagination="pagination"
-            :is-create="false"
-            :is-action="
-              dataApproval?.status !== 'approve' && access_token !== ''
-            "
-            class="mt-6"
-            v-model:model-search="params.search"
-            @change-page="changePage"
-            @change-limit="changeLimit"
-            @search="searchTable"
-          >
+          <Table label-create="Manpower" :is_logging="false" :columns="ColumnsManpower"
+            :entities="dataManPower?.data || []" :loading="isLoadingManPower" :pagination="pagination"
+            :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
+              " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
+            @search="searchTable">
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon
-                  name="pencil"
-                  class="icon-action-table"
-                  v-if="dataForm?.activity_uuid"
-                  @click="handleUpdate(entity)"
-                />
-                <Icon
-                  name="trash"
-                  class="icon-action-table"
-                  v-if="dataForm?.activity_uuid"
-                  @click="handleDelete(entity)"
-                />
+                <Icon name="pencil" class="icon-action-table" v-if="dataForm?.activity_uuid"
+                  @click="handleUpdate(entity)" />
+                <Icon name="trash" class="icon-action-table" v-if="dataForm?.activity_uuid"
+                  @click="handleDelete(entity)" />
               </div>
             </template>
             <template #column_manpower="{ entity }">
               <p class="text-base text-neutral-50 text-left">
-                {{ entity.manpower?.name ?? "-" }}
+                {{ entity.name ?? "-" }}
               </p>
             </template>
             <template #column_total_qty="{ entity }">
-              <p
-                v-if="
-                  (dataApproval?.status === 'approve' && !entity.total_qty) ||
-                  (!access_token && !entity.total_qty)
-                "
-              >
+              <p v-if="
+                (dataApproval?.status === 'approve' && !entity.total_qty) ||
+                (!access_token && !entity.total_qty)
+              ">
                 -
               </p>
-              <FormQuantity
-                v-else
-                ref="quantity"
-                :value="entity.total_qty?.toString() || ''"
-                :label="entity.manpower.name"
+              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity.name"
                 :loading="isLoadingUpdate"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
-                @save="(e) => saveQuantity(e, entity)"
-              />
+                :disabled="dataApproval?.status === 'approve' || !access_token || !dataForm?.activity_uuid"
+                @save="(e) => saveQuantity(e, entity)" />
             </template>
             <template #column_price="{ entity }">
-              <p v-if="!entity.manpower?.price">-</p>
-              <p
-                v-else
-                class="text-base text-neutral-50 text-left whitespace-nowrap"
-              >
-                Rp. {{ Number(entity.manpower.price).toLocaleString("id") }}
+              <p v-if="!entity.price">-</p>
+              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
+                Rp. {{ Number(entity.price).toLocaleString("id") }}
               </p>
             </template>
             <template #column_total="{ entity }">
-              <p v-if="!entity.total_qty && !entity.manpower?.price">-</p>
-              <p
-                v-else
-                class="text-base text-neutral-50 text-left whitespace-nowrap"
-              >
+              <p v-if="!entity.total_qty && !entity.price">-</p>
+              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
                 Rp.
                 {{
                   (
-                    Number(entity.total_qty) * Number(entity.manpower.price)
+                    Number(entity.total_qty) * Number(entity.price)
                   ).toLocaleString("id")
                 }}
               </p>
             </template>
           </Table>
+          <TableSummary :total_price="Number(dataSummary.total_price)" :price="Number(dataSummary.price)"
+            :total_qty="Number(dataSummary.total_qty)" />
         </div>
       </div>
     </div>
   </div>
 
   <Toast ref="toastRef" />
-  <FormAdManpower
-    v-model="open_form"
-    :data-form="dataForm"
-    :selected-value="selected_item"
-    @success="handleSuccess"
-    @error="handleError"
-    @removeSucess="handleRemoveSuccess"
-  />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.manpower?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <FormAdManpower :original_uuid="original_uuid" ref="fromManpower" v-model="open_form" :data-form="dataForm"
+    :selected-value="selected_item" @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

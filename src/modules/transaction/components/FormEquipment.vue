@@ -78,7 +78,7 @@ const rules = computed(() => {
 const { mutate: createEquipmentClone, isPending: isLoadingScope } = useMutation(
   {
     mutationFn: async (payload: FormEquipmentCloneInterface) => {
-      return transaction.cloneEquipment(payload);
+      return transaction.cloneEquipment(payload, props.isAdditional ? '/add-scope/detail' : '');
     },
     onSuccess: (data) => {
       modelValue.value = false;
@@ -134,8 +134,8 @@ const params_Equipment = reactive({
   currentPage: 1,
   perPage: 10,
   ...(props.isAdditional ? {
-    scope_standart_uuid: props.dataForm?.scope_standart_uuid as string,
-    additional_scope_uuid: route.params.id_scope as string,
+    scope_standart_uuid: props.orignal_uuid as string,
+    additional_scope_uuid: route.query.original_uuid as string,
   } : {
     scope_standart_uuid: props.orignal_uuid as string,
     inspection_type_uuid: route.params.id_inspection as string,
@@ -155,7 +155,7 @@ const {
       const { data } = await transaction.getSelectEquipment({
         ...params_Equipment,
         currentPage: pageParam,
-      });
+      }, props.isAdditional ? '/add-scope/detail' : '');
 
       //   const response = data as IPagination<EquipmentInterface[]>;
       const response = data.data as IPagination<EquipmentInterface[]>;

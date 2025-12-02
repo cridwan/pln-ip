@@ -50,7 +50,6 @@ const props = defineProps({
     default: false,
   }
 });
-
 const emit = defineEmits(["getData"]);
 const formEquipment = ref<InstanceType<typeof FormEquipment> | null>(null)
 const transactionStore = useTransactionStore();
@@ -89,7 +88,7 @@ const { refetch: refetchEquipment, isFetching: isLoading } = useQuery({
   queryKey: [`getEquipmentTransactionDetail${props.id}`],
   queryFn: async () => {
     try {
-      const { data, config } = await transactionStore.getEquipment(params);
+      const { data, config } = await transactionStore.getEquipment(params, props.isAdditional ? '/add-scope/detail' : '');
       const response = data.data as IPagination<EquipmentInterface[]>;
 
       total_item.value = response.total;
@@ -272,7 +271,7 @@ watch(
 
   <FormEquipment v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
     @error="handleError" @removeSucess="handleRemoveSuccess" :id="props.id" :orignal_uuid="props.original_uuid"
-    ref="formEquipment" />
+    :is-additional="isAdditional" ref="formEquipment" />
 
   <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 

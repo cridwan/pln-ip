@@ -118,7 +118,7 @@ const {
   queryKey: [`getActivityTransactionDetail${props.id}`],
   queryFn: async () => {
     try {
-      const { data } = await transactionStore.getActivity(params);
+      const { data } = await transactionStore.getActivity(params, props.isAdditional ? '/add-scope/detail' : '');
       const response = data.data as IPagination<ActivityInterface[]>;
 
       total_item.value = response.total;

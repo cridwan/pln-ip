@@ -87,8 +87,8 @@ const params_consumable_material = reactive({
   perPage: 10,
   ...(props.isAdditional
     ? {
-      activity_uuid: props.dataForm?.activity_uuid as string,
-      additional_scope_uuid: route.params.id_scope as string,
+      activity_uuid: props?.original_uuid as string,
+      additional_scope_uuid: route.query.original_uuid as string,
     }
     : {
       activity_uuid: props.dataForm?.activity_uuid as string,
@@ -110,7 +110,7 @@ const {
       const { data } = await transactionStore.getConsMatSelect({
         ...params_consumable_material,
         currentPage: pageParam,
-      });
+      }, props.isAdditional ? '/add-scope/detail' : '');
 
       const response = data as IPagination<ConsumableMaterialStdInterface[]>;
 
@@ -134,7 +134,7 @@ const {
 const { mutate: createConsumableMaterial, isPending: isLoadingCreate } =
   useMutation({
     mutationFn: async (payload: FormConsMatCloneInterface) => {
-      return await transactionStore.cloneConsMatStd(payload);
+      return await transactionStore.cloneConsMatStd(payload, props.isAdditional ? '/add-scope/detail' : '');
     },
     onSuccess: (data) => {
       modelValue.value = false;
@@ -236,7 +236,7 @@ watch(
         newConsumableMaterial?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: item.consmat?.name };
+            return { value: item.uuid, label: `${item.consmat?.name} / ${item.consmat?.global_unit?.name}` };
           }) || [];
       options_consumable_material.value = new_data;
     }

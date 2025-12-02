@@ -16,7 +16,7 @@ import type {
 } from "@/modules/master/types/ManpowerStdType";
 
 import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
-import type { FormManpowerCloneInterface } from "@/modules/transaction/types/ManpowerStdType";
+import type { FormManpowerCloneInterface, ManpowerStdTransactionInterface } from "@/modules/transaction/types/ManpowerStdType";
 
 type OptionType = {
   label: string;
@@ -25,11 +25,15 @@ type OptionType = {
 
 const props = defineProps({
   selectedValue: {
-    type: Object as PropType<ManpowerStdInterface | null>,
+    type: Object as PropType<ManpowerStdTransactionInterface | null>,
   },
   dataForm: {
     type: Object as PropType<FilterManpowerStdInterface | null>,
   },
+  original_uuid: {
+    type: String,
+    default: ''
+  }
 });
 
 const emit = defineEmits(["success", "error"]);
@@ -66,20 +70,16 @@ const rules = computed(() => {
 //--- GET MANPOWER
 const params_manpower = reactive<
   IParams & {
-    from_transaction: boolean;
+    activity_uuid: string;
     additional_scope_uuid: string;
-    from_add_scope: true;
-    original_uuid: string;
   }
 >({
   search: "",
   filters: [],
   currentPage: 1,
   perPage: 10,
-  from_transaction: true,
-  additional_scope_uuid: route.params.id_scope as string,
-  from_add_scope: true,
-  original_uuid: route.query.original_uuid as string,
+  additional_scope_uuid: route.query.original_uuid as string,
+  activity_uuid: props.original_uuid as string,
 });
 const {
   data: dataManpower,
@@ -92,12 +92,12 @@ const {
   enabled: !props.selectedValue && !is_loading_manpower.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await masterStore.getManpowerStd({
+      const { data } = await transactionStore.getManPowerSelect({
         ...params_manpower,
         currentPage: pageParam,
-      });
+      }, '/add-scope/detail');
 
-      const response = data.data as IPagination<ManpowerStdInterface[]>;
+      const response = data as IPagination<ManpowerStdInterface[]>;
 
       return response;
     } catch (error: any) {
@@ -118,7 +118,7 @@ const {
 //--- CREATE MANPOWER
 const { mutate: createManpowerStd, isPending: isLoadingCreate } = useMutation({
   mutationFn: async (payload: FormManpowerCloneInterface) => {
-    return await transactionStore.cloneManPowerStd(payload);
+    return await transactionStore.cloneManPowerStd(payload, '/add-scope/detail');
   },
   onSuccess: (data) => {
     modelValue.value = false;
@@ -207,12 +207,12 @@ watch(
       options_manpower.value = mergeArrays(
         [
           {
-            value: props.selectedValue?.manpower_uuid,
-            label: props.selectedValue?.manpower?.name,
+            value: props.selectedValue?.uuid,
+            label: props.selectedValue?.name,
           },
         ],
         new_data.filter(
-          (item) => item.value !== props.selectedValue?.manpower_uuid
+          (item) => item.value !== props.selectedValue?.uuid
         )
       );
     } else {
@@ -227,51 +227,31 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+watch(() => props.original_uuid, (value) => {
+  params_manpower.activity_uuid = props.original_uuid as string;
+
+  refetchManpower()
+}, { deep: true, immediate: true })
+
+defineExpose({ refetchManpower })
 </script>
 
 <template>
-  <Modal
-    width="440"
-    height="200"
-    :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'"
-    v-model="modelValue"
-  >
-    <form
-      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit"
-    >
-      <Select
-        v-model="model.manpower_uuid"
-        label="Manpower"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_manpower.search"
-        :search="true"
-        :loading="is_loading_manpower"
-        :loading-next-page="isFetchingNextPageManpower"
-        :rules="rules.manpower_uuid"
-        :options="options_manpower"
-        @scroll="scrollManpower"
-        @search="searchManpower"
-      />
+  <Modal width="440" height="200" :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'" v-model="modelValue">
+    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit">
+      <Select v-model="model.manpower_uuid" label="Manpower" options_label="label" options_value="value"
+        v-model:model-search="params_manpower.search" :search="true" :loading="is_loading_manpower"
+        :loading-next-page="isFetchingNextPageManpower" :rules="rules.manpower_uuid" :options="options_manpower"
+        @scroll="scrollManpower" @search="searchManpower" />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button
-          text="Batal"
-          class="w-full"
-          variant="secondary"
-          :disabled="isLoadingCreate"
-          @click="modelValue = false"
-        />
-        <Button
-          type="submit"
-          text="Simpan"
-          class="w-full"
-          color="blue"
-          :disabled="isLoadingCreate"
-          :loading="isLoadingCreate"
-        />
+        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate"
+          @click="modelValue = false" />
+        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate"
+          :loading="isLoadingCreate" />
       </div>
     </form>
   </Modal>

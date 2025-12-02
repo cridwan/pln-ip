@@ -79,7 +79,7 @@ const params_part = reactive({
   ...(props.isAdditional
     ? {
       activity_uuid: props.dataForm?.activity_uuid as string,
-      additional_scope_uuid: route.params.id_scope as string,
+      additional_scope_uuid: route.query.original_uuid as string,
     }
     : {
       activity_uuid: props.dataForm?.activity_uuid as string,
@@ -100,7 +100,7 @@ const {
       const { data } = await transactionStore.getPartSelect({
         ...params_part,
         currentPage: pageParam,
-      });
+      }, props.isAdditional ? '/add-scope/detail' : '');
 
       const response = data as IPagination<PartStdInterface[]>;
 
@@ -123,7 +123,7 @@ const {
 //--- CREATE PART
 const { mutate: createPartStd, isPending: isLoadingCreate } = useMutation({
   mutationFn: async (payload: FormPartCloneInterface) => {
-    return await transactionStore.clonePartStd(payload);
+    return await transactionStore.clonePartStd(payload, props.isAdditional ? '/add-scope/detail' : '');
   },
   onSuccess: (data) => {
     modelValue.value = false;
@@ -222,7 +222,7 @@ watch(
         newPart?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: item.part.name };
+            return { value: item.uuid, label: `${item.part.name} / ${item.part?.global_unit?.name}` };
           }) || [];
       options_part.value = new_data;
     }

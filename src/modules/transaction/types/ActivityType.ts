@@ -7,6 +7,11 @@ export interface FormActivityInterfaceClone {
   activity_uuid: string;
   equipment_uuid: string;
 }
+export interface ActivitySelectInterface {
+  name: string;
+  uuid: string;
+  original_uuid: string;
+}
 
 
 export const ColumnsActivityTransaction: TableColumnType[] = [
