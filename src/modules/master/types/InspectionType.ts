@@ -11,6 +11,7 @@ export interface InspectionTypeInterface {
   created_at: string;
   updated_at: string;
   day: number;
+  has_transaction?: number;
 }
 
 export interface InspectionTypeCreateInterface {

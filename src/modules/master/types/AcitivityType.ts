@@ -14,6 +14,7 @@ export interface ActivityInterface {
   updated_at: string;
   link_ik1: null;
   link_ik2: null;
+  has_transaction?: number;
 }
 
 export interface ActivityCreateInterface {

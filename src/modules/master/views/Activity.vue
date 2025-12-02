@@ -330,7 +330,8 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0" />
             </div>
           </template>
           <template #column_equipment="{ entity }">

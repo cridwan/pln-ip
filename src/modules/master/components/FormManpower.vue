@@ -133,7 +133,8 @@ watch(modelValue, (value) => {
     :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'" v-model="modelValue">
     <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
       @submit.prevent="handleSubmit">
-      <Input v-model="model.name" star label="Nama Manpower" :rules="rules.name" :custom_symbols="all_characters" />
+      <Input v-model="model.name" :disabled="Number(props.selectedValue?.has_transaction || 0) > 0" star
+        label="Nama Manpower" :rules="rules.name" :custom_symbols="all_characters" />
       <Input v-model="model.price" star label="Harga" :rules="rules.price" :custom_symbols="numbers_positive"
         :is_currency="true" />
 

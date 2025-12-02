@@ -12,6 +12,7 @@ export interface ManpowerStdInterface {
   created_at: string;
   updated_at: string;
   use_transaction?: boolean;
+  has_transaction?: number;
 }
 
 export interface ManpowerStdCreateInterface {
