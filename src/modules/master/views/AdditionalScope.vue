@@ -365,7 +365,7 @@ const openModalPlay = (document: ResponseDocumentInterface) => {
           </template>
           <template #column_sequence_video="{ entity }">
             <span class="text-white cursor-pointer underline" @click="openModalPlay(entity.sequence?.document)"
-              v-if="entity.sequence.document">{{ entity.sequence?.document?.document_name }}</span>
+              v-if="entity.sequence?.document">{{ entity.sequence?.document?.document_name }}</span>
             <span v-else class="text-white">{{ '-' }}</span>
           </template>
         </Table>
