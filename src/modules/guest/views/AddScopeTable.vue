@@ -160,7 +160,7 @@ onMounted(() => {
         </div>
       </template>
       <template #column_video="{ entity }">
-        <span class="text-white cursor-pointer underline" v-if="entity.sequence.document"
+        <span class="text-white cursor-pointer underline" v-if="entity.sequence?.document"
           @click="clickVideo(entity.sequence.document)">{{ entity.sequence?.document?.document_name || '-' }}</span>
         <span class="text-white">-</span>
       </template>
