@@ -1,26 +1,25 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import {
+  computed,
+  onBeforeMount,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watch,
+  nextTick,
+} from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogPortal,
-  DialogRoot,
-  DialogTitle,
-  VisuallyHidden,
-} from "radix-vue";
+import type { AxiosError } from "axios";
 
 import { useGlobalStore } from "@/stores/GlobalStore";
-import GuestSidebarAddScope from "@/components/layouts/GuestSidebarAddScope.vue";
 import { Icon, Loading } from "@/components";
 import eventBus from "@/utils/eventBus";
 import { useQuery } from "@tanstack/vue-query";
 import type { SequenceInterface } from "@/modules/master/types/SequenceTypes";
-import type { AxiosError } from "axios";
 import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
-import SidebarAddScope from "@/components/layouts/SidebarAddScope.vue";
-import GuestSidebar from "@/components/layouts/GuestSidebar.vue";
+import GuestSidebarAddScope from "@/components/layouts/GuestSidebarAddScope.vue";
 
 const videosData = ref<any>({
   main: [],
@@ -34,17 +33,11 @@ const videos: any = computed(() => {
 });
 
 const videoSrc = ref<string | null>(null);
+const isInitialized = ref(false); // Flag untuk tracking initialization
 
 const loadVideo = async () => {
-  // if (videos.value[currentVideoIndex.value]) {
-  //   videoSrc.value = (
-  //     await videos.value[currentVideoIndex.value].video()
-  //   ).default;
-  //   preloadVideo(videoSrc.value as string);
-  // }
   const item = videos.value[currentVideoIndex.value];
 
-  console.log("ITEM", item);
   if (!item) return;
 
   videoSrc.value = item.video;
@@ -79,14 +72,12 @@ const {
   isFetching: isLoadingSequence,
   refetch: refetchSequence,
 } = useQuery({
-  queryKey: ["getSequenceGuest"],
+  queryKey: ["getSequenceTransaction"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getSequences(params);
-      console.log("DATA", data);
       const response = data.data as SequenceInterface;
 
-      console.log("AAAAA", response);
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
@@ -120,11 +111,13 @@ async function preloadVideo(url: string): Promise<void> {
     const videoUrl = URL.createObjectURL(blob);
 
     const videoElement = document.getElementById("video") as HTMLVideoElement;
-    videoElement.src = videoUrl;
+    if (videoElement) {
+      videoElement.src = videoUrl;
 
-    videoElement.onloadeddata = () => {
-      is_loading.value = false;
-    };
+      videoElement.onloadeddata = () => {
+        is_loading.value = false;
+      };
+    }
   } catch (error) {
     console.error(error);
     is_loading.value = false;
@@ -224,11 +217,9 @@ watch(is_loading, async (value) => {
         };
 
         if (videoRef.value.readyState >= 1) {
-          console.log("Force metadata ready");
           videoRef.value.dispatchEvent(new Event("loadedmetadata"));
         }
       } else {
-        console.error("videoRef belum terinisialisasi!");
         resolve();
       }
     });
@@ -310,42 +301,6 @@ const handleJumpStep = async (index: number) => {
   updateURLParameter(nextIndex);
   await initializeVideo();
   openStep.value = false;
-
-  // if (videoRef.value) {
-  //   if (videoRef.value.currentTime === videoRef.value.duration) {
-  //     const urlParams = new URLSearchParams(window.location.search);
-  //     const videoParam = urlParams.get("video") || "1";
-  //     const video = parseInt(videoParam, 10);
-
-  //     if (index === video) {
-  //       return;
-  //     }
-
-  //     const { path } = route;
-
-  //     disabledNext.value = true;
-  //     disabledBack.value = true;
-  //     isButtonVisible.value = false;
-
-  //     if (index > video) {
-  //       const updatedQuery = { video: video + 1, to: index };
-  //       router.push({ path, query: updatedQuery });
-  //       const nextIndex = currentVideoIndex.value + 1;
-  //       currentVideoIndex.value = nextIndex;
-  //       index_temp.value = nextIndex;
-  //       is_start_at_end.value = false;
-  //       await initializeVideo();
-  //     } else {
-  //       const updatedQuery = { video: video, to: index };
-  //       router.push({ path, query: updatedQuery });
-  //       if (videoRef.value) {
-  //         reverseInterval = setInterval(reverseVideo, 100);
-  //       }
-  //     }
-
-  //     openStep.value = false;
-  //   }
-  // }
 };
 
 const handleStepNavigation = () => {
@@ -364,33 +319,40 @@ watch(openStep, (value) => {
   }
 });
 
-watch(dataSequence, (val) => {
-  if (!val) return;
-
-  videosData.value.main = [
-    {
-      id: 1,
-      video:
-        import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-        val.document?.document_link,
-      name: val.document?.document_name,
-      top: 235,
-      left: 545,
-    },
-  ];
-});
-
+// Watch untuk dataSequence
 watch(
-  () => videos.value,
-  (val) => {
-    if (val && val.length > 0) {
-      initializeFromURL();
+  dataSequence,
+  async (val) => {
+    if (!val) return;
+
+    videosData.value.main = [
+      {
+        id: 1,
+        video:
+          import.meta.env.VITE_API_BASE_URL.replace("api", "") +
+          val.document?.document_link,
+        name: val.document?.document_name,
+        top: 235,
+        left: 545,
+      },
+    ];
+
+    // Trigger initialization setelah data video ready
+    if (!isInitialized.value && videosData.value.main.length > 0) {
+      await nextTick();
+      await initializeFromURL();
     }
   },
-  { immediate: false }
+  { immediate: true }
 );
 
 const initializeFromURL = async () => {
+  if (videos.value.length === 0) {
+    return;
+  }
+
+  isInitialized.value = true;
+
   const urlParams = new URLSearchParams(window.location.search);
   const videoParam = urlParams.get("video") || "1";
   const startParam = urlParams.get("start");
@@ -404,7 +366,7 @@ const initializeFromURL = async () => {
   await initializeVideo();
 };
 
-onMounted(() => {
+onMounted(async () => {
   titleHeader.value =
     route.params.menu === "ci"
       ? "Combustion Inspection"
@@ -423,18 +385,30 @@ onMounted(() => {
   eventBus.on("back", handleBack);
   eventBus.on("stepNavigation", handleStepNavigation);
 
-  // initializeFromURL();
+  // Tunggu hingga videosData ready dengan timeout
+  const maxWait = 50; // 5 detik max
+  let attempts = 0;
+
+  while (videos.value.length === 0 && attempts < maxWait) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    attempts++;
+  }
+
+  if (videos.value.length > 0 && !isInitialized.value) {
+    await initializeFromURL();
+  }
 });
 
 onUnmounted(() => {
   window.removeEventListener("popstate", initializeFromURL);
   eventBus.off("next", handleNext);
   eventBus.off("back", handleBack);
-  eventBus.on("stepNavigation", handleStepNavigation);
+  eventBus.off("stepNavigation", handleStepNavigation);
   if (reverseInterval) {
     clearInterval(reverseInterval);
     reverseInterval = null;
   }
+  isInitialized.value = false;
 });
 </script>
 
@@ -449,7 +423,7 @@ onUnmounted(() => {
     >
       <Loading width="50" height="50" />
     </div>
-    <div class="scope-video-container">
+    <div class="w-full h-screen relative mx-auto">
       <video
         id="video"
         ref="videoRef"
@@ -459,7 +433,7 @@ onUnmounted(() => {
         class="scope-video"
         @ended="handleVideoEnd"
       ></video>
-      <div v-for="(item, key) in videos" :key="key">
+      <!-- <div v-for="(item, key) in videos" :key="key">
         <div
           v-if="
             isButtonVisible && currentVideoIndex === key && item.name !== ''
@@ -471,11 +445,11 @@ onUnmounted(() => {
             {{ item.name }}
           </button>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 
-  <DialogRoot v-model:open="openStep">
+  <!-- <DialogRoot v-model:open="openStep">
     <DialogPortal>
       <DialogContent
         class="v-drawer-content"
@@ -542,7 +516,7 @@ onUnmounted(() => {
         </div>
       </DialogContent>
     </DialogPortal>
-  </DialogRoot>
+  </DialogRoot> -->
 </template>
 
 <style lang="sass" scoped>
