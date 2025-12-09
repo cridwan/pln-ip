@@ -4,10 +4,7 @@ import { reactive, ref, computed, type PropType, watch } from "vue";
 import { Button, Input, Modal, Select } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers, requiredIf } from "@vuelidate/validators";
-import {
-  useInfiniteQuery,
-  useMutation,
-} from "@tanstack/vue-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import { all_characters, mergeArrays } from "@/helpers/global";
 import type { IPagination, IParams } from "@/types/GlobalType";
 
@@ -54,7 +51,7 @@ const rules = computed(() => {
       required: helpers.withMessage(`This field is required`, required),
     },
     sequence_uuid: {
-      required: helpers.withMessage(`This field is required`, requiredIf(false)),
+      required: helpers.withMessage(`This field is required`, requiredIf(true)),
     },
   };
 });
@@ -251,21 +248,56 @@ watch(
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Tipe Inspeksi' : 'Tambah Tipe Inspeksi'" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" star :rules="rules.name" :custom_symbols="all_characters" label="Nama Inspeksi" />
-      <Select v-model="model.sequence_uuid" label="Sequence" options_label="label" options_value="value"
-        v-model:model-search="params_sequence.search" :search="true" :loading="is_loading_sequence"
-        :loading-next-page="isFetchingNextPageSequence" :rules="rules.sequence_uuid" :options="options_sequence"
-        @scroll="scrollSequence" @search="searchSequence" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Tipe Inspeksi' : 'Tambah Tipe Inspeksi'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+        label="Nama Inspeksi"
+      />
+      <Select
+        v-model="model.sequence_uuid"
+        star
+        label="Sequence"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_sequence.search"
+        :search="true"
+        :loading="is_loading_sequence"
+        :loading-next-page="isFetchingNextPageSequence"
+        :rules="rules.sequence_uuid"
+        :options="options_sequence"
+        @scroll="scrollSequence"
+        @search="searchSequence"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate"
+        />
       </div>
     </form>
   </Modal>
