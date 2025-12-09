@@ -4,7 +4,14 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
-import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
@@ -26,8 +33,8 @@ const authStore = useAuthStore();
 const open_form = ref(false);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_delete = ref(false);
-const selected_item = ref<QcPlanInterface | null>(null)
-const formCloneQcPlanm = ref<InstanceType<typeof FormCloneQcPlan> | null>(null)
+const selected_item = ref<QcPlanInterface | null>(null);
+const formCloneQcPlanm = ref<InstanceType<typeof FormCloneQcPlan> | null>(null);
 const { access_token } = storeToRefs(authStore);
 const entitiesQcPlan = ref<QcPlanInterface[]>([]);
 const transactionStore = useTransactionStore();
@@ -83,7 +90,7 @@ const { mutate: deleteQcPlan, isPending: isLoadingDelete } = useMutation({
     open_delete.value = false;
     refetchQcPlan();
     if (formCloneQcPlanm.value?.refetchQcPlan) {
-      formCloneQcPlanm.value.refetchQcPlan()
+      formCloneQcPlanm.value.refetchQcPlan();
     }
   },
   onError: (error: any) => {
@@ -115,17 +122,17 @@ const { isFetching: isLoadingQcPlan, refetch: refetchQcPlan } = useQuery({
             name: item.name,
             document: item.document
               ? {
-                file: item.document
-                  ? [
-                    {
-                      id: item.document.uuid,
-                      name: item.document.document_original_name,
-                      size: item.document.document_size,
-                      file: item.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  file: item.document
+                    ? [
+                        {
+                          id: item.document.uuid,
+                          name: item.document.document_original_name,
+                          size: item.document.document_size,
+                          file: item.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             note: null,
             document_original: item.document,
@@ -258,7 +265,7 @@ const handleSuccess = () => {
   refetchQcPlan();
 
   if (formCloneQcPlanm.value?.refetchQcPlan) {
-    formCloneQcPlanm.value.refetchQcPlan()
+    formCloneQcPlanm.value.refetchQcPlan();
   }
 };
 
@@ -275,8 +282,8 @@ const handleRemoveSuccess = () => {
 };
 
 const handleCreate = () => {
-  open_form.value = true
-}
+  open_form.value = true;
+};
 
 const onDelete = () => {
   deleteQcPlan(selected_item.value?.id as string);
@@ -304,7 +311,7 @@ onMounted(() => {
       url: "",
     },
     {
-      name: route.query?.inspection as string,
+      name: ((route.query?.inspection as string) || "").toUpperCase(),
       as_link: false,
       url: "",
     },
@@ -319,42 +326,91 @@ onMounted(() => {
 
 <template>
   <Toast ref="toastRef" />
-  <Button icon_only="plus" class="absolute right-10" size="sm" rounded="full" color="blue" @click="handleCreate" />
+  <Button
+    icon_only="plus"
+    class="absolute right-10"
+    size="sm"
+    rounded="full"
+    color="blue"
+    @click="handleCreate"
+    v-show="authStore.users?.role == 'planner'"
+  />
   <Breadcrumb :items="breadcrumb" />
-  <Table :is_logging="false" label-create="QC Plan Document" :columns="ColumnsQcPlan" :entities="entitiesQcPlan"
-    :loading="isLoadingQcPlan" :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
-      " v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-    @search="searchTable">
+  <Table
+    :is_logging="false"
+    label-create="QC Plan Document"
+    :columns="ColumnsQcPlan"
+    :entities="entitiesQcPlan"
+    :loading="isLoadingQcPlan"
+    :pagination="pagination"
+    :is-create="false"
+    :is-action="
+      dataApproval?.status !== 'approve' &&
+      access_token !== '' &&
+      authStore.users?.role == 'planner'
+    "
+    v-model:model-search="params.search"
+    @change-page="changePage"
+    @change-limit="changeLimit"
+    @search="searchTable"
+  >
     <template #column_action="{ entity }">
       <div class="flex items-center justify-center gap-4">
-        <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+        <Icon
+          name="trash"
+          class="icon-action-table"
+          @click="handleDelete(entity)"
+        />
       </div>
     </template>
     <template #column_attachment="{ entity }">
       <div class="w-full flex justify-center">
-        <p v-if="
-          (dataApproval?.status === 'approve' && !entity.document) ||
-          (!access_token && !entity.document)
-        ">
+        <p
+          v-if="
+            (dataApproval?.status === 'approve' && !entity.document) ||
+            (!access_token && !entity.document)
+          "
+        >
           -
         </p>
-        <FormOnlyUploadFile v-else ref="attachment" :value="entity.document" :label="entity.name"
-          :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
-          @save="(e) => saveFile(e, entity)" />
+        <FormOnlyUploadFile
+          v-else
+          ref="attachment"
+          :value="entity.document"
+          :label="entity.name"
+          :loading="is_loading_create"
+          :disabled="
+            dataApproval?.status === 'approve' ||
+            !access_token ||
+            authStore.users?.role != 'planner'
+          "
+          @save="(e) => saveFile(e, entity)"
+        />
       </div>
     </template>
     <template #column_preview="{ entity }">
       <div v-if="entity.document" class="w-full flex justify-center">
         <div
           class="bg-cyan-500 text-center border border-neutral-50 rounded-lg px-2 min-w-[120px] text-base text-neutral-50 cursor-pointer"
-          @click="preview(entity)">
+          @click="preview(entity)"
+        >
           Preview
         </div>
       </div>
       <div v-else class="text-center">-</div>
     </template>
   </Table>
-  <FormCloneQcPlan ref="formCloneQcPlanm" v-model="open_form" @success="handleSuccess" @error="handleError"
-    @removeSucess="handleRemoveSuccess" />
-  <ModalDelete v-model="open_delete" :title="`${selected_item?.name}`" :loading="isLoadingDelete" @delete="onDelete" />
+  <FormCloneQcPlan
+    ref="formCloneQcPlanm"
+    v-model="open_form"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
+  <ModalDelete
+    v-model="open_delete"
+    :title="`${selected_item?.name}`"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

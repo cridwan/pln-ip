@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 import { AxiosError } from "axios";
 
 import {
@@ -12,6 +13,7 @@ import {
 } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 import { useMasterStore } from "../../stores/MasterStore";
 import FilterConsumableMaterialStd from "../../components/additional/FilterConsumableMaterialStd.vue";
@@ -21,9 +23,7 @@ import type {
 } from "../../types/ConsumableMaterialStdType";
 import { ColumnConsumableMaterialStd } from "../../constants/ConsumableMaterialStdConstant";
 import FormConsumableMaterialStd from "../../components/FormConsumableMaterialStd.vue";
-import { useRoute } from "vue-router";
 import ButtonGroup from "../../components/ButtonGroup.vue";
-import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const dataForm = ref<ConsumableMaterialStdCreateModelInterface | null>(null);
 const formConsumableMaterialStd = ref<InstanceType<
@@ -397,11 +397,13 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"

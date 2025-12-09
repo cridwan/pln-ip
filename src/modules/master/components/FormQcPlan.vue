@@ -122,7 +122,7 @@ watch(modelValue, (value) => {
     width="440"
     height="200"
     :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Global Unit' : 'Tambah Global Unit'"
+    :title="props.selectedValue ? 'Ubah QC Plan' : 'Tambah QC Plan'"
     v-model="modelValue"
   >
     <form

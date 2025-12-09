@@ -33,16 +33,20 @@ import type { UpdatePartInterface } from "../types/PartType";
 import TableSummary from "@/components/tables/TableSummary.vue";
 import type { PartStdTransactionInterface } from "../types/PartStdType";
 
-const original_uuid = ref<string | undefined>(undefined)
-const formPartStd = ref<InstanceType<typeof FormPartStd> | null>(null)
+const original_uuid = ref<string | undefined>(undefined);
+const formPartStd = ref<InstanceType<typeof FormPartStd> | null>(null);
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
 const route = useRoute();
-const dataSummary = ref<{ total_price: Number, price: Number, total_qty: Number }>({
+const dataSummary = ref<{
+  total_price: Number;
+  price: Number;
+  total_qty: Number;
+}>({
   total_price: 0,
   price: 0,
-  total_qty: 0
+  total_qty: 0,
 });
 const params = reactive({
   search: "",
@@ -102,8 +106,8 @@ const {
       dataSummary.value = {
         total_price: summary.total_price,
         price: summary.price,
-        total_qty: summary.total_qty
-      }
+        total_qty: summary.total_qty,
+      };
       const response = data as IPagination<PartStdTransactionInterface[]>;
       total_item.value = response.total;
       is_loading_filter.value = false;
@@ -134,7 +138,7 @@ const { mutate: deletePartStd, isPending: isLoadingDelete } = useMutation({
     open_delete.value = false;
     refetchPart();
     if (formPartStd.value?.refetchPart) {
-      formPartStd.value.refetchPart()
+      formPartStd.value.refetchPart();
     }
   },
   onError: (error: any) => {
@@ -217,7 +221,7 @@ const handleSuccess = () => {
   refetchPart();
 
   if (formPartStd.value?.refetchPart) {
-    formPartStd.value.refetchPart()
+    formPartStd.value.refetchPart();
   }
 };
 
@@ -288,7 +292,7 @@ const handleOnFilter = (
   is_loading_filter.value = true;
   dataForm.value = data;
   dataActivity.value = activity;
-  original_uuid.value = activity.original_uuid as string
+  original_uuid.value = activity.original_uuid as string;
   setFilter();
   refetchPart();
 };
@@ -308,7 +312,10 @@ const handleRemoveSuccess = () => {
 //   edit_qty.value = false;
 // };
 
-const saveQuantity = (e: { quantity: string }, entity: PartStdTransactionInterface) => {
+const saveQuantity = (
+  e: { quantity: string },
+  entity: PartStdTransactionInterface
+) => {
   updatePart({
     id: entity.uuid,
     payload: {
@@ -335,7 +342,7 @@ onMounted(() => {
       url: "",
     },
     {
-      name: route.query?.inspection as string,
+      name: ((route.query?.inspection as string) || "").toUpperCase(),
       as_link: false,
       url: "",
     },
@@ -350,27 +357,59 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button v-if="
-      dataForm?.activity_uuid &&
-      dataApproval?.status !== 'approve' &&
-      access_token
-    " icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <Button
+      v-if="
+        dataForm?.activity_uuid &&
+        dataApproval?.status !== 'approve' &&
+        access_token &&
+        authStore.users?.role == 'planner'
+      "
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
 
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
+        <FilterPartStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table :is_logging="false" label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []"
-            :loading="isLoadingPart" :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
-              " class="mt-6" v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
+          <Table
+            :is_logging="false"
+            label-create="Part"
+            :columns="ColumnsPart"
+            :entities="dataPart?.data || []"
+            :loading="isLoadingPart"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="
+              dataApproval?.status !== 'approve' &&
+              access_token !== '' &&
+              authStore.users?.role == 'planner'
+            "
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
-                <Icon v-if="dataForm?.activity_uuid" name="trash" class="icon-action-table"
-                  @click="handleDelete(entity)" />
+                <Icon
+                  v-if="dataForm?.activity_uuid"
+                  name="trash"
+                  class="icon-action-table"
+                  @click="handleDelete(entity)"
+                />
               </div>
             </template>
 
@@ -381,10 +420,12 @@ onMounted(() => {
             </template>
 
             <template #column_total_qty="{ entity, index }">
-              <p v-if="
-                (dataApproval?.status === 'approve' && !entity.total_qty) ||
-                (!access_token && !entity.total_qty)
-              ">
+              <p
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.total_qty) ||
+                  (!access_token && !entity.total_qty)
+                "
+              >
                 -
               </p>
               <!-- <InputQty
@@ -398,10 +439,20 @@ onMounted(() => {
               >
                 {{ Number(entity.total_qty)?.toLocaleString("id") ?? "-" }}
               </p> -->
-              <FormQuantity v-else ref="quantity" :value="entity.total_qty?.toString() || ''" :label="entity.name"
+              <FormQuantity
+                v-else
+                ref="quantity"
+                :value="entity.total_qty?.toString() || ''"
+                :label="entity.name"
                 :loading="isLoadingUpdate"
-                :disabled="dataApproval?.status === 'approve' || !access_token || !dataForm?.activity_uuid"
-                @save="(e) => saveQuantity(e, entity)" />
+                :disabled="
+                  dataApproval?.status === 'approve' ||
+                  !access_token ||
+                  !dataForm?.activity_uuid ||
+                  authStore.users?.role != 'planner'
+                "
+                @save="(e) => saveQuantity(e, entity)"
+              />
             </template>
             <template #column_price="{ entity, index }">
               <p v-if="!entity.price">-</p>
@@ -410,7 +461,10 @@ onMounted(() => {
                 :qty="Number(entity.total_qty)"
                 @change="handleEdit"
               /> -->
-              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
                 Rp. {{ Number(entity.price)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
@@ -421,7 +475,10 @@ onMounted(() => {
                 :qty="Number(entity.total_qty)"
                 @change="handleEdit"
               /> -->
-              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
                 Rp.
                 {{
                   (
@@ -443,16 +500,31 @@ onMounted(() => {
               </p>
             </template>
           </Table>
-          <TableSummary :total_price="Number(dataSummary.total_price)" :price="Number(dataSummary.price)"
-            :total_qty="Number(dataSummary.total_qty)" />
+          <TableSummary
+            :total_price="Number(dataSummary.total_price)"
+            :price="Number(dataSummary.price)"
+            :total_qty="Number(dataSummary.total_qty)"
+          />
         </div>
       </div>
     </div>
   </div>
 
   <Toast ref="toastRef" />
-  <FormPartStd v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-    :original_uuid="original_uuid" @error="handleError" @removeSucess="handleRemoveSuccess" ref="formPartStd" />
-  <ModalDelete v-model="open_delete" :title="`${selected_item?.name} / ${selected_item?.unit}`"
-    :loading="isLoadingDelete" @delete="onDelete" />
+  <FormPartStd
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    :original_uuid="original_uuid"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+    ref="formPartStd"
+  />
+  <ModalDelete
+    v-model="open_delete"
+    :title="`${selected_item?.name} / ${selected_item?.unit}`"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

@@ -13,7 +13,6 @@ export interface ActivitySelectInterface {
   original_uuid: string;
 }
 
-
 export const ColumnsActivityTransaction: TableColumnType[] = [
   {
     key: "serial_number",
@@ -29,7 +28,7 @@ export const ColumnsActivityTransaction: TableColumnType[] = [
   },
   {
     key: "duration",
-    label: "Duration",
+    label: "Duration (jam)",
     align: "left",
     sort: false,
   },

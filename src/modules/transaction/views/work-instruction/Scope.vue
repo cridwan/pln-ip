@@ -104,96 +104,96 @@ const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
             children: [],
             asset_welness: item.asset_welnes
               ? {
-                color: item.asset_welnes?.color,
-                note: item.asset_welnes?.note,
-                file: item.asset_welnes?.document
-                  ? [
-                    {
-                      id: item.asset_welnes.document.uuid,
-                      name: item.asset_welnes.document
-                        .document_original_name,
-                      size: item.asset_welnes.document.document_size,
-                      file: item.asset_welnes.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  color: item.asset_welnes?.color,
+                  note: item.asset_welnes?.note,
+                  file: item.asset_welnes?.document
+                    ? [
+                        {
+                          id: item.asset_welnes.document.uuid,
+                          name: item.asset_welnes.document
+                            .document_original_name,
+                          size: item.asset_welnes.document.document_size,
+                          file: item.asset_welnes.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             oh_recom: item.oh_recom
               ? {
-                note: item.oh_recom?.note,
-                file: item.oh_recom?.document
-                  ? [
-                    {
-                      id: item.oh_recom.document.uuid,
-                      name: item.oh_recom.document.document_original_name,
-                      size: item.oh_recom.document.document_size,
-                      file: item.oh_recom.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.oh_recom?.note,
+                  file: item.oh_recom?.document
+                    ? [
+                        {
+                          id: item.oh_recom.document.uuid,
+                          name: item.oh_recom.document.document_original_name,
+                          size: item.oh_recom.document.document_size,
+                          file: item.oh_recom.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             wo_priority: item.wo_priority
               ? {
-                note: item.wo_priority?.note,
-                file: item.wo_priority?.document
-                  ? [
-                    {
-                      id: item.wo_priority.document.uuid,
-                      name: item.wo_priority.document
-                        .document_original_name,
-                      size: item.wo_priority.document.document_size,
-                      file: item.wo_priority.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.wo_priority?.note,
+                  file: item.wo_priority?.document
+                    ? [
+                        {
+                          id: item.wo_priority.document.uuid,
+                          name: item.wo_priority.document
+                            .document_original_name,
+                          size: item.wo_priority.document.document_size,
+                          file: item.wo_priority.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             history: item.history
               ? {
-                note: item.history?.note,
-                file: item.history?.document
-                  ? [
-                    {
-                      id: item.history.document.uuid,
-                      name: item.history.document.document_original_name,
-                      size: item.history.document.document_size,
-                      file: item.history.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.history?.note,
+                  file: item.history?.document
+                    ? [
+                        {
+                          id: item.history.document.uuid,
+                          name: item.history.document.document_original_name,
+                          size: item.history.document.document_size,
+                          file: item.history.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             rla: item.rla
               ? {
-                note: item.rla?.note,
-                file: item.rla?.document
-                  ? [
-                    {
-                      id: item.rla.document.uuid,
-                      name: item.rla.document.document_original_name,
-                      size: item.rla.document.document_size,
-                      file: item.rla.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.rla?.note,
+                  file: item.rla?.document
+                    ? [
+                        {
+                          id: item.rla.document.uuid,
+                          name: item.rla.document.document_original_name,
+                          size: item.rla.document.document_size,
+                          file: item.rla.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             ncr: item.ncr
               ? {
-                note: item.ncr?.note,
-                file: item.ncr?.document
-                  ? [
-                    {
-                      id: item.ncr.document.uuid,
-                      name: item.ncr.document.document_original_name,
-                      size: item.ncr.document.document_size,
-                      file: item.ncr.document.document_link,
-                    },
-                  ]
-                  : [],
-              }
+                  note: item.ncr?.note,
+                  file: item.ncr?.document
+                    ? [
+                        {
+                          id: item.ncr.document.uuid,
+                          name: item.ncr.document.document_original_name,
+                          size: item.ncr.document.document_size,
+                          file: item.ncr.document.document_link,
+                        },
+                      ]
+                    : [],
+                }
               : null,
             document: item.document,
           };
@@ -551,7 +551,7 @@ onMounted(() => {
       url: "",
     },
     {
-      name: route.query?.inspection as string,
+      name: ((route.query?.inspection as string) || "").toUpperCase(),
       as_link: false,
       url: "",
     },
@@ -566,8 +566,15 @@ onMounted(() => {
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.asset" :loading="isLoadingDelete" @delete="onDelete" />
-  <div class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1">
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.asset"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
+  <div
+    class="absolute right-12 rounded-full bg-cyan-500 text-neutral-50 text-center w-fit px-4 py-1"
+  >
     <span v-if="isLoadingDuration">Loading...</span>
     <span v-else>{{ dataDuration }} Days</span>
   </div>
@@ -579,34 +586,65 @@ onMounted(() => {
     @click="handleCreate" /> -->
   <div class="flex gap-8">
     <div class="basis-1/5">
-      <FilterScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
+      <FilterScope
+        @filter="handleOnFilter"
+        @reset-filter="handleResetFilter"
+        name="Instruksi Kerja"
+        :loading="is_loading_filter"
+      />
     </div>
     <div class="flex-1 overflow-auto">
       <div class="max-w-full min-w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table label-create="Asset" :columns="ColumnsWorkInstruction" :entities="entitiesScope"
-          :loading="isLoadingScope" :pagination="pagination" :is-create="false" :isAction="false"
-          v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-          @search="searchTable" @open-children="openChildren">
+        <Table
+          label-create="Asset"
+          :columns="ColumnsWorkInstruction"
+          :entities="entitiesScope"
+          :loading="isLoadingScope"
+          :pagination="pagination"
+          :is-create="false"
+          :isAction="false"
+          :is_logging="false"
+          v-model:model-search="params.search"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+          @open-children="openChildren"
+        >
           <template #column_preview="{ entity }">
             <p v-if="!entity.document" class="text-white">No Document</p>
             <ButtonPreview v-else @click="preview(entity.document)" />
           </template>
           <template #column_ik_link="{ entity }">
-            <a target="_blank" :href="entity.link" class="text-base text-neutral-50 text-left" v-if="entity.link">
-              {{ entity.link ?? '-' }}
+            <a
+              target="_blank"
+              :href="entity.link"
+              class="text-base text-neutral-50 text-left"
+              v-if="entity.link"
+            >
+              {{ entity.link ?? "-" }}
             </a>
             <span v-else>-</span>
           </template>
           <template #children="{ entity, index, parentActive }">
-            <tr v-if="
-              children_active.find((el) => el.id === entity.id)?.open === true
-            ">
+            <tr
+              v-if="
+                children_active.find((el) => el.id === entity.id)?.open === true
+              "
+            >
               <td :colspan="ColumnsWorkInstruction.length + 5">
                 <div class="bg-[rgb(207,225,255,0.4)] px-3 py-2 rounded">
-                  <TableEquipment :with-ik="true" :is-action="false" :id="entity.id" :entity="entity.children"
-                    :status-approval="dataApproval?.status" :open="children_active.find((el) => el.id === entity.id)?.open
-                      " @get-data="getData" />
+                  <TableEquipment
+                    :with-ik="true"
+                    :is-action="false"
+                    :id="entity.id"
+                    :entity="entity.children"
+                    :status-approval="dataApproval?.status"
+                    :open="
+                      children_active.find((el) => el.id === entity.id)?.open
+                    "
+                    @get-data="getData"
+                  />
                 </div>
               </td>
             </tr>
@@ -615,7 +653,13 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormScope v-model="open_form" :dataForm="dataForm" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" />
+    <FormScope
+      v-model="open_form"
+      name="Instruksi Kerja"
+      :dataForm="dataForm"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+    />
   </div>
 </template>

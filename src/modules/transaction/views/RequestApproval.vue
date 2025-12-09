@@ -100,7 +100,7 @@ const params_users = reactive<IParams>({
   search: "",
   filter: {
     role: "approval",
-    area: "yes"
+    area: "yes",
   },
   currentPage: 1,
   perPage: 10,
@@ -220,7 +220,7 @@ onMounted(() => {
       url: "",
     },
     {
-      name: route.query?.inspection as string,
+      name: ((route.query?.inspection as string) || "").toUpperCase(),
       as_link: false,
       url: "",
     },
@@ -235,30 +235,62 @@ onMounted(() => {
 
 <template>
   <Breadcrumb :items="breadcrumb" class="mb-10" />
-  <div class="w-full flex items-center justify-center bg-white p-4 shadow-md rounded-sm">
+  <div
+    class="w-full flex items-center justify-center bg-white p-4 shadow-md rounded-sm"
+  >
     <div class="flex flex-col items-center gap-3">
       <h1 class="text-blue-950 font-semibold">Request Approve Project</h1>
-      <p class="text-blue-950 tracking-wide font-normal text-lg text-center" v-if="dataProject?.status == 'pending'">
+      <p
+        class="text-blue-950 tracking-wide font-normal text-lg text-center"
+        v-if="dataProject?.status == 'pending'"
+      >
         Silahkan pilih user untuk melakukan request approve project
         {{ dataProject?.name }}
       </p>
-      <p class="text-blue-950 tracking-wide font-normal text-lg text-center" v-else>
+      <p
+        class="text-blue-950 tracking-wide font-normal text-lg text-center"
+        v-else
+      >
         Project {{ dataProject?.name }} sudah di approve
       </p>
       <div class="w-full" v-show="dataProject?.status == 'pending'">
-        <Select label="Pilih user approval" options_label="label" options_value="value" v-model="model.user_id"
-          v-model:model-search="params_users.search" :search="true" :loading="is_loading_users"
-          :loading-next-page="isFetchingNextPageUser" :rules="rules.user_id" :options="options_users"
-          @scroll="scrollUser" @search="searchUser" />
+        <Select
+          label="Pilih user approval"
+          options_label="label"
+          options_value="value"
+          v-model="model.user_id"
+          v-model:model-search="params_users.search"
+          :search="true"
+          :loading="is_loading_users"
+          :loading-next-page="isFetchingNextPageUser"
+          :rules="rules.user_id"
+          :options="options_users"
+          @scroll="scrollUser"
+          @search="searchUser"
+        />
       </div>
 
-      <Button v-show="dataProject?.status == 'pending'" :text="dataProject?.status == 'pending' ? 'Request Approval' : 'Disable'
-        " :color="dataProject?.status == 'pending' ? 'blue' : 'green'" :loading="isLoadingRequest" variant="primary"
-        size="lg" icon_before="check-list" type="button" @click="handleRequestApprove" />
+      <Button
+        v-show="dataProject?.status == 'pending'"
+        :text="
+          dataProject?.status == 'pending' ? 'Request Approval' : 'Disable'
+        "
+        :color="dataProject?.status == 'pending' ? 'blue' : 'green'"
+        :loading="isLoadingRequest"
+        variant="primary"
+        size="lg"
+        icon_before="check-list"
+        type="button"
+        @click="handleRequestApprove"
+      />
     </div>
   </div>
   <Toast ref="toastRef" />
-  <FormApproval v-model="open_form" @success="handleSuccess" @error="handleError" />
+  <FormApproval
+    v-model="open_form"
+    @success="handleSuccess"
+    @error="handleError"
+  />
 </template>
 <style lang="sass">
 .table

@@ -89,17 +89,22 @@ defineExpose({
             'button-trigger-active': modelOpenInputData === true,
           },
           value && value?.file?.length > 0 ? 'button-trigger-active' : '',
-          disabled ? 'cursor-default' : 'cursor-pointer',
+          'cursor-pointer',
         ]"
       >
         {{ value && value?.file?.length > 0 ? "Active" : "Add" }}
       </button>
     </PopoverTrigger>
-    <PopoverPortal v-if="!disabled">
+    <PopoverPortal>
       <PopoverContent :side-offset="5" class="popover-content-upload">
         <p class="popover-title">{{ label }}</p>
         <div class="mt-4">
-          <Upload v-model="modelUpload" :multiple="multiple" :max-count="10" />
+          <Upload
+            v-model="modelUpload"
+            :disabled="disabled"
+            :multiple="multiple"
+            :max-count="10"
+          />
         </div>
         <div class="popover-footer">
           <Button
@@ -111,6 +116,7 @@ defineExpose({
             @click="cancel"
           />
           <Button
+            v-if="!disabled"
             text="Save"
             size="sm"
             rounded="full"

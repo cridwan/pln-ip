@@ -19,7 +19,10 @@ import type {
   FilterConsumableMaterialStdInterface,
 } from "@/modules/master/types/ConsumableMaterialStdType";
 import { useTransactionStore } from "../stores/TransactionStore";
-import type { ConsumableMaterialStdTransactionInterface, FormConsMatCloneInterface } from "../types/ConsumableMaterialStdType";
+import type {
+  ConsumableMaterialStdTransactionInterface,
+  FormConsMatCloneInterface,
+} from "../types/ConsumableMaterialStdType";
 import { useRoute } from "vue-router";
 
 type OptionType = {
@@ -40,8 +43,8 @@ const props = defineProps({
   },
   original_uuid: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
 // const modelUpload = ref<File | null>(null);
@@ -87,13 +90,13 @@ const params_consumable_material = reactive({
   perPage: 10,
   ...(props.isAdditional
     ? {
-      activity_uuid: props?.original_uuid as string,
-      additional_scope_uuid: route.query.original_uuid as string,
-    }
+        activity_uuid: props?.original_uuid as string,
+        additional_scope_uuid: route.query.original_uuid as string,
+      }
     : {
-      activity_uuid: props.dataForm?.activity_uuid as string,
-      inspection_type_uuid: route.params.id_inspection as string,
-    }),
+        activity_uuid: props.dataForm?.activity_uuid as string,
+        inspection_type_uuid: route.params.id_inspection as string,
+      }),
 });
 
 const {
@@ -107,10 +110,13 @@ const {
   enabled: !props.selectedValue && !is_loading_consumable_material.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await transactionStore.getConsMatSelect({
-        ...params_consumable_material,
-        currentPage: pageParam,
-      }, props.isAdditional ? '/add-scope/detail' : '');
+      const { data } = await transactionStore.getConsMatSelect(
+        {
+          ...params_consumable_material,
+          currentPage: pageParam,
+        },
+        props.isAdditional ? "/add-scope/detail" : ""
+      );
 
       const response = data as IPagination<ConsumableMaterialStdInterface[]>;
 
@@ -134,7 +140,10 @@ const {
 const { mutate: createConsumableMaterial, isPending: isLoadingCreate } =
   useMutation({
     mutationFn: async (payload: FormConsMatCloneInterface) => {
-      return await transactionStore.cloneConsMatStd(payload, props.isAdditional ? '/add-scope/detail' : '');
+      return await transactionStore.cloneConsMatStd(
+        payload,
+        props.isAdditional ? "/add-scope/detail" : ""
+      );
     },
     onSuccess: (data) => {
       modelValue.value = false;
@@ -227,16 +236,17 @@ watch(
             label: props.selectedValue?.name,
           },
         ],
-        new_data.filter(
-          (item) => item.value !== props.selectedValue?.uuid
-        )
+        new_data.filter((item) => item.value !== props.selectedValue?.uuid)
       );
     } else {
       const new_data: OptionType[] =
         newConsumableMaterial?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: `${item.consmat?.name} / ${item.consmat?.global_unit?.name}` };
+            return {
+              value: item.uuid,
+              label: `${item.consmat?.name} / ${item.consmat?.global_unit?.name}`,
+            };
           }) || [];
       options_consumable_material.value = new_data;
     }
@@ -254,27 +264,56 @@ watch(
   { deep: true, immediate: true }
 );
 
-defineExpose({ refetchConsumableMaterial })
+defineExpose({ refetchConsumableMaterial });
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue
-    ? 'Ubah Consumable Material Std'
-    : 'Tambah Consumable Material Std'
-    " v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Select v-model="model.cons_mat_uuid" label="Consumable Material" options_label="label" options_value="value"
-        v-model:model-search="params_consumable_material.search" :search="true"
-        :loading="is_loading_consumable_material" :loading-next-page="isFetchingNextPageConsumableMaterial"
-        :rules="rules.cons_mat_uuid" :options="options_consumable_material" @scroll="scrollConsumableMaterial"
-        @search="searchConsumableMaterial" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="
+      props.selectedValue
+        ? 'Ubah Consumable Material'
+        : 'Tambah Consumable Material'
+    "
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Select
+        v-model="model.cons_mat_uuid"
+        label="Consumable Material"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_consumable_material.search"
+        :search="true"
+        :loading="is_loading_consumable_material"
+        :loading-next-page="isFetchingNextPageConsumableMaterial"
+        :rules="rules.cons_mat_uuid"
+        :options="options_consumable_material"
+        @scroll="scrollConsumableMaterial"
+        @search="searchConsumableMaterial"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate"
-          :loading="isLoadingCreate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate"
+          :loading="isLoadingCreate"
+        />
       </div>
     </form>
   </Modal>

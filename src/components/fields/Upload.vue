@@ -338,11 +338,15 @@ function clickUpload() {
       <div class="v-upload--label--instruction">{{ instruction }}</div>
     </div>
     <div class="v-upload--container">
-      <div class="v-upload--upload" :class="[
-        disabled ? `v-upload--disabled` : '',
-        classUpload,
-        error_message ? 'v-upload--error' : null,
-      ]" @click="clickUpload">
+      <div
+        class="v-upload--upload"
+        :class="[
+          disabled ? `v-upload--disabled` : '',
+          classUpload,
+          error_message ? 'v-upload--error' : null,
+        ]"
+        @click="clickUpload"
+      >
         <p>Choose File</p>
       </div>
 
@@ -353,17 +357,37 @@ function clickUpload() {
             <p class="preview-text">{{ item.name }}</p>
           </div>
           <div class="preview-action">
-            <Icon name="download" class="preview-action--icon" @click="downloadFiles(item)" />
-            <Icon name="trash" class="preview-action--icon" @click="removeFiles(item)" />
+            <Icon
+              name="download"
+              class="preview-action--icon"
+              @click="downloadFiles(item)"
+            />
+            <Icon
+              v-if="!disabled"
+              name="trash"
+              class="preview-action--icon"
+              @click="removeFiles(item)"
+            />
           </div>
         </div>
       </div>
 
-      <input v-if="!disabled" ref="upload" class="v-upload--input" :id="id" :multiple="multiple"
-        :accept="formatAccept()" type="file" @change="(e) => handleInput(e as InputEvent)" />
+      <input
+        v-if="!disabled"
+        ref="upload"
+        class="v-upload--input"
+        :id="id"
+        :multiple="multiple"
+        :accept="formatAccept()"
+        type="file"
+        @change="(e) => handleInput(e as InputEvent)"
+      />
     </div>
     <span v-if="notes !== undefined" class="v-upload-notes">{{ notes }}</span>
-    <span v-if="status !== 'default' || checkErrorUpload()" :class="classTextStatus">
+    <span
+      v-if="status !== 'default' || checkErrorUpload()"
+      :class="classTextStatus"
+    >
       {{ statusMessage || checkErrorMessageUpload() }}
     </span>
   </div>

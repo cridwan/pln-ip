@@ -14,13 +14,6 @@ export const ColumnsHse: TableColumnType[] = [
     sort: false,
     width: "150",
   },
-  {
-    key: "preview",
-    label: "",
-    align: "center",
-    sort: false,
-    width: "150",
-  },
 ];
 
 export const ColumnsHseAdditional: TableColumnType[] = [

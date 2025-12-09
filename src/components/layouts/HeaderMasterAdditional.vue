@@ -15,7 +15,7 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push({ name: 'login' });
+  router.push({ name: "login" });
 };
 </script>
 
@@ -25,9 +25,13 @@ const logout = () => {
     <div class="menu-bar">
       <div class="menu-wrapper">
         <button class="user-info" @click="router.push('/profile')">
-          <p>User : superadmin@gmail.com</p>
+          <p>User : {{ authStore.users?.email ?? "" }}</p>
         </button>
-        <button v-if="authStore.users?.role === 'planner'" class="menu-button" @click="router.push('/')">
+        <button
+          v-if="authStore.users?.role === 'planner'"
+          class="menu-button"
+          @click="router.push('/')"
+        >
           Location
         </button>
         <button class="sign-out-button" @click="logout">Sign Out</button>

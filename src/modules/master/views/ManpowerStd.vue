@@ -28,7 +28,7 @@ import { ColumnsManpowerStd } from "../constants/ManpowerStdConstant";
 import ButtonGroup from "../components/ButtonGroup.vue";
 
 const dataForm = ref<ManpowerStdCreateModelInterface | null>(null);
-const formManpowerStd = ref<InstanceType<typeof FormManpowerStd> | null>(null)
+const formManpowerStd = ref<InstanceType<typeof FormManpowerStd> | null>(null);
 const masterStore = useMasterStore();
 const total_item = ref(0);
 const params = reactive({
@@ -103,7 +103,7 @@ const { mutate: deleteManpowerStd, isPending: isLoadingDelete } = useMutation({
     open_delete.value = false;
     refetchManpowerStd();
     if (formManpowerStd.value?.refetchManpower) {
-      formManpowerStd.value.refetchManpower()
+      formManpowerStd.value.refetchManpower();
     }
   },
   onError: (error: any) => {
@@ -122,7 +122,7 @@ const { mutate: downloadManpowerStd, isPending: isLoadingDownload } =
     mutationFn: async () => {
       return await masterStore.downloadManpowerStd(params);
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -135,7 +135,7 @@ const { mutate: templateManpowerStd, isPending: isLoadingTemplate } =
     mutationFn: async () => {
       return await masterStore.templateManpowerStd();
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -209,7 +209,7 @@ const handleSuccess = () => {
   params.currentPage = 1;
   refetchManpowerStd();
   if (formManpowerStd.value?.refetchManpower) {
-    formManpowerStd.value.refetchManpower()
+    formManpowerStd.value.refetchManpower();
   }
 };
 
@@ -291,7 +291,7 @@ const handleResetFilter = () => {
 const previewDocument = (document: ResponseDocumentInterface) => {
   window.open(
     import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-    document.document_link,
+      document.document_link,
     "_blank"
   );
 };
@@ -331,28 +331,62 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button v-if="dataForm?.activity_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
-        @click="handleCreate" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.activity_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterManpowerStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
+        <FilterManpowerStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table label-create="User" :columns="ColumnsManpowerStd" :entities="dataManpowerStd?.data || []"
-          :loading="isLoadingManpowerStd" :pagination="pagination" :is-create="false"
-          v-model:model-search="params.search" class="mt-6" @change-page="changePage" @change-limit="changeLimit"
-          @search="searchTable">
+        <Table
+          label-create="User"
+          :columns="ColumnsManpowerStd"
+          :entities="dataManpowerStd?.data || []"
+          :loading="isLoadingManpowerStd"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          class="mt-6"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                v-show="Number(entity.has_transaction) == 0" />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
+              />
             </div>
           </template>
           <template #column_manpower="{ entity }">
@@ -364,11 +398,22 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormManpowerStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" ref="formManpowerStd" />
+    <FormManpowerStd
+      :data-form="dataForm"
+      v-model="open_form"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+      ref="formManpowerStd"
+    />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.manpower?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.manpower?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

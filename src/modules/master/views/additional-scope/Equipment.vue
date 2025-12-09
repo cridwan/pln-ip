@@ -3,9 +3,17 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { AxiosError } from "axios";
 import { useRoute } from "vue-router";
 
-import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 import { ColumnsEquipment } from "../../constants/EquipmentConstant";
 import { useMasterStore } from "../../stores/MasterStore";
@@ -16,7 +24,6 @@ import type {
 import FormAdEquipment from "../../components/FormAdEquipment.vue";
 import FilterAdEquipment from "../../components/FilterAdEquipment.vue";
 import ButtonGroup from "../../components/ButtonGroup.vue";
-import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const dataForm = ref<EquipmentFilterInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
@@ -58,8 +65,11 @@ const {
   queryKey: ["getAddEquipmentMaster"],
   queryFn: async () => {
     try {
-      console.log('trigger disini')
-      const { data } = await masterStore.getEquipment(params, '/add-scope/detail');
+      console.log("trigger disini");
+      const { data } = await masterStore.getEquipment(
+        params,
+        "/add-scope/detail"
+      );
       const response = data.data as IPagination<EquipmentInterface[]>;
 
       total_item.value = response.total;
@@ -81,7 +91,7 @@ const {
 //--- DELETE EQUIPMENT
 const { mutate: deleteEquipment, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteEquipment(id, '/add-scope/detail');
+    return await masterStore.deleteEquipment(id, "/add-scope/detail");
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -107,9 +117,9 @@ const { mutate: deleteEquipment, isPending: isLoadingDelete } = useMutation({
 const { mutate: downloadEquipment, isPending: isLoadingDownload } = useMutation(
   {
     mutationFn: async () => {
-      return await masterStore.downloadEquipment(params, '/add-scope/detail');
+      return await masterStore.downloadEquipment(params, "/add-scope/detail");
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -121,11 +131,11 @@ const { mutate: downloadEquipment, isPending: isLoadingDownload } = useMutation(
 const { mutate: templateEquipment, isPending: isLoadingTemplate } = useMutation(
   {
     mutationFn: async () => {
-      return await masterStore.templateEquipment('/add-scope/detail', {
-        filters: params.filters
+      return await masterStore.templateEquipment("/add-scope/detail", {
+        filters: params.filters,
       });
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -136,7 +146,7 @@ const { mutate: templateEquipment, isPending: isLoadingTemplate } = useMutation(
 //--- IMPORT
 const { mutate: importEquipment, isPending: isLoadingImport } = useMutation({
   mutationFn: async (payload: File) => {
-    return await masterStore.importEquipment(payload, '/add-scope/detail');
+    return await masterStore.importEquipment(payload, "/add-scope/detail");
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -323,31 +333,70 @@ onMounted(() => {
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button v-if="dataForm?.scope_standart_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
-        @click="handleCreate" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.scope_standart_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterAdEquipment @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingEquipment" />
+        <FilterAdEquipment
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="isLoadingEquipment"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" class="mb-6" />
-        <Table label-create="Sub Bidang" :columns="ColumnsEquipment" :entities="dataEquipment?.data || []"
-          :loading="isLoadingEquipment" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
-          @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+        <Table
+          label-create="Sub Bidang"
+          :columns="ColumnsEquipment"
+          :entities="dataEquipment?.data || []"
+          :loading="isLoadingEquipment"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                v-show="Number(entity.has_transaction) == 0" />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
+              />
             </div>
           </template>
           <template #column_scope_standart="{ entity }">
@@ -359,8 +408,14 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormAdEquipment v-model="open_form" :selected-value="selected_item" :data-form="dataForm" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+    <FormAdEquipment
+      v-model="open_form"
+      :selected-value="selected_item"
+      :data-form="dataForm"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+    />
   </div>
 </template>
 

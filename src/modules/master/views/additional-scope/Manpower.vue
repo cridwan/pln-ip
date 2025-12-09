@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 import { AxiosError } from "axios";
 
 import {
@@ -15,6 +16,7 @@ import type {
   IPagination,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 import { useMasterStore } from "../../stores/MasterStore";
 import FormManpowerStd from "../../components/FormManpowerStd.vue";
@@ -24,9 +26,7 @@ import type {
   ManpowerStdInterface,
 } from "../../types/ManpowerStdType";
 import { ColumnsManpowerStd } from "../../constants/ManpowerStdConstant";
-import { useRoute } from "vue-router";
 import ButtonGroup from "../../components/ButtonGroup.vue";
-import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const route = useRoute();
 const dataForm = ref<ManpowerStdCreateModelInterface | null>(null);
@@ -392,11 +392,13 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"

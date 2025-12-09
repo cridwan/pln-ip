@@ -1,5 +1,6 @@
 import GuestLayout from "@/layouts/GuestLayout.vue";
 import GuestAddScopeLayout from "@/layouts/GuestAddScopeLayout.vue";
+import GuestDefaultLayout from "@/layouts/GuestDefaultLayout.vue";
 
 export const routeTransaction = [
   {
@@ -16,9 +17,9 @@ export const routeTransaction = [
   {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/sequence",
     name: "guest sequence",
-    component: () => import("@/modules/guest/views/Sequence.vue"),
+    component: () => import("@/modules/guest/views/Squences.vue"),
     meta: {
-      layout: GuestLayout,
+      layout: GuestDefaultLayout,
       requireAuth: true,
       role: ["guest"],
       except: ["superuser"],

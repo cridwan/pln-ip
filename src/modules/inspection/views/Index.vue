@@ -24,6 +24,10 @@ import type { IPagination } from "@/types/GlobalType";
 import type { MachineInterface } from "@/modules/master/types/MachineType";
 import type { InspectionTypeInterface } from "@/modules/master/types/InspectionType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
+import { UserEnum } from "@/modules/auth/types/AuthType";
+import { useProjectStore } from "@/modules/auth/stores/ProjectStore";
+import { all_characters } from "@/helpers/global";
 
 import { useInspectionStore } from "../stores/InspectionStore";
 import type {
@@ -31,9 +35,6 @@ import type {
   TCreateGenerate,
   TInspection,
 } from "../types/InspectionType";
-import { useAuthStore } from "@/modules/auth/stores/AuthStore";
-import { UserEnum } from "@/modules/auth/types/AuthType";
-import { useProjectStore } from "@/modules/auth/stores/ProjectStore";
 
 const videos = [Home0, Home1, Home2];
 
@@ -94,9 +95,7 @@ const { mutate: deleteActivity, isPending: isLoadingDelete } = useMutation({
 //--- END
 
 //--- GET MACHINE
-const {
-  data: dataMachine,
-} = useQuery({
+const { data: dataMachine } = useQuery({
   queryKey: ["getMachine"],
   queryFn: async () => {
     try {
@@ -119,9 +118,7 @@ const {
 //--- END
 
 //--- GET INSPECTION TYPE
-const {
-  data: dataInspectionType,
-} = useQuery({
+const { data: dataInspectionType } = useQuery({
   queryKey: ["getInspectionType"],
   queryFn: async () => {
     try {
@@ -189,7 +186,7 @@ const { mutate: generate, isPending: isLoadingGenerate } = useMutation({
         machine: find_item?.machine?.name,
         unit: find_item?.machine?.unit?.name,
         location: find_item?.machine?.unit?.location?.name,
-      }
+      },
     });
   },
   onError: (error: any) => {
@@ -229,31 +226,35 @@ const {
 });
 //--- END
 
-watch(dataMachine, (value) => {
-  const data = value?.data[0];
-  breadcrumb.value = [
-    {
-      name: "Scope Overhaul",
-      as_link: false,
-      url: "",
-    },
-    {
-      name: String(data?.unit?.location?.name || ""),
-      as_link: false,
-      url: "",
-    },
-    {
-      name: String(data?.unit?.name || ""),
-      as_link: false,
-      url: "",
-    },
-    {
-      name: String(data?.name || ""),
-      as_link: false,
-      url: "",
-    },
-  ];
-}, { deep: true, immediate: true });
+watch(
+  dataMachine,
+  (value) => {
+    const data = value?.data[0];
+    breadcrumb.value = [
+      {
+        name: "Scope Overhaul",
+        as_link: false,
+        url: "",
+      },
+      {
+        name: String(data?.unit?.location?.name || ""),
+        as_link: false,
+        url: "",
+      },
+      {
+        name: String(data?.unit?.name || ""),
+        as_link: false,
+        url: "",
+      },
+      {
+        name: String(data?.name || ""),
+        as_link: false,
+        url: "",
+      },
+    ];
+  },
+  { deep: true, immediate: true }
+);
 
 watch(
   [dataMachine, dataInspectionType],
@@ -346,14 +347,14 @@ const onDelete = () => {
 const selectInspection = (item: TInspection) => {
   if (authStore.users && authStore.users.role === UserEnum.GUEST) {
     router.push({
-      path: `/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/${item.name}/undefined/${item.uuid}/scope`,
+      path: `/${route.params?.id}/guest/${route.params?.id_unit}/${route.params?.id_machine}/ci/undefined/${item.uuid}/scope`,
       query: {
         inspection: item.name,
         machine: item.machine?.name,
         unit: item.machine?.unit?.name,
         location: item.machine?.unit?.location?.name,
-      }
-    })
+      },
+    });
   } else {
     toScope(item);
   }
@@ -429,8 +430,8 @@ const searchScope = () => {
       ? "ci"
       : inspection === "turbine inspection" ||
         inspection === "turbin inspection"
-        ? "ti"
-        : "mi";
+      ? "ti"
+      : "mi";
   refetchProject();
 };
 
@@ -445,8 +446,8 @@ const generateScope = () => {
       ? "ci"
       : inspection === "turbine inspection" ||
         inspection === "turbin inspection"
-        ? "ti"
-        : "mi";
+      ? "ti"
+      : "mi";
 
   const payload: TCreateGenerate = {
     name: model.value,
@@ -464,18 +465,16 @@ const toTransaction = (item: ResponseProject) => {
     (item) => item.uuid === scopeSelected.value
   );
   const inspection = find_item?.name.toLowerCase();
-  projectStore.setProject(item)
-  router.push(
-    {
-      path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${item.uuid}/${scopeSelected.value}/scope`,
-      query: {
-        inspection,
-        machine: find_item?.machine?.name,
-        unit: find_item?.machine?.unit?.name,
-        location: find_item?.machine?.unit?.location?.name,
-      }
-    }
-  );
+  projectStore.setProject(item);
+  router.push({
+    path: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${inspection_selected.value}/${item.uuid}/${scopeSelected.value}/scope`,
+    query: {
+      inspection,
+      machine: find_item?.machine?.name,
+      unit: find_item?.machine?.unit?.name,
+      location: find_item?.machine?.unit?.location?.name,
+    },
+  });
 };
 
 onMounted(() => {
@@ -526,45 +525,98 @@ const toDelete = (item: ResponseProject) => {
       <Breadcrumb :items="breadcrumb" />
     </div>
     <div class="scope-video-container">
-      <video ref="videoRef" :src="videos[currentVideoIndex === null ? 0 : currentVideoIndex]" class="scope-video"
-        @loadedmetadata="handleFirstVideoLoad" @ended="handleVideoEnd" autoplay muted playsinline></video>
+      <video
+        ref="videoRef"
+        :src="videos[currentVideoIndex === null ? 0 : currentVideoIndex]"
+        class="scope-video"
+        @loadedmetadata="handleFirstVideoLoad"
+        @ended="handleVideoEnd"
+        autoplay
+        muted
+        playsinline
+      ></video>
       <div class="scope-button-home">
-        <button v-for="(item, key) in dataInspectionType?.data" :id="`button-home-${key}`" :key="key"
-          :class="{ 'scope-button-home--active': scopeSelected === item.uuid }" @mouseover="handleMouseOver(key)"
-          @mouseleave="handleMouseLeave" @click="selectInspection(item)">
+        <button
+          v-for="(item, key) in dataInspectionType?.data"
+          :id="`button-home-${key}`"
+          :key="key"
+          :class="{ 'scope-button-home--active': scopeSelected === item.uuid }"
+          @mouseover="handleMouseOver(key)"
+          @mouseleave="handleMouseLeave"
+          @click="selectInspection(item)"
+        >
           {{ item.name }}
         </button>
       </div>
       <div v-show="scopeSelected" id="scope-menu" class="scope-button-menus">
         <div class="w-[450px] relative">
-          <Input rounded="full" v-model="model" />
-          <div v-if="open_search"
-            class="absolute top-11 right-0 left-0 bg-neutral-950 bg-opacity-50 rounded-xl py-3 text-sm text-neutral-50">
+          <Input
+            rounded="full"
+            v-model="model"
+            :custom_symbols="all_characters"
+          />
+          <div
+            v-if="open_search"
+            class="absolute top-11 right-0 left-0 bg-neutral-950 bg-opacity-50 rounded-xl py-3 text-sm text-neutral-50"
+          >
             <p v-if="isLoadingProject" class="w-full text-center">Loading...</p>
-            <p v-if="!isLoadingProject && (dataProject || []).length === 0" class="w-full text-center">
+            <p
+              v-if="!isLoadingProject && (dataProject || []).length === 0"
+              class="w-full text-center"
+            >
               Not Found Data
             </p>
-            <p v-else-if="!isLoadingProject && (dataProject || []).length > 0" v-for="(item, key) in dataProject"
-              :key="key" class="px-4 hover:text-neutral-200 py-1 flex justify-between">
+            <p
+              v-else-if="!isLoadingProject && (dataProject || []).length > 0"
+              v-for="(item, key) in dataProject"
+              :key="key"
+              class="px-4 hover:text-neutral-200 py-1 flex justify-between"
+            >
               <span class="cursor-pointer" @click="toTransaction(item)">{{
                 item.name
-                }}</span>
-              <Icon v-if="item.status != 'approve' && authStore.users?.role !== 'approval'" name="trash"
-                class="cursor-pointer" @click="toDelete(item)" />
+              }}</span>
+              <Icon
+                v-if="
+                  item.status != 'approve' &&
+                  authStore.users?.role !== 'approval'
+                "
+                name="trash"
+                class="cursor-pointer"
+                @click="toDelete(item)"
+              />
             </p>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <Button text="Search" color="blue" rounded="full" class="!px-6" :disabled="isLoadingGenerate"
-            @click="searchScope" />
-          <Button text="Generate" color="blue" rounded="full" class="!px-6" :disabled="isLoadingGenerate"
-            :loading="isLoadingGenerate" @click="generateScope" />
+          <Button
+            text="Search"
+            color="blue"
+            rounded="full"
+            class="!px-6"
+            :disabled="isLoadingGenerate"
+            @click="searchScope"
+          />
+          <Button
+            v-if="authStore.users?.role !== UserEnum.APPROVAL"
+            text="Generate"
+            color="blue"
+            rounded="full"
+            class="!px-6"
+            :disabled="isLoadingGenerate"
+            :loading="isLoadingGenerate"
+            @click="generateScope"
+          />
         </div>
       </div>
     </div>
   </div>
 
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>
 
 <style lang="sass">

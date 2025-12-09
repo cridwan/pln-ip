@@ -15,7 +15,7 @@ export const ColumnsActivity: TableColumnType[] = [
   },
   {
     key: "duration",
-    label: "Duration",
+    label: "Duration (jam)",
     align: "left",
     sort: false,
   },
@@ -26,9 +26,8 @@ export const ColumnsActivity: TableColumnType[] = [
     sort: false,
   },
   {
-
     key: "ik_link",
-    label: "IK Link",
+    label: "IK Online",
     align: "left",
     sort: false,
   },
@@ -37,7 +36,7 @@ export const ColumnsActivity: TableColumnType[] = [
     label: "IK Doc",
     align: "left",
     sort: false,
-  }
+  },
 ];
 
 export const ColumnsActivityGuest: TableColumnType[] = [
@@ -55,7 +54,7 @@ export const ColumnsActivityGuest: TableColumnType[] = [
   },
   {
     key: "duration",
-    label: "Duration",
+    label: "Duration (Jam)",
     align: "left",
     sort: false,
   },

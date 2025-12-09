@@ -11,14 +11,14 @@ export interface IPagination<T> {
   prev_page_url: null | number;
   to: number;
   total: number;
-  summary?: Record<string, any>
+  summary?: Record<string, any>;
 }
 
 export interface ProjectCardInterface {
-  name: string,
-  status: "Completed" | "In Progress" | "Pending" | "Cancelled", // 'Completed', 'In Progress', 'Pending', 'Cancelled'
-  createdBy: string,
-  dateCreated: string, // Format ISO
+  name: string;
+  status: "Completed" | "In Progress" | "Pending" | "Cancelled"; // 'Completed', 'In Progress', 'Pending', 'Cancelled'
+  createdBy: string;
+  dateCreated: string; // Format ISO
 }
 
 export interface IParams {
@@ -56,4 +56,9 @@ export interface ResponseDocumentInterface {
   document_original_name: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface CreateActivityLogSyncInterface {
+  activity_type: string;
+  activity_id: string;
 }

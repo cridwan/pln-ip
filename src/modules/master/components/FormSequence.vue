@@ -6,10 +6,13 @@ import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { useMutation } from "@tanstack/vue-query";
 import type {
+  CreateActivityLogSyncInterface,
   CreateDocumentInterface,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
 import { all_characters } from "@/helpers/global";
+import { useGlobalStore } from "@/stores/GlobalStore";
+import UploadStream from "@/components/fields/UploadStream.vue";
 
 import { useMasterStore } from "../stores/MasterStore";
 import type {
@@ -17,8 +20,6 @@ import type {
   SequenceCreateModelInterface,
   SequenceCreateInterface,
 } from "../types/SequenceTypes";
-import { useGlobalStore } from "@/stores/GlobalStore";
-import UploadStream from "@/components/fields/UploadStream.vue";
 
 const props = defineProps({
   selectedValue: {
@@ -46,11 +47,9 @@ const rules = computed(() => {
     name: {
       required: helpers.withMessage(`This field is required`, required),
     },
-    ...(!props.selectedValue && {
-      file: {
-        required: helpers.withMessage(`This field is required`, required),
-      },
-    }),
+    file: {
+      required: helpers.withMessage(`This field is required`, required),
+    },
   };
 });
 
@@ -115,10 +114,15 @@ const { mutate: updateSequence, isPending: isLoadingUpdate } = useMutation({
   },
   onSuccess: async () => {
     if (modelUpload.value) {
+      const type = "App\\Models\\Sequence";
       createDocument({
         document: modelUpload.value as File,
-        document_type: "App\\Models\\Sequence",
+        document_type: type,
         document_uuid: props.selectedValue?.uuid as string,
+      });
+      createActivityLogSync({
+        activity_id: props.selectedValue?.uuid as string,
+        activity_type: type,
       });
     } else {
       modelValue.value = false;
@@ -132,13 +136,21 @@ const { mutate: updateSequence, isPending: isLoadingUpdate } = useMutation({
 });
 //--- END
 
+//--- CREATE ACTIVITY LOG SYNC
+const { mutate: createActivityLogSync } = useMutation({
+  mutationFn: async (payload: CreateActivityLogSyncInterface) => {
+    return await globalStore.createActivityLogSync(payload);
+  },
+});
+//--- END
+
 const handleChangeFile = (e: File) => {
   modelUpload.value = e;
 };
 
-const removeSuccess = () => {
+const handleRemove = () => {
   documentValues.value = null;
-  emit("removeSucess");
+  model.value.file = [];
 };
 
 const handleSubmit = async () => {
@@ -203,20 +215,50 @@ watch(
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Sequence' : 'Tambah Sequence'" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" label="Nama" star :rules="rules.name" :custom_symbols="all_characters" />
-      <UploadStream v-model="model.file" star :rules="rules.file" :progress="uploadProgress"
-        :selectedValues="documentValues" @changes="handleChangeFile" @removeSuccess="removeSuccess" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Sequence' : 'Tambah Sequence'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        label="Nama"
+        star
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+      />
+      <UploadStream
+        v-model="model.file"
+        star
+        :rules="rules.file"
+        :progress="uploadProgress"
+        :selectedValues="documentValues"
+        @changes="handleChangeFile"
+        @handleRemove="handleRemove"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue"
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
           :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument" />
+          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
+        />
       </div>
     </form>
   </Modal>

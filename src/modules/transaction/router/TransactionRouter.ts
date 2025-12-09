@@ -1,5 +1,6 @@
 import MainLayout from "@/layouts/MainLayout.vue";
 import AddScopeLayout from "@/layouts/AddScopeLayout.vue";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 export const routeTransaction = [
   {
@@ -16,9 +17,9 @@ export const routeTransaction = [
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/sequence",
     name: "transaction sequence",
-    component: () => import("@/modules/transaction/views/Sequence.vue"),
+    component: () => import("@/modules/transaction/views/Squences.vue"),
     meta: {
-      layout: MainLayout,
+      layout: DefaultLayout,
       requireAuth: true,
       role: ["planner", "approval"],
       except: ["superuser"],
@@ -175,11 +176,13 @@ export const routeTransaction = [
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/work-instruction",
     name: "add scope detail work instruction",
     component: () =>
-      import("@/modules/transaction/views/add-scope-detail/WorkInstruction.vue"),
+      import(
+        "@/modules/transaction/views/add-scope-detail/WorkInstruction.vue"
+      ),
     meta: {
       layout: AddScopeLayout,
       requireAuth: true,
-      role: "planner",
+      role: ["planner","approval"],
       except: ["superuser"],
     },
   },

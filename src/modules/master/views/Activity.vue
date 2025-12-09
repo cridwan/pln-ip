@@ -13,6 +13,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
+import { parsedUrl } from "@/helpers/global";
 
 import { ColumnsActivity } from "../constants/ActivityConstant";
 import { useMasterStore } from "../stores/MasterStore";
@@ -23,7 +24,6 @@ import type {
 import FormActivity from "../components/FormActivity.vue";
 import FilterActivity from "../components/FilterActivity.vue";
 import ButtonGroup from "../components/ButtonGroup.vue";
-import { parsedUrl } from "@/helpers/global";
 
 const dataForm = ref<ActivityModelCreateInterface | null>(null);
 const masterStore = useMasterStore();
@@ -114,7 +114,7 @@ const { mutate: downloadActivity, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
     return await masterStore.downloadActivity(params);
   },
-  onSuccess: () => { },
+  onSuccess: () => {},
   onError: (error) => {
     console.log(error);
   },
@@ -126,7 +126,7 @@ const { mutate: templateActivity, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
     return await masterStore.templateActivity();
   },
-  onSuccess: () => { },
+  onSuccess: () => {},
   onError: (error) => {
     console.log(error);
   },
@@ -311,27 +311,62 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate"
-        v-if="dataForm?.equipment_uuid" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+        v-if="dataForm?.equipment_uuid"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterActivity @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingActivity" />
+        <FilterActivity
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="isLoadingActivity"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table label-create="Sub Bidang" :columns="ColumnsActivity" :entities="dataActivity?.data || []"
-          :loading="isLoadingActivity" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
-          class="mt-6" @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
+        <Table
+          label-create="Sub Bidang"
+          :columns="ColumnsActivity"
+          :entities="dataActivity?.data || []"
+          :loading="isLoadingActivity"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          class="mt-6"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                v-show="Number(entity.has_transaction) == 0" />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
+              />
             </div>
           </template>
           <template #column_equipment="{ entity }">
@@ -340,15 +375,23 @@ onMounted(() => {
             </p>
           </template>
           <template #column_ik_link="{ entity }">
-            <a target="_blank" :href="entity.link_ik1" class="text-base text-neutral-50 text-left"
-              v-if="entity.link_ik1">
-              {{ entity.link_ik1 ?? '-' }}
+            <a
+              target="_blank"
+              :href="entity.link_ik1"
+              class="text-base text-neutral-50 text-left"
+              v-if="entity.link_ik1"
+            >
+              {{ entity.link_ik1 ?? "-" }}
             </a>
             <span v-else>-</span>
           </template>
           <template #column_ik_doc="{ entity }">
-            <a target="_blank" :href="parsedUrl(entity.document.document_link)"
-              class="text-base text-neutral-50 text-left" v-if="entity.document">
+            <a
+              target="_blank"
+              :href="parsedUrl(entity.document.document_link)"
+              class="text-base text-neutral-50 text-left"
+              v-if="entity.document"
+            >
               {{ entity.document?.document_name }}
             </a>
             <span v-else>-</span>
@@ -357,12 +400,23 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormActivity v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+    <FormActivity
+      v-model="open_form"
+      :data-form="dataForm"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+    />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>
 
 <style lang="sass"></style>
