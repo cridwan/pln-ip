@@ -156,6 +156,15 @@ const handleRemove = () => {
 const handleSubmit = async () => {
   const isValid = await v$_form.value.$validate();
 
+  console.log(
+    "KK",
+    modelUpload.value,
+    isValid,
+    model.value,
+    documentValues.value,
+    props.selectedValue
+  );
+
   if (!isValid) return;
 
   if (props.selectedValue) {
@@ -177,6 +186,17 @@ const handleSubmit = async () => {
 const setValue = () => {
   model.value.name = props.selectedValue?.name || "";
   model.value.link = props.selectedValue?.link || "";
+
+  if (props.selectedValue?.document) {
+    model.value.file = [
+      {
+        id: "0",
+        name: props.selectedValue.document?.document_name,
+        size: props.selectedValue.document?.document_size,
+        file: props.selectedValue.document?.document_link,
+      },
+    ];
+  }
 };
 
 const resetValue = () => {

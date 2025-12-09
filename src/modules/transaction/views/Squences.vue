@@ -21,52 +21,33 @@ import type { SequenceInterface } from "@/modules/master/types/SequenceTypes";
 import type { AxiosError } from "axios";
 import { useTransactionStore } from "../stores/TransactionStore";
 
-const videosData = ref({
-  ci: [
-    {
-      id: 0,
-      video: () =>
-        import("/videos/combustion-inspection/1-manhole-turbine-cylinder.webm"),
-      name: "Manhole Turbine Cylinder",
-      top: 235,
-      left: 545,
-    },
-  ],
-  mi: [
-    {
-      id: 0,
-      video: () =>
-        import("/videos/major-inspection/1-manhole-turbine-cylinder.mp4"),
-      name: "Manhole Turbine Cylinder",
-      top: 233,
-      left: 550,
-    },
-  ],
-  ti: [
-    {
-      id: 0,
-      video: () =>
-        import("/videos/combustion-inspection/1-manhole-turbine-cylinder.webm"),
-      name: "Manhole Turbine Cylinder",
-      top: 235,
-      left: 545,
-    },
-  ],
+const videosData = ref<any>({
+  main: [],
+  ci: [],
+  mi: [],
+  ti: [],
 });
 
 const videos: any = computed(() => {
-  return videosData.value[(route.params.menu as string) || "ci"];
+  return videosData.value.main;
 });
 
 const videoSrc = ref<string | null>(null);
 
 const loadVideo = async () => {
-  if (videos.value[currentVideoIndex.value]) {
-    videoSrc.value = (
-      await videos.value[currentVideoIndex.value].video()
-    ).default;
-    preloadVideo(videoSrc.value as string);
-  }
+  // if (videos.value[currentVideoIndex.value]) {
+  //   videoSrc.value = (
+  //     await videos.value[currentVideoIndex.value].video()
+  //   ).default;
+  //   preloadVideo(videoSrc.value as string);
+  // }
+  const item = videos.value[currentVideoIndex.value];
+
+  console.log("ITEM", item);
+  if (!item) return;
+
+  videoSrc.value = item.video;
+  preloadVideo(videoSrc.value as string);
 };
 
 const transactionStore = useTransactionStore();
@@ -101,7 +82,9 @@ const {
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getSequences(params);
-      const response = data.data as IPagination<SequenceInterface[]>;
+      const response = data.data as SequenceInterface;
+
+      console.log("AAAAA", response);
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
@@ -379,6 +362,32 @@ watch(openStep, (value) => {
   }
 });
 
+watch(dataSequence, (val) => {
+  if (!val) return;
+
+  videosData.value.main = [
+    {
+      id: 1,
+      video:
+        import.meta.env.VITE_API_BASE_URL.replace("api", "") +
+        val.document?.document_link,
+      name: val.document?.document_name,
+      top: 235,
+      left: 545,
+    },
+  ];
+});
+
+watch(
+  () => videos.value,
+  (val) => {
+    if (val && val.length > 0) {
+      initializeFromURL();
+    }
+  },
+  { immediate: false }
+);
+
 const initializeFromURL = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const videoParam = urlParams.get("video") || "1";
@@ -412,7 +421,7 @@ onMounted(() => {
   eventBus.on("back", handleBack);
   eventBus.on("stepNavigation", handleStepNavigation);
 
-  initializeFromURL();
+  // initializeFromURL();
 });
 
 onUnmounted(() => {
