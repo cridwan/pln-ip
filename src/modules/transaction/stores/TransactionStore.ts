@@ -904,7 +904,9 @@ export const useTransactionStore = defineStore(
 
     const getSequences = async (params:IParams) => {
       return await api
-        .get(`/transaction/project/sequences`)
+        .get(`/transaction/project/sequences`,{
+          params
+        })
         .then((resp) => {
           return Promise.resolve(resp);
         })

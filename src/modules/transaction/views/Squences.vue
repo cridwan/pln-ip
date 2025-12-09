@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import {
+  computed,
+  onBeforeMount,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import {
@@ -16,8 +24,8 @@ import { Icon, Loading } from "@/components";
 import eventBus from "@/utils/eventBus";
 import Sidebar from "@/components/layouts/Sidebar.vue";
 import { useQuery } from "@tanstack/vue-query";
-import type { IPagination } from "@/types/GlobalType";
 import type { SequenceInterface } from "@/modules/master/types/SequenceTypes";
+
 import type { AxiosError } from "axios";
 import { useTransactionStore } from "../stores/TransactionStore";
 
@@ -78,10 +86,11 @@ const {
   isFetching: isLoadingSequence,
   refetch: refetchSequence,
 } = useQuery({
-  queryKey: ["getSequenceMaster"],
+  queryKey: ["getSequenceTransaction"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getSequences(params);
+      console.log("DATA", data);
       const response = data.data as SequenceInterface;
 
       console.log("AAAAA", response);

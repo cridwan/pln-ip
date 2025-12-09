@@ -158,6 +158,17 @@ export const routeTransaction = [
     },
   },
   {
+    path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/sequence",
+    name: "add scope detail sequence guest",
+    component: () => import("@/modules/guest/views/add-scope-detail/Sequences.vue"),
+    meta: {
+      layout: GuestDefaultLayout,
+      requireAuth: true,
+      role: ["guest"],
+      except: ["superuser"],
+    },
+  },
+  {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/equipment",
     name: "add scope detail equipment guest",
     component: () =>
