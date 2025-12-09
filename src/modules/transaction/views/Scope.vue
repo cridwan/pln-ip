@@ -573,7 +573,8 @@ onMounted(() => {
     v-if="
       dataForm?.sub_bidang_uuid &&
       dataApproval?.status !== 'approve' &&
-      access_token
+      access_token &&
+      authStore.users?.role == 'planner'
     "
     icon_only="plus"
     class="absolute right-[9rem] top-[6.5rem]"
@@ -601,7 +602,11 @@ onMounted(() => {
           :is_logging="false"
           :pagination="pagination"
           :is-create="false"
-          :is-action="dataApproval?.status !== 'approve' && access_token !== ''"
+          :is-action="
+            dataApproval?.status !== 'approve' &&
+            access_token !== '' &&
+            authStore.users?.role == 'planner'
+          "
           v-model:model-search="params.search"
           @delete="handleDelete"
           @change-page="changePage"
@@ -626,7 +631,11 @@ onMounted(() => {
                 :value="entity.asset_welness"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+                :disabled="
+                  dataApproval?.status === 'approve' ||
+                  !access_token ||
+                  authStore.users?.role != 'planner'
+                "
                 @save="(e) => saveAssetWelness(e, entity)"
               />
             </div>
@@ -647,7 +656,11 @@ onMounted(() => {
                 :value="entity.oh_recom"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+                :disabled="
+                  dataApproval?.status === 'approve' ||
+                  !access_token ||
+                  authStore.users?.role != 'planner'
+                "
                 @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')"
               />
             </div>
@@ -668,7 +681,11 @@ onMounted(() => {
                 :value="entity.wo_priority"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+                :disabled="
+                  dataApproval?.status === 'approve' ||
+                  !access_token ||
+                  authStore.users?.role != 'planner'
+                "
                 @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')"
               />
             </div>
@@ -689,7 +706,11 @@ onMounted(() => {
                 :value="entity.history"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+                :disabled="
+                  dataApproval?.status === 'approve' ||
+                  !access_token ||
+                  authStore.users?.role != 'planner'
+                "
                 @save="(e) => saveFieldWithFile(e, entity, 'history')"
               />
             </div>
@@ -710,7 +731,11 @@ onMounted(() => {
                 :value="entity.rla"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+                :disabled="
+                  dataApproval?.status === 'approve' ||
+                  !access_token ||
+                  authStore.users?.role != 'planner'
+                "
                 @save="(e) => saveFieldWithFile(e, entity, 'rla')"
               />
             </div>
@@ -731,7 +756,11 @@ onMounted(() => {
                 :value="entity.ncr"
                 :label="entity.asset"
                 :loading="is_loading_create"
-                :disabled="dataApproval?.status === 'approve' || !access_token"
+                :disabled="
+                  dataApproval?.status === 'approve' ||
+                  !access_token ||
+                  authStore.users?.role != 'planner'
+                "
                 @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
               />
             </div>
@@ -747,6 +776,7 @@ onMounted(() => {
                   <TableEquipment
                     :with-ik="false"
                     :id="entity.id"
+                    :is-action="authStore.users?.role == 'planner'"
                     :original_uuid="entity.original_uuid"
                     :entity="entity.children"
                     :status-approval="dataApproval?.status"

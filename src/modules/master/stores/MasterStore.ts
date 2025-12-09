@@ -2592,7 +2592,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Activity.xlsx`;
+          a.download = `${prefix ? 'Detail ' : ''} Activity.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -2625,7 +2625,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Activity Template.xlsx`;
+          a.download = `${prefix ? 'Detail ' : ''} Activity Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -2728,7 +2728,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Equipment.xlsx`;
+          a.download = `${prefix ? 'Detail ' :''} Equipment.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -2761,7 +2761,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Equipment Template.xlsx`;
+          a.download = `${prefix ? 'Detail ' :''} Equipment Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -2864,7 +2864,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Part Standart.xlsx`;
+          a.download = `${prefix ? 'Detail ' : ''} Part Standart.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -2898,7 +2898,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Part Standart Template.xlsx`;
+          a.download = `${prefix ? 'Detail ' : ''} Part Standart Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3001,7 +3001,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Manpower Standart.xlsx`;
+          a.download = `${prefix ? 'Detail':''} Standart Manpower.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3034,7 +3034,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Manpower Standart Template.xlsx`;
+          a.download = `${prefix ? 'Detail':''} Manpower Standart Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3145,7 +3145,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Consumable Material Standart.xlsx`;
+          a.download = `${prefix ? 'Detail':''} Consumable Material Standart.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3178,7 +3178,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Consumable Material Standart Template.xlsx`;
+          a.download = `${prefix ? 'Detail':''} Consumable Material Standart Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();

@@ -95,7 +95,7 @@ defineExpose({
         {{ value && value?.file?.length > 0 ? "Active" : "Add" }}
       </button>
     </PopoverTrigger>
-    <PopoverPortal v-if="!disabled">
+    <PopoverPortal>
       <PopoverContent :side-offset="5" class="popover-content-upload">
         <p class="popover-title">{{ label }}</p>
         <div class="mt-4">

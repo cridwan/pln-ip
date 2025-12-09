@@ -5,7 +5,7 @@ import { Button, Input, Modal } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { useMutation } from "@tanstack/vue-query";
-import { all_characters } from "@/helpers/global";
+import { all_characters, numbers_positive } from "@/helpers/global";
 import type {
   CreateActivityLogSyncInterface,
   CreateDocumentInterface,
@@ -44,6 +44,7 @@ const model = ref<ActivityCreateInterface>({
   duration: "",
   link_ik1: "",
   equipment_uuid: props.dataForm?.equipment_uuid || "",
+  serial_number: "",
 });
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
@@ -55,6 +56,9 @@ const rules = computed(() => {
       required: helpers.withMessage(`This field is required`, required),
     },
     link_ik1: {
+      required: helpers.withMessage(`This field is required`, required),
+    },
+    serial_number: {
       required: helpers.withMessage(`This field is required`, required),
     },
   };
@@ -158,6 +162,7 @@ const handleSubmit = async () => {
         duration: model.value.duration,
         link_ik1: model.value.link_ik1,
         equipment_uuid: model.value.equipment_uuid,
+        serial_number: model.value.serial_number,
       },
     });
   } else {
@@ -166,6 +171,7 @@ const handleSubmit = async () => {
       duration: model.value.duration,
       link_ik1: model.value.link_ik1,
       equipment_uuid: model.value.equipment_uuid,
+      serial_number: model.value.serial_number,
     });
   }
 };
@@ -175,6 +181,7 @@ const setValue = () => {
   model.value.duration = (props.selectedValue?.duration || 0).toString() || "";
   model.value.link_ik1 = props.selectedValue?.link_ik1 || "";
   model.value.equipment_uuid = props.selectedValue?.equipment_uuid || "";
+  model.value.serial_number = props.selectedValue?.serial_number || "";
 };
 
 const resetValue = () => {
@@ -183,6 +190,7 @@ const resetValue = () => {
     duration: "",
     link_ik1: "",
     equipment_uuid: props.dataForm?.equipment_uuid || "",
+    serial_number: "",
   };
   uploadProgress.value = 0;
 };
@@ -245,6 +253,13 @@ const handleRemove = () => {
         label="Durasi (Jam)"
         :rules="rules.duration"
         :custom_symbols="all_characters"
+      />
+      <Input
+        v-model="model.serial_number"
+        star
+        label="No Urut"
+        :rules="rules.serial_number"
+        :custom_symbols="numbers_positive"
       />
       <Input
         v-model="model.link_ik1"

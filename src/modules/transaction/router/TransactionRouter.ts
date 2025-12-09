@@ -182,7 +182,7 @@ export const routeTransaction = [
     meta: {
       layout: AddScopeLayout,
       requireAuth: true,
-      role: "planner",
+      role: ["planner","approval"],
       except: ["superuser"],
     },
   },

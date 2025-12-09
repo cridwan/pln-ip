@@ -13,12 +13,5 @@ export const ColumnsQcPlan: TableColumnType[] = [
     align: "center",
     sort: false,
     width: "150",
-  },
-  {
-    key: "preview",
-    label: "",
-    align: "center",
-    sort: false,
-    width: "150",
-  },
+  }
 ];

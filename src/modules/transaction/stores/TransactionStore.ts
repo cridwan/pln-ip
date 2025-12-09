@@ -642,7 +642,7 @@ export const useTransactionStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Scope.xlsx`;
+          a.download = `${type == 'SCOPE STANDART' ? '':'Additional '}Scope.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -676,7 +676,7 @@ export const useTransactionStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Scope.xlsx`;
+          a.download = `Budget Activity${type == 'SCOPE STANDART' ? '':' Additional'}.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -902,6 +902,17 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getSequences = async (params:IParams) => {
+      return await api
+        .get(`/transaction/project/sequences`)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const approveProject = async (uuid: string, payload: FormApprovalInterface) => {
       return await api
         .put(`/transaction/project/${uuid}/approve`, payload)
@@ -985,7 +996,8 @@ export const useTransactionStore = defineStore(
       deleteQcPlan,
       getHseSelect,
       cloneHse,
-      getAddScopeSelect
+      getAddScopeSelect,
+      getSequences
     };
   },
   {

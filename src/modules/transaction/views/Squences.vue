@@ -16,10 +16,10 @@ import { Icon, Loading } from "@/components";
 import eventBus from "@/utils/eventBus";
 import Sidebar from "@/components/layouts/Sidebar.vue";
 import { useQuery } from "@tanstack/vue-query";
-import { useMasterStore } from "@/modules/master/stores/MasterStore";
 import type { IPagination } from "@/types/GlobalType";
 import type { SequenceInterface } from "@/modules/master/types/SequenceTypes";
 import type { AxiosError } from "axios";
+import { useTransactionStore } from "../stores/TransactionStore";
 
 const videosData = ref({
   ci: [
@@ -69,7 +69,7 @@ const loadVideo = async () => {
   }
 };
 
-const masterStore = useMasterStore();
+const transactionStore = useTransactionStore();
 const router = useRouter();
 const route = useRoute();
 const globalStore = useGlobalStore();
@@ -85,7 +85,9 @@ const {
 //--- GET SEQUENCE
 const params = reactive({
   search: "",
-  filter: "",
+  filter: {
+    inspectionType: route.params.id_inspection,
+  },
   filters: [],
   currentPage: 1,
   perPage: 10,
@@ -98,11 +100,8 @@ const {
   queryKey: ["getSequenceMaster"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getSequence(params);
+      const { data } = await transactionStore.getSequences(params);
       const response = data.data as IPagination<SequenceInterface[]>;
-
-      console.log("response", response);
-
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
@@ -434,7 +433,7 @@ onUnmounted(() => {
       <Sidebar />
     </div>
     <div
-      v-if="is_loading"
+      v-if="isLoadingSequence"
       class="z-[100000000000] fixed top-0 right-0 bottom-0 left-0 bg-neutral-900 bg-opacity-50 flex justify-center items-center"
     >
       <Loading width="50" height="50" />

@@ -333,6 +333,7 @@ onMounted(() => {
     rounded="full"
     color="blue"
     @click="handleCreate"
+    v-show="authStore.users?.role == 'planner'"
   />
   <Breadcrumb :items="breadcrumb" />
   <Table
@@ -343,7 +344,11 @@ onMounted(() => {
     :loading="isLoadingQcPlan"
     :pagination="pagination"
     :is-create="false"
-    :is-action="dataApproval?.status !== 'approve' && access_token !== ''"
+    :is-action="
+      dataApproval?.status !== 'approve' &&
+      access_token !== '' &&
+      authStore.users?.role == 'planner'
+    "
     v-model:model-search="params.search"
     @change-page="changePage"
     @change-limit="changeLimit"
@@ -374,7 +379,11 @@ onMounted(() => {
           :value="entity.document"
           :label="entity.name"
           :loading="is_loading_create"
-          :disabled="dataApproval?.status === 'approve' || !access_token"
+          :disabled="
+            dataApproval?.status === 'approve' ||
+            !access_token ||
+            authStore.users?.role != 'planner'
+          "
           @save="(e) => saveFile(e, entity)"
         />
       </div>

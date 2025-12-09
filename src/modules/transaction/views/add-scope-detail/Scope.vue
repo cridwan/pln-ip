@@ -612,7 +612,8 @@ onMounted(() => {
     v-if="
       dataForm?.sub_bidang_uuid &&
       dataApproval?.status !== 'approve' &&
-      access_token
+      access_token &&
+      authStore.users?.role == 'planner'
     "
     icon_only="plus"
     class="absolute right-[9rem] top-[6.5rem]"
@@ -646,6 +647,11 @@ onMounted(() => {
           @change-limit="changeLimit"
           @search="searchTable"
           @open-children="openChildren"
+          :is-action="
+            dataApproval?.status !== 'approve' &&
+            access_token !== '' &&
+            authStore.users?.role == 'planner'
+          "
         >
           <template #column_asset_welness="{ entity }">
             <div class="w-full flex justify-center">
@@ -785,6 +791,7 @@ onMounted(() => {
                   <TableEquipment
                     :is-additional="true"
                     :id="entity.id"
+                    :is-action="authStore.users?.role == 'planner'"
                     :entity="entity.children"
                     :original_uuid="entity.original_uuid"
                     :status-approval="dataApproval?.status"

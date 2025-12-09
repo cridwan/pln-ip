@@ -54,7 +54,7 @@ export const ColumnsActivityGuest: TableColumnType[] = [
   },
   {
     key: "duration",
-    label: "Duration",
+    label: "Duration (Jam)",
     align: "left",
     sort: false,
   },

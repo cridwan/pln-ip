@@ -330,6 +330,7 @@ onMounted(() => {
     rounded="full"
     color="blue"
     @click="handleCreate"
+    v-show="authStore.users?.role == 'planner'"
   />
   <Breadcrumb :items="breadcrumb" />
   <Table
@@ -339,7 +340,11 @@ onMounted(() => {
     :loading="isLoadingHseDoc"
     :pagination="pagination"
     :is-create="false"
-    :is-action="dataApproval?.status !== 'approve' && access_token !== ''"
+    :is-action="
+      dataApproval?.status !== 'approve' &&
+      access_token !== '' &&
+      authStore.users?.role == 'planner'
+    "
     v-model:model-search="params.search"
     @change-page="changePage"
     @change-limit="changeLimit"
@@ -373,21 +378,14 @@ onMounted(() => {
           :value="entity.document"
           :label="entity.name"
           :loading="is_loading_create"
-          :disabled="dataApproval?.status === 'approve' || !access_token"
+          :disabled="
+            dataApproval?.status === 'approve' ||
+            !access_token ||
+            authStore.users?.role != 'planner'
+          "
           @save="(e) => saveFile(e, entity)"
         />
       </div>
-    </template>
-    <template #column_preview="{ entity }">
-      <div v-if="entity.document" class="w-full flex justify-center">
-        <div
-          class="bg-cyan-500 text-center border border-neutral-50 rounded-lg px-2 min-w-[120px] text-base text-neutral-50 cursor-pointer"
-          @click="preview(entity)"
-        >
-          Preview
-        </div>
-      </div>
-      <div v-else class="text-center">-</div>
     </template>
   </Table>
   <FormCloneHseDoc

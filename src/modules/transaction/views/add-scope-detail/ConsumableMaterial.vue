@@ -365,7 +365,8 @@ onMounted(() => {
       v-if="
         dataForm?.activity_uuid &&
         dataApproval?.status !== 'approve' &&
-        access_token
+        access_token &&
+        authStore.users?.role == 'planner'
       "
       icon_only="plus"
       class="absolute right-0"
@@ -395,7 +396,9 @@ onMounted(() => {
             :pagination="pagination"
             :is-create="false"
             :is-action="
-              dataApproval?.status !== 'approve' && access_token !== ''
+              dataApproval?.status !== 'approve' &&
+              access_token !== '' &&
+              authStore.users?.role == 'planner'
             "
             class="mt-6"
             v-model:model-search="params.search"
@@ -443,7 +446,8 @@ onMounted(() => {
                 :disabled="
                   dataApproval?.status === 'approve' ||
                   !access_token ||
-                  !dataForm?.activity_uuid
+                  !dataForm?.activity_uuid ||
+                  authStore.users?.role != 'planner'
                 "
                 @save="(e) => saveQuantity(e, entity)"
               />

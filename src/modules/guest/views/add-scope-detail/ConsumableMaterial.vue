@@ -2,10 +2,7 @@
 import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
-import {
-  Breadcrumb,
-  Table,
-} from "@/components";
+import { Breadcrumb, Table } from "@/components";
 import { useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type {
@@ -50,7 +47,9 @@ const {
   queryFn: async () => {
     try {
       const { data } = await masterStore.getConsMatGrouping(params);
-      const response = data.data as IPagination<ConsumableMaterialStdInterface[]>;
+      const response = data.data as IPagination<
+        ConsumableMaterialStdInterface[]
+      >;
 
       total_item.value = response.total;
       is_loading_filter.value = false;
@@ -170,16 +169,30 @@ onMounted(() => {
   <div class="relative w-full">
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
-          :loading="is_loading_filter" />
+        <FilterConsumableMaterialStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Material" :columns="ColumnsConsumableMaterial" :entities="dataConsMat?.data || []"
-            :loading="isLoadingConsMat" :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
-            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            :is_logging="false" @search="searchTable">
+          <Table
+            label-create="Material"
+            :columns="ColumnsConsumableMaterial"
+            :entities="dataConsMat?.data || []"
+            :loading="isLoadingConsMat"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="false"
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            :is_logging="false"
+            @search="searchTable"
+          >
             <template #column_material="{ entity }">
               <p class="text-base text-neutral-50 text-left min-w-[100px]">
                 {{ entity.consmat?.name ?? "-" }}
@@ -192,13 +205,19 @@ onMounted(() => {
             </template>
             <template #column_price="{ entity }">
               <p v-if="!entity.consmat?.price">-</p>
-              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
                 Rp. {{ numberFormat(entity.consmat?.price) ?? "-" }}
               </p>
             </template>
             <template #column_total="{ entity }">
               <p v-if="!entity.total_qty && !entity.consmat?.price">-</p>
-              <p v-else class="text-base text-neutral-50 text-left whitespace-nowrap">
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
                 Rp.
                 {{
                   (

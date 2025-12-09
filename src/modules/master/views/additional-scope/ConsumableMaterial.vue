@@ -46,7 +46,7 @@ const params = reactive({
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additionalScope",
+      column: "activity.equipment.scopeStandart.additional_scope_uuid",
       value: route.params.id,
     },
   ],
@@ -280,7 +280,7 @@ const resetFilter = () => {
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additionalScope",
+      column: "activity.equipment.scopeStandart.additional_scope_uuid",
       value: route.params.id,
     },
   ];

@@ -522,7 +522,11 @@ onMounted(() => {
       @delete="onDelete"
     />
     <Button
-      v-if="dataApproval?.status !== 'approve' && access_token"
+      v-if="
+        dataApproval?.status !== 'approve' &&
+        access_token &&
+        authStore.users?.role == 'planner'
+      "
       icon_only="plus"
       class="absolute right-0"
       size="sm"
@@ -566,7 +570,11 @@ onMounted(() => {
             :value="entity.asset_welness"
             :label="entity.asset"
             :loading="is_loading_create"
-            :disabled="dataApproval?.status === 'approve' || !access_token"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
             @save="(e) => saveAssetWelness(e, entity)"
           />
         </div>
@@ -587,7 +595,11 @@ onMounted(() => {
             :value="entity.oh_recom"
             :label="entity.asset"
             :loading="is_loading_create"
-            :disabled="dataApproval?.status === 'approve' || !access_token"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
             @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')"
           />
         </div>
@@ -608,7 +620,11 @@ onMounted(() => {
             :value="entity.wo_priority"
             :label="entity.asset"
             :loading="is_loading_create"
-            :disabled="dataApproval?.status === 'approve' || !access_token"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
             @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')"
           />
         </div>
@@ -629,7 +645,11 @@ onMounted(() => {
             :value="entity.history"
             :label="entity.asset"
             :loading="is_loading_create"
-            :disabled="dataApproval?.status === 'approve' || !access_token"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
             @save="(e) => saveFieldWithFile(e, entity, 'history')"
           />
         </div>
@@ -650,7 +670,11 @@ onMounted(() => {
             :value="entity.rla"
             :label="entity.asset"
             :loading="is_loading_create"
-            :disabled="dataApproval?.status === 'approve' || !access_token"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
             @save="(e) => saveFieldWithFile(e, entity, 'rla')"
           />
         </div>
@@ -671,7 +695,11 @@ onMounted(() => {
             :value="entity.ncr"
             :label="entity.asset"
             :loading="is_loading_create"
-            :disabled="dataApproval?.status === 'approve' || !access_token"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
             @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
           />
         </div>
@@ -685,7 +713,11 @@ onMounted(() => {
             @click="toDetail(entity.id, entity)"
           />
           <Icon
-            v-if="dataApproval?.status !== 'approve' && access_token"
+            v-if="
+              dataApproval?.status !== 'approve' &&
+              access_token &&
+              authStore.users?.role == 'planner'
+            "
             name="trash"
             class="cursor-pointer text-white"
             @click="handleDelete(entity)"

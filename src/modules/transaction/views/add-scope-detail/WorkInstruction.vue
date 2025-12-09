@@ -408,8 +408,8 @@ const setFilter = () => {
     {
       group: "AND",
       operator: "EQ",
-      column: "project_uuid",
-      value: route.params.id_project,
+      column: "additional_scope_uuid",
+      value: route.params.id_scope,
     },
     {
       group: "AND",

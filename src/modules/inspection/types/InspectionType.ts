@@ -1,4 +1,5 @@
 import type { MachineInterface } from "@/modules/master/types/MachineType";
+import type { SequenceInterface } from "@/modules/master/types/SequenceTypes";
 import type { UserInterface } from "@/modules/master/types/UserType";
 
 export interface TInspection {
@@ -8,6 +9,7 @@ export interface TInspection {
   machine?: MachineInterface,
   created_at: string;
   updated_at: string;
+  sequence?:SequenceInterface;
   day: number;
 }
 
