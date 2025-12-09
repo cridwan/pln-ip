@@ -288,12 +288,18 @@ export const MenusAddScope: MenuInterface[] = [
   },
   {
     id: 2,
+    name: "Sequence",
+    url: "/sequence",
+    icon: "forward-message",
+  },
+  {
+    id: 3,
     name: "Scope",
     url: "/scope",
     icon: "document",
   },
   {
-    id: 2,
+    id: 4,
     name: "Instruksi Kerja",
     url: "/work-instruction",
     icon: "megaphone",
@@ -311,19 +317,19 @@ export const MenusAddScope: MenuInterface[] = [
   //   icon: "pulse-line",
   // },
   {
-    id: 4,
+    id: 5,
     name: "Consumable Material",
     url: "/consumable-material",
     icon: "box",
   },
   {
-    id: 5,
+    id: 6,
     name: "Manpower",
     url: "/manpower",
     icon: "male",
   },
   {
-    id: 6,
+    id: 7,
     name: "Part",
     url: "/part",
     icon: "trolley-items",
@@ -336,6 +342,12 @@ export const MenusGuestAddScope: MenuInterface[] = [
     name: "Main Menu",
     url: "/",
     icon: "out",
+  },
+  {
+    id: 2,
+    name: "Sequence",
+    url: "/sequence",
+    icon: "forward-message",
   },
   {
     id: 2,

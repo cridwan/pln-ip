@@ -14,12 +14,12 @@ import {
 import { useGlobalStore } from "@/stores/GlobalStore";
 import { Icon, Loading } from "@/components";
 import eventBus from "@/utils/eventBus";
+import Sidebar from "@/components/layouts/Sidebar.vue";
 import { useQuery } from "@tanstack/vue-query";
 import type { SequenceInterface } from "@/modules/master/types/SequenceTypes";
 import type { AxiosError } from "axios";
-import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
+import { useTransactionStore } from "../../stores/TransactionStore";
 import SidebarAddScope from "@/components/layouts/SidebarAddScope.vue";
-import GuestSidebar from "@/components/layouts/GuestSidebar.vue";
 
 const videosData = ref<any>({
   main: [],
@@ -67,7 +67,7 @@ const {
 const params = reactive({
   search: "",
   filter: {
-    inspectionType: route.params.id_inspection,
+    additionalScope: route.query.original_uuid,
   },
   filters: [],
   currentPage: 1,
@@ -78,7 +78,7 @@ const {
   isFetching: isLoadingSequence,
   refetch: refetchSequence,
 } = useQuery({
-  queryKey: ["getSequenceGuest"],
+  queryKey: ["getSequenceTransaction"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getSequences(params);
@@ -440,7 +440,7 @@ onUnmounted(() => {
 <template>
   <div class="scope-container">
     <div>
-      <GuestSidebar />
+      <SidebarAddScope />
     </div>
     <div
       v-if="isLoadingSequence"

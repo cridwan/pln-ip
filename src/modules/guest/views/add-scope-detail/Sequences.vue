@@ -12,6 +12,7 @@ import {
 } from "radix-vue";
 
 import { useGlobalStore } from "@/stores/GlobalStore";
+import GuestSidebarAddScope from "@/components/layouts/GuestSidebarAddScope.vue";
 import { Icon, Loading } from "@/components";
 import eventBus from "@/utils/eventBus";
 import { useQuery } from "@tanstack/vue-query";
@@ -67,7 +68,7 @@ const {
 const params = reactive({
   search: "",
   filter: {
-    inspectionType: route.params.id_inspection,
+    additionalScope: route.params.id_scope,
   },
   filters: [],
   currentPage: 1,
@@ -440,7 +441,7 @@ onUnmounted(() => {
 <template>
   <div class="scope-container">
     <div>
-      <GuestSidebar />
+      <GuestSidebarAddScope />
     </div>
     <div
       v-if="isLoadingSequence"

@@ -186,6 +186,20 @@ export const routeTransaction = [
       except: ["superuser"],
     },
   },
+   {
+    path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/sequence",
+    name: "add scope detail transaction sequence",
+    component: () =>
+      import(
+        "@/modules/transaction/views/add-scope-detail/Sequences.vue"
+      ),
+    meta: {
+      layout: DefaultLayout,
+      requireAuth: true,
+      role: ["planner","approval"],
+      except: ["superuser"],
+    },
+  },
   {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/equipment",
     name: "add scope detail equipment",
