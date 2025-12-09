@@ -25,7 +25,9 @@ import FormConsumableMaterialStd from "../components/FormConsumableMaterialStd.v
 import ButtonGroup from "../components/ButtonGroup.vue";
 
 const dataForm = ref<ConsumableMaterialStdCreateModelInterface | null>(null);
-const formConsumableMaterialStd = ref<InstanceType<typeof FormConsumableMaterialStd> | null>(null)
+const formConsumableMaterialStd = ref<InstanceType<
+  typeof FormConsumableMaterialStd
+> | null>(null);
 const masterStore = useMasterStore();
 const total_item = ref(0);
 const params = reactive({
@@ -103,7 +105,7 @@ const { mutate: deleteConsMatStd, isPending: isLoadingDelete } = useMutation({
     refetchConsMatStd();
 
     if (formConsumableMaterialStd.value?.refetchConsumableMaterial) {
-      formConsumableMaterialStd.value.refetchConsumableMaterial()
+      formConsumableMaterialStd.value.refetchConsumableMaterial();
     }
   },
   onError: (error: any) => {
@@ -122,7 +124,7 @@ const { mutate: downloadConsMatStd, isPending: isLoadingDownload } =
     mutationFn: async () => {
       return await masterStore.downloadConsumableMaterialStd(params);
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -135,7 +137,7 @@ const { mutate: templateConsMatStd, isPending: isLoadingTemplate } =
     mutationFn: async () => {
       return await masterStore.templateConsumableMaterialStd();
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -210,7 +212,7 @@ const handleSuccess = () => {
   refetchConsMatStd();
 
   if (formConsumableMaterialStd.value?.refetchConsumableMaterial) {
-    formConsumableMaterialStd.value.refetchConsumableMaterial()
+    formConsumableMaterialStd.value.refetchConsumableMaterial();
   }
 };
 
@@ -312,29 +314,62 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button v-if="dataForm?.activity_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
-        @click="handleCreate" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.activity_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterConsumableMaterialStd @filter="handleOnFilter" @reset-filter="handleResetFilter"
-          :loading="is_loading_filter" />
+        <FilterConsumableMaterialStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table label-create="User" :columns="ColumnConsumableMaterialStd" :entities="dataConsMatStd?.data || []"
-          :loading="isLoadingConsMatStd" :pagination="pagination" :is-create="false"
-          v-model:model-search="params.search" class="mt-6" @change-page="changePage" @change-limit="changeLimit"
-          @search="searchTable">
+        <Table
+          label-create="User"
+          :columns="ColumnConsumableMaterialStd"
+          :entities="dataConsMatStd?.data || []"
+          :loading="isLoadingConsMatStd"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          class="mt-6"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                v-show="Number(entity.has_transaction) == 0" />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
+              />
             </div>
           </template>
           <template #column_cons_mat="{ entity }">
@@ -351,13 +386,22 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormConsumableMaterialStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item"
-      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess"
-      ref="formConsumableMaterialStd" />
+    <FormConsumableMaterialStd
+      :data-form="dataForm"
+      v-model="open_form"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+      ref="formConsumableMaterialStd"
+    />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete"
-    :title="`${selected_item?.consmat?.name} / ${selected_item?.consmat?.global_unit?.name}`" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="`${selected_item?.consmat?.name} / ${selected_item?.consmat?.global_unit?.name}`"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

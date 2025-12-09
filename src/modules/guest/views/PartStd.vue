@@ -3,10 +3,7 @@ import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 
-import {
-  Breadcrumb,
-  Table,
-} from "@/components";
+import { Breadcrumb, Table } from "@/components";
 import { useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
@@ -178,15 +175,30 @@ onMounted(() => {
   <div class="relative w-full">
     <div class="flex gap-8">
       <div class="basis-1/5">
-        <FilterPartStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
+        <FilterPartStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
+        />
       </div>
       <div class="flex-1 overflow-auto">
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
-          <Table label-create="Part" :columns="ColumnsPart" :entities="dataPart?.data || []" :loading="isLoadingPart"
-            :is_logging="false" :pagination="pagination" :is-create="false" :is-action="false" class="mt-6"
-            v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-            @search="searchTable">
+          <Table
+            label-create="Part"
+            :columns="ColumnsPart"
+            :entities="dataPart?.data || []"
+            :loading="isLoadingPart"
+            :is_logging="false"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="false"
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
             <template #column_part="{ entity }">
               <p class="text-neutral-50">
                 {{ entity.part?.name ?? "-" }}
@@ -194,7 +206,9 @@ onMounted(() => {
             </template>
 
             <template #column_total_qty="{ entity }">
-              <span class="text-base text-neutral-50 text-left">{{ entity.total_qty }}</span>
+              <span class="text-base text-neutral-50 text-left">{{
+                entity.total_qty
+              }}</span>
             </template>
 
             <template #column_unit="{ entity }">

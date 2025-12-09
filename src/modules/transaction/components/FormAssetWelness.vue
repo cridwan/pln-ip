@@ -98,56 +98,101 @@ defineExpose({
 <template>
   <PopoverRoot v-model:open="modelOpenInputData">
     <PopoverTrigger>
-      <button class="button-trigger" :class="[
-        {
-          'button-trigger-active': modelOpenInputData === true,
-        },
-        (value && value?.color) || (value && value?.note)
-          ? value?.color === 'red'
-            ? '!bg-red-500'
-            : value?.color === 'yellow'
+      <button
+        class="button-trigger"
+        :class="[
+          {
+            'button-trigger-active': modelOpenInputData === true,
+          },
+          (value && value?.color) || (value && value?.note)
+            ? value?.color === 'red'
+              ? '!bg-red-500'
+              : value?.color === 'yellow'
               ? '!bg-yellow-500'
               : value?.color === 'green'
-                ? '!bg-green-500'
-                : ''
-          : '',
-        disabled ? 'cursor-default' : 'cursor-pointer',
-      ]">
+              ? '!bg-green-500'
+              : ''
+            : '',
+          'cursor-pointer',
+        ]"
+      >
         {{
           (value && value?.color) || (value && value?.note)
             ? value.color === "red"
               ? "Red"
               : value.color === "yellow"
-                ? "Yellow"
-                : value.color === "green"
-                  ? "Green"
-                  : "Clear"
+              ? "Yellow"
+              : value.color === "green"
+              ? "Green"
+              : "Clear"
             : "Add"
         }}
       </button>
     </PopoverTrigger>
-    <PopoverPortal v-if="!disabled" class="!z-[9999]">
+    <PopoverPortal class="!z-[9999]">
       <PopoverContent :side-offset="5" class="popover-content">
         <p class="popover-title">{{ label }}</p>
         <div class="button-colors">
-          <button class="button-red" :class="{ 'red-active': model.color === 'red' }" @click="model.color = 'red'">
+          <button
+            :class="[
+              { 'red-active': model.color === 'red' },
+              disabled ? '!cursor-default' : 'button-red',
+            ]"
+            @click="
+              () => {
+                if (!disabled) model.color = 'red';
+              }
+            "
+          >
             Red
           </button>
-          <button class="button-yellow" :class="{ 'yellow-active': model.color === 'yellow' }"
-            @click="model.color = 'yellow'">
+          <button
+            :class="[
+              { 'yellow-active': model.color === 'yellow' },
+              disabled ? '!cursor-default' : 'button-yellow',
+            ]"
+            @click="
+              () => {
+                if (!disabled) model.color = 'yellow';
+              }
+            "
+          >
             Yellow
           </button>
-          <button class="button-green" :class="{ 'green-active': model.color === 'green' }"
-            @click="model.color = 'green'">
+          <button
+            :class="[
+              { 'green-active': model.color === 'green' },
+              disabled ? '!cursor-default' : 'button-green',
+            ]"
+            @click="
+              () => {
+                if (!disabled) model.color = 'green';
+              }
+            "
+          >
             Green
           </button>
-          <button class="button-clear" @click="onClear">Clear</button>
+          <button
+            :class="disabled ? '!cursor-default' : 'button-clear'"
+            @click="
+              () => {
+                if (!disabled) onClear;
+              }
+            "
+          >
+            Clear
+          </button>
         </div>
         <div class="mt-4">
-          <Textarea label="Note" :rows="6" v-model="model.note" />
+          <Textarea
+            label="Note"
+            :rows="6"
+            :disabled="disabled"
+            v-model="model.note"
+          />
         </div>
         <div class="mt-4">
-          <Upload v-model="modelUpload" :max-count="10" />
+          <Upload v-model="modelUpload" :disabled="disabled" :max-count="10" />
         </div>
         <!-- <div class="popover-input mt-4">
           <div class="w-[400px]">
@@ -177,9 +222,24 @@ defineExpose({
           </div>
         </div> -->
         <div class="popover-footer">
-          <Button text="Cancel" size="sm" rounded="full" color="red" :disabled="loading" @click="cancel" />
-          <Button text="Save" size="sm" rounded="full" color="blue" :disabled="loading" :loading="loading"
-            @click="save" />
+          <Button
+            text="Cancel"
+            size="sm"
+            rounded="full"
+            color="red"
+            :disabled="loading"
+            @click="cancel"
+          />
+          <Button
+            v-if="!disabled"
+            text="Save"
+            size="sm"
+            rounded="full"
+            color="blue"
+            :disabled="loading"
+            :loading="loading"
+            @click="save"
+          />
         </div>
       </PopoverContent>
     </PopoverPortal>

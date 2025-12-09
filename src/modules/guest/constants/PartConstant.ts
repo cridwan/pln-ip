@@ -8,6 +8,13 @@ export const ColumnsPart: TableColumnType[] = [
     sort: false,
   },
   {
+    key: "number_drawing",
+    label: "No. Drawing",
+    align: "left",
+    sort: false,
+    width: "150",
+  },
+  {
     key: "total_qty",
     label: "Quantity",
     align: "left",
@@ -16,14 +23,7 @@ export const ColumnsPart: TableColumnType[] = [
   },
   {
     key: "unit",
-    label: "Unit",
-    align: "left",
-    sort: false,
-    width: "150",
-  },
-  {
-    key: "number_drawing",
-    label: "No. Drawing",
+    label: "Satuan",
     align: "left",
     sort: false,
     width: "150",

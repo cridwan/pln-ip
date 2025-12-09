@@ -4,7 +4,14 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
-import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
@@ -28,7 +35,7 @@ const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
 const open_delete = ref(false);
 const selected_item = ref<HseDocInterface | null>(null);
-const formCloneHse = ref<InstanceType<typeof FormCloneHseDoc> | null>(null)
+const formCloneHse = ref<InstanceType<typeof FormCloneHseDoc> | null>(null);
 const entitiesHseDoc = ref<HseDocInterface[]>([]);
 const transactionStore = useTransactionStore();
 const globalStore = useGlobalStore();
@@ -67,7 +74,7 @@ const { mutate: deleteHseDoc, isPending: isLoadingDelete } = useMutation({
     open_delete.value = false;
     refetchHseDoc();
     if (formCloneHse.value?.refetchHseDoc) {
-      formCloneHse.value.refetchHseDoc()
+      formCloneHse.value.refetchHseDoc();
     }
   },
   onError: (error: any) => {
@@ -111,17 +118,17 @@ const { isFetching: isLoadingHseDoc, refetch: refetchHseDoc } = useQuery({
           created_at: item.created_at,
           document: item.document
             ? {
-              file: item.document
-                ? [
-                  {
-                    id: item.document.uuid,
-                    name: item.document.document_original_name,
-                    size: item.document.document_size,
-                    file: item.document.document_link,
-                  },
-                ]
-                : [],
-            }
+                file: item.document
+                  ? [
+                      {
+                        id: item.document.uuid,
+                        name: item.document.document_original_name,
+                        size: item.document.document_size,
+                        file: item.document.document_link,
+                      },
+                    ]
+                  : [],
+              }
             : null,
           document_original: item.document,
           name: item.name,
@@ -244,7 +251,6 @@ function searchTable() {
   }, 1000);
 }
 
-
 const handleSuccess = () => {
   toastRef.value?.showToast({
     title: "Success",
@@ -255,7 +261,7 @@ const handleSuccess = () => {
   refetchHseDoc();
 
   if (formCloneHse.value?.refetchHseDoc) {
-    formCloneHse.value.refetchHseDoc()
+    formCloneHse.value.refetchHseDoc();
   }
 };
 
@@ -272,8 +278,8 @@ const handleRemoveSuccess = () => {
 };
 
 const handleCreate = () => {
-  open_form.value = true
-}
+  open_form.value = true;
+};
 
 const onDelete = () => {
   deleteHseDoc(selected_item.value?.uuid as string);
@@ -302,7 +308,7 @@ onMounted(() => {
       url: "",
     },
     {
-      name: route.query?.inspection as string,
+      name: ((route.query?.inspection as string) || "").toUpperCase(),
       as_link: false,
       url: "",
     },
@@ -317,15 +323,35 @@ onMounted(() => {
 
 <template>
   <Toast ref="toastRef" />
-  <Button icon_only="plus" class="absolute right-10" size="sm" rounded="full" color="blue" @click="handleCreate" />
+  <Button
+    icon_only="plus"
+    class="absolute right-10"
+    size="sm"
+    rounded="full"
+    color="blue"
+    @click="handleCreate"
+  />
   <Breadcrumb :items="breadcrumb" />
-  <Table :is_logging="false" :columns="ColumnsHse" :entities="entitiesHseDoc" :loading="isLoadingHseDoc"
-    :pagination="pagination" :is-create="false" :is-action="dataApproval?.status !== 'approve' && access_token !== ''
-      " v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-    @search="searchTable">
+  <Table
+    :is_logging="false"
+    :columns="ColumnsHse"
+    :entities="entitiesHseDoc"
+    :loading="isLoadingHseDoc"
+    :pagination="pagination"
+    :is-create="false"
+    :is-action="dataApproval?.status !== 'approve' && access_token !== ''"
+    v-model:model-search="params.search"
+    @change-page="changePage"
+    @change-limit="changeLimit"
+    @search="searchTable"
+  >
     <template #column_action="{ entity }">
       <div class="flex items-center justify-center gap-4">
-        <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+        <Icon
+          name="trash"
+          class="icon-action-table"
+          @click="handleDelete(entity)"
+        />
       </div>
     </template>
     <template #column_name="{ entity }">
@@ -333,29 +359,48 @@ onMounted(() => {
     </template>
     <template #column_attachment="{ entity }">
       <div class="w-full flex justify-center">
-        <p v-if="
-          (dataApproval?.status === 'approve' && !entity.document) ||
-          (!access_token && !entity.document)
-        ">
+        <p
+          v-if="
+            (dataApproval?.status === 'approve' && !entity.document) ||
+            (!access_token && !entity.document)
+          "
+        >
           -
         </p>
-        <FormOnlyUploadFile v-else ref="attachment" :value="entity.document" :label="entity.name"
-          :loading="is_loading_create" :disabled="dataApproval?.status === 'approve' || !access_token"
-          @save="(e) => saveFile(e, entity)" />
+        <FormOnlyUploadFile
+          v-else
+          ref="attachment"
+          :value="entity.document"
+          :label="entity.name"
+          :loading="is_loading_create"
+          :disabled="dataApproval?.status === 'approve' || !access_token"
+          @save="(e) => saveFile(e, entity)"
+        />
       </div>
     </template>
     <template #column_preview="{ entity }">
       <div v-if="entity.document" class="w-full flex justify-center">
         <div
           class="bg-cyan-500 text-center border border-neutral-50 rounded-lg px-2 min-w-[120px] text-base text-neutral-50 cursor-pointer"
-          @click="preview(entity)">
+          @click="preview(entity)"
+        >
           Preview
         </div>
       </div>
       <div v-else class="text-center">-</div>
     </template>
   </Table>
-  <FormCloneHseDoc ref="formCloneHse" v-model="open_form" @success="handleSuccess" @error="handleError"
-    @removeSucess="handleRemoveSuccess" />
-  <ModalDelete v-model="open_delete" :title="`${selected_item?.name}`" :loading="isLoadingDelete" @delete="onDelete" />
+  <FormCloneHseDoc
+    ref="formCloneHse"
+    v-model="open_form"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
+  <ModalDelete
+    v-model="open_delete"
+    :title="`${selected_item?.name}`"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

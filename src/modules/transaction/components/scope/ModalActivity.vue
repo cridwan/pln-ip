@@ -44,16 +44,16 @@ const props = defineProps({
   },
   scope_name: {
     type: String,
-    default: ''
+    default: "",
   },
   withIk: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
-const formActivity = ref<InstanceType<typeof FormActivity> | null>(null)
+const formActivity = ref<InstanceType<typeof FormActivity> | null>(null);
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
 const transactionStore = useTransactionStore();
@@ -94,20 +94,23 @@ const model = computed({
 });
 
 const columnActivity = computed(() => {
-  return props.withIk ? ColumnsActivityTransaction.concat([{
-
-    key: "ik_link",
-    label: "IK Link",
-    align: "left",
-    sort: false,
-  },
-  {
-    key: "ik_doc",
-    label: "IK Doc",
-    align: "left",
-    sort: false,
-  }]) : ColumnsActivityTransaction;
-})
+  return props.withIk
+    ? ColumnsActivityTransaction.concat([
+        {
+          key: "ik_link",
+          label: "IK Online",
+          align: "left",
+          sort: false,
+        },
+        {
+          key: "ik_doc",
+          label: "IK Doc",
+          align: "left",
+          sort: false,
+        },
+      ])
+    : ColumnsActivityTransaction;
+});
 
 //--- GET ACTIVITY
 const {
@@ -118,7 +121,10 @@ const {
   queryKey: [`getActivityTransactionDetail${props.id}`],
   queryFn: async () => {
     try {
-      const { data } = await transactionStore.getActivity(params, props.isAdditional ? '/add-scope/detail' : '');
+      const { data } = await transactionStore.getActivity(
+        params,
+        props.isAdditional ? "/add-scope/detail" : ""
+      );
       const response = data.data as IPagination<ActivityInterface[]>;
 
       total_item.value = response.total;
@@ -150,7 +156,7 @@ const { mutate: deleteActivity, isPending: isLoadingDelete } = useMutation({
     refetchActivity();
 
     if (formActivity.value?.refetchActivity) {
-      formActivity.value.refetchActivity()
+      formActivity.value.refetchActivity();
     }
   },
   onError: (error: any) => {
@@ -214,7 +220,7 @@ const handleSuccess = () => {
   refetchActivity();
 
   if (formActivity.value?.refetchActivity) {
-    formActivity.value.refetchActivity()
+    formActivity.value.refetchActivity();
   }
 };
 
@@ -240,18 +246,50 @@ watch(model, (value) => {
 </script>
 
 <template>
-  <Modal width="1000" height="500" :showButtonClose="false" :title="`Data Activity > ${scope_name}`" v-model="model">
+  <Modal
+    width="1000"
+    height="500"
+    :showButtonClose="false"
+    :title="`Data Activity > ${scope_name}`"
+    v-model="model"
+  >
     <div class="flex flex-col">
-      <div v-if="statusApproval !== 'approve' && access_token" class="flex justify-end">
-        <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" v-show="props.isAction" />
+      <div
+        v-if="statusApproval !== 'approve' && access_token"
+        class="flex justify-end"
+      >
+        <Button
+          icon_only="plus"
+          size="sm"
+          rounded="full"
+          color="blue"
+          @click="handleCreate"
+          v-show="props.isAction"
+        />
       </div>
-      <Table label-create="Sub Bidang" :is_logging="false" :columns="columnActivity"
-        :entities="dataActivity?.data || []" :loading="isLoading" :pagination="pagination" :is-create="false"
-        :is-search="false" :is-action="props.isAction && (statusApproval !== 'approve' && access_token !== '')"
-        class="mt-6" @change-page="changePage" @change-limit="changeLimit">
+      <Table
+        label-create="Sub Bidang"
+        :is_logging="false"
+        :columns="columnActivity"
+        :entities="dataActivity?.data || []"
+        :loading="isLoading"
+        :pagination="pagination"
+        :is-create="false"
+        :is-search="false"
+        :is-action="
+          props.isAction && statusApproval !== 'approve' && access_token !== ''
+        "
+        class="mt-6"
+        @change-page="changePage"
+        @change-limit="changeLimit"
+      >
         <template #column_action="{ entity }">
           <div class="flex items-center justify-center gap-4">
-            <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+            <Icon
+              name="trash"
+              class="icon-action-table"
+              @click="handleDelete(entity)"
+            />
           </div>
         </template>
         <template #column_equipment="{ entity }">
@@ -260,14 +298,23 @@ watch(model, (value) => {
           </p>
         </template>
         <template #column_ik_link="{ entity }">
-          <a target="_blank" :href="entity.link_ik1" class="text-base text-neutral-50 text-left" v-if="entity.link_ik1">
-            {{ entity.link_ik1 ?? '-' }}
+          <a
+            target="_blank"
+            :href="entity.link_ik1"
+            class="text-base text-neutral-50 text-left"
+            v-if="entity.link_ik1"
+          >
+            {{ entity.link_ik1 ?? "-" }}
           </a>
           <span v-else>-</span>
         </template>
         <template #column_ik_doc="{ entity }">
-          <a target="_blank" :href="parsedUrl(entity.document.document_link)"
-            class="text-base text-neutral-50 text-left" v-if="entity.document">
+          <a
+            target="_blank"
+            :href="parsedUrl(entity.document.document_link)"
+            class="text-base text-neutral-50 text-left"
+            v-if="entity.document"
+          >
             {{ entity.document?.document_name }}
           </a>
           <span v-else>-</span>
@@ -276,10 +323,23 @@ watch(model, (value) => {
     </div>
   </Modal>
 
-  <FormActivity :is-additional="props.isAdditional" v-model="open_form" :data-form="dataForm"
-    :original_uuid="props.original_uuid" :selected-value="selected_item" @success="handleSuccess" @error="handleError"
-    @removeSucess="handleRemoveSuccess" ref="formActivity" />
+  <FormActivity
+    :is-additional="props.isAdditional"
+    v-model="open_form"
+    :data-form="dataForm"
+    :original_uuid="props.original_uuid"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+    ref="formActivity"
+  />
 
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
   <Toast ref="toastRef" />
 </template>

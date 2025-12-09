@@ -1,13 +1,22 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 import { AxiosError } from "axios";
 
-import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type {
   IPagination,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 import { useMasterStore } from "../../stores/MasterStore";
 import FormManpowerStd from "../../components/FormManpowerStd.vue";
@@ -17,9 +26,7 @@ import type {
   ManpowerStdInterface,
 } from "../../types/ManpowerStdType";
 import { ColumnsManpowerStd } from "../../constants/ManpowerStdConstant";
-import { useRoute } from "vue-router";
 import ButtonGroup from "../../components/ButtonGroup.vue";
-import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const route = useRoute();
 const dataForm = ref<ManpowerStdCreateModelInterface | null>(null);
@@ -63,7 +70,10 @@ const {
   queryFn: async () => {
     try {
       console.log(params);
-      const { data } = await masterStore.getManpowerStd(params, '/add-scope/detail');
+      const { data } = await masterStore.getManpowerStd(
+        params,
+        "/add-scope/detail"
+      );
       const response = data.data as IPagination<ManpowerStdInterface[]>;
       total_item.value = response.total;
 
@@ -84,7 +94,7 @@ const {
 //--- DELETE SCOPE
 const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteManpowerStd(id, '/add-scope/detail');
+    return await masterStore.deleteManpowerStd(id, "/add-scope/detail");
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -95,7 +105,7 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
     open_delete.value = false;
     refetchManpowerStd();
     if (formManpowerStd.value?.refetchManpower) {
-      formManpowerStd.value.refetchManpower()
+      formManpowerStd.value.refetchManpower();
     }
   },
   onError: (error: any) => {
@@ -112,9 +122,9 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
 const { mutate: downloadManpowerStd, isPending: isLoadingDownload } =
   useMutation({
     mutationFn: async () => {
-      return await masterStore.downloadManpowerStd(params, '/add-scope/detail');
+      return await masterStore.downloadManpowerStd(params, "/add-scope/detail");
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -125,11 +135,11 @@ const { mutate: downloadManpowerStd, isPending: isLoadingDownload } =
 const { mutate: templateManpowerStd, isPending: isLoadingTemplate } =
   useMutation({
     mutationFn: async () => {
-      return await masterStore.templateManpowerStd('/add-scope/detail', {
-        filters: params.filters
+      return await masterStore.templateManpowerStd("/add-scope/detail", {
+        filters: params.filters,
       });
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error) => {
       console.log(error);
     },
@@ -139,7 +149,7 @@ const { mutate: templateManpowerStd, isPending: isLoadingTemplate } =
 //--- IMPORT
 const { mutate: importManpowerStd, isPending: isLoadingImport } = useMutation({
   mutationFn: async (payload: File) => {
-    return await masterStore.importManpowerStd(payload, '/add-scope/detail');
+    return await masterStore.importManpowerStd(payload, "/add-scope/detail");
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -203,7 +213,7 @@ const handleSuccess = () => {
   params.currentPage = 1;
   refetchManpowerStd();
   if (formManpowerStd.value?.refetchManpower) {
-    formManpowerStd.value.refetchManpower()
+    formManpowerStd.value.refetchManpower();
   }
 };
 
@@ -277,7 +287,7 @@ const handleResetFilter = () => {
 const previewDocument = (document: ResponseDocumentInterface) => {
   window.open(
     import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-    document.document_link,
+      document.document_link,
     "_blank"
   );
 };
@@ -297,7 +307,6 @@ const handleExportTemplate = () => {
 const handleImport = (file: File) => {
   importManpowerStd(file);
 };
-
 
 onMounted(() => {
   breadcrumb.value = [
@@ -332,32 +341,69 @@ onMounted(() => {
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.manpower?.name" :loading="isLoadingDelete"
-    @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.manpower?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button v-if="dataForm?.activity_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
-        @click="handleCreate" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.activity_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterManpowerStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingManpowerStd" />
+        <FilterManpowerStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="isLoadingManpowerStd"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" class="mb-6" />
-        <Table label-create="User" :columns="ColumnsManpowerStd" :entities="dataManpowerStd?.data || []"
-          :loading="isLoadingManpowerStd" :pagination="pagination" :is-create="false"
-          v-model:model-search="params.search" @change-page="changePage" @change-limit="changeLimit"
-          @search="searchTable">
+        <Table
+          label-create="User"
+          :columns="ColumnsManpowerStd"
+          :entities="dataManpowerStd?.data || []"
+          :loading="isLoadingManpowerStd"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                v-show="Number(entity.has_transaction) == 0" />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
+              />
             </div>
           </template>
           <template #column_manpower="{ entity }">
@@ -369,7 +415,15 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormManpowerStd :is-additional="true" :data-form="dataForm" v-model="open_form" :selected-value="selected_item"
-      @success="handleSuccess" @error="handleError" @removeSucess="handleRemoveSuccess" ref="formManpowerStd" />
+    <FormManpowerStd
+      :is-additional="true"
+      :data-form="dataForm"
+      v-model="open_form"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+      ref="formManpowerStd"
+    />
   </div>
 </template>

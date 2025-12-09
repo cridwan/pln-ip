@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/vue-query";
 import { all_characters } from "@/helpers/global";
 import { useGlobalStore } from "@/stores/GlobalStore";
 import type {
+  CreateActivityLogSyncInterface,
   CreateDocumentInterface,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
@@ -114,10 +115,15 @@ const { mutate: updateActivity, isPending: isLoadingUpdate } = useMutation({
   },
   onSuccess: async () => {
     if (modelUpload.value) {
+      const type = "App\\Models\\Activity";
       createDocument({
         document: modelUpload.value as File,
-        document_type: "App\\Models\\Activity",
+        document_type: type,
         document_uuid: props.selectedValue?.uuid as string,
+      });
+      createActivityLogSync({
+        activity_id: props.selectedValue?.uuid as string,
+        activity_type: type,
       });
     } else {
       modelValue.value = false;
@@ -127,6 +133,14 @@ const { mutate: updateActivity, isPending: isLoadingUpdate } = useMutation({
   onError: (error) => {
     console.log(error);
     emit("error", error);
+  },
+});
+//--- END
+
+//--- CREATE ACTIVITY LOG SYNC
+const { mutate: createActivityLogSync } = useMutation({
+  mutationFn: async (payload: CreateActivityLogSyncInterface) => {
+    return await globalStore.createActivityLogSync(payload);
   },
 });
 //--- END
@@ -171,7 +185,7 @@ const resetValue = () => {
     equipment_uuid: props.dataForm?.equipment_uuid || "",
   };
   uploadProgress.value = 0;
-  documentValues.value = null
+  documentValues.value = null;
 };
 
 watch(modelValue, (value) => {
@@ -201,30 +215,68 @@ const handleChangeFile = (e: File) => {
   modelUpload.value = e;
 };
 
-const removeSuccess = () => {
+const handleRemove = () => {
   documentValues.value = null;
-  emit("removeSucess");
+  modelUpload.value = null;
 };
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Activity' : 'Tambah Activity'" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" star label="Nama" :rules="rules.name" :custom_symbols="all_characters" />
-      <Input v-model="model.duration" star label="Durasi (Jam)" :rules="rules.duration"
-        :custom_symbols="all_characters" />
-      <Input v-model="model.link_ik1" label="IK Online ex. (http://google.com)" :custom_symbols="all_characters" />
-      <UploadStream label="File IK" :progress="uploadProgress" :selectedValues="documentValues"
-        @changes="handleChangeFile" @removeSuccess="removeSuccess" :fileType="['pdf', 'doc', 'docx', 'xls', 'xlsx']" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Activity' : 'Tambah Activity'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        label="Nama"
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+      />
+      <Input
+        v-model="model.duration"
+        star
+        label="Durasi (Jam)"
+        :rules="rules.duration"
+        :custom_symbols="all_characters"
+      />
+      <Input
+        v-model="model.link_ik1"
+        label="IK Online ex. (http://google.com)"
+        :custom_symbols="all_characters"
+      />
+      <UploadStream
+        label="File IK"
+        :progress="uploadProgress"
+        :selectedValues="documentValues"
+        @changes="handleChangeFile"
+        @handleRemove="handleRemove"
+        :fileType="['pdf', 'doc', 'docx', 'xls', 'xlsx']"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument" @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue"
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
           :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument" />
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
+          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
+        />
       </div>
     </form>
   </Modal>

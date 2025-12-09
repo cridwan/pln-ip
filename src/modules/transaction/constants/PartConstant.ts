@@ -8,8 +8,22 @@ export const ColumnsPart: TableColumnType[] = [
     sort: false,
   },
   {
+    key: "number_drawing",
+    label: "No. Drawing",
+    align: "left",
+    sort: false,
+    width: "150",
+  },
+  {
     key: "total_qty",
     label: "Quantity",
+    align: "left",
+    sort: false,
+    width: "150",
+  },
+  {
+    key: "unit",
+    label: "Satuan",
     align: "left",
     sort: false,
     width: "150",
@@ -24,20 +38,6 @@ export const ColumnsPart: TableColumnType[] = [
   {
     key: "total",
     label: "Total Harga",
-    align: "left",
-    sort: false,
-    width: "150",
-  },
-  {
-    key: "unit",
-    label: "Unit",
-    align: "left",
-    sort: false,
-    width: "150",
-  },
-  {
-    key: "number_drawing",
-    label: "No. Drawing",
     align: "left",
     sort: false,
     width: "150",

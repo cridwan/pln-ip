@@ -23,6 +23,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  name: {
+    type: String,
+    default: "Scope",
+  },
 });
 
 type OptionType = {
@@ -61,13 +65,13 @@ const handleSubmit = async () => {
   createScope(
     props.isAdditional
       ? {
-        scope_standart_uuid: model.value.scope_standart_uuid,
-        additional_scope_uuid: route.params.id_scope as string,
-      }
+          scope_standart_uuid: model.value.scope_standart_uuid,
+          additional_scope_uuid: route.params.id_scope as string,
+        }
       : {
-        scope_standart_uuid: model.value.scope_standart_uuid,
-        project_uuid: route.params.id_project as string,
-      }
+          scope_standart_uuid: model.value.scope_standart_uuid,
+          project_uuid: route.params.id_project as string,
+        }
   );
 };
 
@@ -83,7 +87,10 @@ const resetValue = () => {
 
 const { mutate: createScope, isPending: isLoadingScope } = useMutation({
   mutationFn: async (payload: FormScopeInterface) => {
-    return transactionStore.cloneScopeStandar(payload, props.isAdditional ? '/add-scope/detail' : '');
+    return transactionStore.cloneScopeStandar(
+      payload,
+      props.isAdditional ? "/add-scope/detail" : ""
+    );
   },
   onSuccess: (data) => {
     modelValue.value = false;
@@ -103,13 +110,13 @@ const params_scope = reactive({
   perPage: 10,
   ...(props.isAdditional
     ? {
-      sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string,
-      additional_scope_uuid: route.query?.original_uuid as string,
-    }
+        sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string,
+        additional_scope_uuid: route.query?.original_uuid as string,
+      }
     : {
-      inspection_type_uuid: route.params.id_inspection as string,
-      sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string,
-    }),
+        inspection_type_uuid: route.params.id_inspection as string,
+        sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string,
+      }),
 });
 const {
   data: dataScope,
@@ -122,10 +129,13 @@ const {
   enabled: !is_loading_scope.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await transactionStore.getSelectScopeStandar({
-        ...params_scope,
-        currentPage: pageParam,
-      }, props.isAdditional ? '/add-scope/detail' : '');
+      const { data } = await transactionStore.getSelectScopeStandar(
+        {
+          ...params_scope,
+          currentPage: pageParam,
+        },
+        props.isAdditional ? "/add-scope/detail" : ""
+      );
 
       const response = data.data as IPagination<ScopeInterface[]>;
 
@@ -198,23 +208,52 @@ watch(modelValue, (value) => {
   }
 });
 
-defineExpose({ refetchScope })
+defineExpose({ refetchScope });
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" title="Tambah Scope" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Select v-model="model.scope_standart_uuid" label="Scope" options_label="label" options_value="value"
-        v-model:model-search="params_scope.search" :search="true" :loading="is_loading_scope"
-        :loading-next-page="isFetchingNextPageScope" :rules="rules.scope_standart_uuid" :options="options_scope"
-        @scroll="scrollScope" @search="searchScope" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="`Tambah ${name}`"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Select
+        v-model="model.scope_standart_uuid"
+        label="Scope"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_scope.search"
+        :search="true"
+        :loading="is_loading_scope"
+        :loading-next-page="isFetchingNextPageScope"
+        :rules="rules.scope_standart_uuid"
+        :options="options_scope"
+        @scroll="scrollScope"
+        @search="searchScope"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingScope"
-          @click="modelValue = isLoadingScope" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingScope"
-          :loading="isLoadingScope" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingScope"
+          @click="modelValue = isLoadingScope"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingScope"
+          :loading="isLoadingScope"
+        />
       </div>
     </form>
   </Modal>

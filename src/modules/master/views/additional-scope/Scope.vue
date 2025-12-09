@@ -2,7 +2,14 @@
 import { computed, onMounted, reactive, ref } from "vue";
 import { AxiosError } from "axios";
 
-import { Breadcrumb, Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type {
   IPagination,
@@ -42,7 +49,7 @@ const params = reactive<IParams>({
       group: "AND",
       operator: "EQ",
       column: "sub_bidang_uuid",
-      value: '',
+      value: "",
     },
   ],
   currentPage: 1,
@@ -64,7 +71,7 @@ const {
   queryKey: ["getScopeMaster"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getScope(params, '/add-scope/detail');
+      const { data } = await masterStore.getScope(params, "/add-scope/detail");
       const response = data as IPagination<ScopeInterface[]>;
 
       total_item.value = response.total;
@@ -111,9 +118,9 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
 //--- DOWNLOAD
 const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
   mutationFn: async () => {
-    return await masterStore.downloadScope(params, '/add-scope/detail');
+    return await masterStore.downloadScope(params, "/add-scope/detail");
   },
-  onSuccess: () => { },
+  onSuccess: () => {},
   onError: (error) => {
     console.log(error);
   },
@@ -123,11 +130,11 @@ const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
 //--- DOWNLOAD TEMPLATE
 const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
   mutationFn: async () => {
-    return await masterStore.templateScope('/add-scope/detail', {
-      filters: params.filters
+    return await masterStore.templateScope("/add-scope/detail", {
+      filters: params.filters,
     });
   },
-  onSuccess: () => { },
+  onSuccess: () => {},
   onError: (error) => {
     console.log(error);
   },
@@ -137,7 +144,7 @@ const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
 //--- IMPORT
 const { mutate: importScope, isPending: isLoadingImport } = useMutation({
   mutationFn: async (payload: File) => {
-    return await masterStore.importScope(payload, '/add-scope/detail');
+    return await masterStore.importScope(payload, "/add-scope/detail");
   },
   onSuccess: () => {
     refetchScope();
@@ -255,7 +262,7 @@ const resetFilter = () => {
       group: "AND",
       operator: "EQ",
       column: "sub_bidang_uuid",
-      value: '',
+      value: "",
     },
   ];
 };
@@ -274,7 +281,7 @@ const handleResetFilter = () => {
 const previewDocument = (document: ResponseDocumentInterface) => {
   window.open(
     import.meta.env.VITE_API_BASE_URL.replace("api", "") +
-    document.document_link,
+      document.document_link,
     "_blank"
   );
 };
@@ -333,43 +340,89 @@ onMounted(() => {
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 
   <div class="relative w-full">
     <div class="flex items-center gap-2 absolute right-0 top-10">
-      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
-        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
-        @import="handleImport" />
-      <Button v-if="dataForm?.sub_bidang_uuid" icon_only="plus" size="sm" rounded="full" color="blue"
-        @click="handleCreate" />
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.sub_bidang_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
     </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterAdScope @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="isLoadingScope" />
+        <FilterAdScope
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="isLoadingScope"
+        />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" class="mb-6" />
-        <Table label-create="User" :columns="ColumnsScope" :entities="dataScope?.data || []" :loading="isLoadingScope"
-          :pagination="pagination" :is-create="false" v-model:model-search="params.search" @change-page="changePage"
-          @change-limit="changeLimit" @search="searchTable">
+        <Table
+          label-create="User"
+          :columns="ColumnsScope"
+          :entities="dataScope?.data || []"
+          :loading="isLoadingScope"
+          :pagination="pagination"
+          :is-create="false"
+          v-model:model-search="params.search"
+          @change-page="changePage"
+          @change-limit="changeLimit"
+          @search="searchTable"
+        >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-              <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)"
-                v-show="Number(entity.has_transaction) == 0" />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="pencil"
+                class="icon-action-table"
+                @click="handleUpdate(entity)"
+              />
+              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
+                name="trash"
+                class="icon-action-table"
+                @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
+              />
             </div>
           </template>
           <template #column_document="{ entity }">
-            <a class="text-base text-neutral-50 text-left underline cursor-pointer" v-if="entity.document"
-              :href="parsedUrl(entity.document.document_link)">
+            <a
+              class="text-base text-neutral-50 text-left underline cursor-pointer"
+              v-if="entity.document"
+              :href="parsedUrl(entity.document.document_link)"
+            >
               {{ entity.document?.document_name ?? "-" }}
             </a>
             <p v-else>-</p>
           </template>
           <template #column_link="{ entity }">
-            <a :href="entity.link" target="_blank" class="text-base text-neutral-50 text-left underline cursor-pointer"
-              v-if="entity.link">
+            <a
+              :href="entity.link"
+              target="_blank"
+              class="text-base text-neutral-50 text-left underline cursor-pointer"
+              v-if="entity.link"
+            >
               {{ entity.link ?? "-" }}
             </a>
             <p v-else>-</p>
@@ -378,7 +431,13 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormAdScope v-model="open_form" :selected-value="selected_item" :data-form="dataForm" @success="handleSuccess"
-      @error="handleError" @removeSucess="handleRemoveSuccess" />
+    <FormAdScope
+      v-model="open_form"
+      :selected-value="selected_item"
+      :data-form="dataForm"
+      @success="handleSuccess"
+      @error="handleError"
+      @removeSucess="handleRemoveSuccess"
+    />
   </div>
 </template>

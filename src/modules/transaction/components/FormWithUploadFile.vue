@@ -83,25 +83,28 @@ defineExpose({
 <template>
   <PopoverRoot v-model:open="modelOpenInputData">
     <PopoverTrigger>
-      <button class="button-trigger" :class="[
-        {
-          'button-trigger-active': modelOpenInputData === true,
-        },
-        (value && value?.file?.length > 0) ||
+      <button
+        class="button-trigger"
+        :class="[
+          {
+            'button-trigger-active': modelOpenInputData === true,
+          },
+          (value && value?.file?.length > 0) ||
           (value && value?.note !== '' && value && value?.note !== null)
-          ? 'button-trigger-active'
-          : '',
-        disabled ? 'cursor-default' : 'cursor-pointer',
-      ]">
+            ? 'button-trigger-active'
+            : '',
+          'cursor-pointer',
+        ]"
+      >
         {{
           (value && value?.file?.length > 0) ||
-            (value && value?.note !== "" && value && value?.note !== null)
+          (value && value?.note !== "" && value && value?.note !== null)
             ? "Active"
             : "Add"
         }}
       </button>
     </PopoverTrigger>
-    <PopoverPortal v-if="!disabled">
+    <PopoverPortal>
       <PopoverContent :side-offset="5" class="popover-content-file">
         <!-- <p class="popover-title">{{ label }}</p>
         <div class="popover-input mt-4">
@@ -131,14 +134,34 @@ defineExpose({
             </div>
           </div>
         </div> -->
-        <Textarea label="Note" :rows="6" v-model="modelNote" />
+        <Textarea
+          label="Note"
+          :rows="6"
+          :disabled="disabled"
+          v-model="modelNote"
+        />
         <div class="mt-4">
-          <Upload v-model="modelUpload" />
+          <Upload v-model="modelUpload" :disabled="disabled" />
         </div>
         <div class="popover-footer">
-          <Button text="Cancel" size="sm" rounded="full" color="red" :disabled="loading" @click="cancel" />
-          <Button text="Save" size="sm" rounded="full" color="blue" :disabled="loading" :loading="loading"
-            @click="save" />
+          <Button
+            text="Cancel"
+            size="sm"
+            rounded="full"
+            color="red"
+            :disabled="loading"
+            @click="cancel"
+          />
+          <Button
+            v-if="!disabled"
+            text="Save"
+            size="sm"
+            rounded="full"
+            color="blue"
+            :disabled="loading"
+            :loading="loading"
+            @click="save"
+          />
         </div>
       </PopoverContent>
     </PopoverPortal>

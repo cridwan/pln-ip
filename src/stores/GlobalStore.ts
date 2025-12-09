@@ -4,7 +4,10 @@ import { ref } from "vue";
 
 import { encryptStorage } from "@/utils/storage";
 import { api } from "@/api/axios";
-import type { CreateDocumentInterface } from "@/types/GlobalType";
+import type {
+  CreateActivityLogSyncInterface,
+  CreateDocumentInterface,
+} from "@/types/GlobalType";
 import type { TInspection } from "@/modules/inspection/types/InspectionType";
 
 export const useGlobalStore = defineStore(
@@ -41,7 +44,10 @@ export const useGlobalStore = defineStore(
         });
     };
 
-    const createStreamDocument = async (payload: CreateDocumentInterface, onProgress?: (percent: number) => void) => {
+    const createStreamDocument = async (
+      payload: CreateDocumentInterface,
+      onProgress?: (percent: number) => void
+    ) => {
       return await api
         .post(`/document/stream`, payload.document, {
           headers: {
@@ -50,11 +56,13 @@ export const useGlobalStore = defineStore(
             "X-modeltype": payload.document_type,
             "X-modeluuid": payload.document_uuid,
             "X-filemimetype": payload.document.type,
-            "X-filesize": payload.document.size
+            "X-filesize": payload.document.size,
           },
           onUploadProgress: (progressEvent) => {
             if (onProgress && progressEvent.total) {
-              const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              const percent = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
               onProgress(percent);
             }
           },
@@ -80,10 +88,24 @@ export const useGlobalStore = defineStore(
         });
     };
 
+    const createActivityLogSync = async (
+      payload: CreateActivityLogSyncInterface
+    ) => {
+      return await api
+        .post(`/activity-log/sync`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     return {
       createDocument,
       createStreamDocument,
       deleteDocument,
+      createActivityLogSync,
       titleHeader,
       disabledNext,
       disabledBack,

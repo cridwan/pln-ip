@@ -8,6 +8,7 @@ import { required, helpers } from "@vuelidate/validators";
 import { useMutation } from "@tanstack/vue-query";
 import { useGlobalStore } from "@/stores/GlobalStore";
 import type {
+  CreateActivityLogSyncInterface,
   CreateDocumentInterface,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
@@ -103,10 +104,15 @@ const { mutate: updateScope, isPending: isLoadingUpdate } = useMutation({
   },
   onSuccess: async () => {
     if (modelUpload.value) {
+      const type = "App\\Models\\ScopeStandart";
       createDocument({
         document: modelUpload.value as File,
-        document_type: "App\\Models\\ScopeStandart",
+        document_type: type,
         document_uuid: props.selectedValue?.uuid as string,
+      });
+      createActivityLogSync({
+        activity_id: props.selectedValue?.uuid as string,
+        activity_type: type,
       });
     } else {
       modelValue.value = false;
@@ -138,6 +144,14 @@ const { mutate: createDocument, isPending: isLoadingDocument } = useMutation({
 });
 //--- END
 
+//--- CREATE ACTIVITY LOG SYNC
+const { mutate: createActivityLogSync } = useMutation({
+  mutationFn: async (payload: CreateActivityLogSyncInterface) => {
+    return await globalStore.createActivityLogSync(payload);
+  },
+});
+//--- END
+
 const handleSubmit = async () => {
   const isValid = await v$_form.value.$validate();
 
@@ -148,22 +162,22 @@ const handleSubmit = async () => {
       model_details.value.length === 1 && model_details.value?.[0]?.name === ""
         ? []
         : model_details.value.map((item) => {
-          const find_item = props.selectedValue?.details?.find(
-            (el) => el.uuid === item.id
-          );
+            const find_item = props.selectedValue?.details?.find(
+              (el) => el.uuid === item.id
+            );
 
-          if (find_item) {
-            return {
-              name: item.name,
-              uuid: find_item.uuid,
-            };
-          } else {
-            return {
-              name: item.name,
-              uuid: null,
-            };
-          }
-        });
+            if (find_item) {
+              return {
+                name: item.name,
+                uuid: find_item.uuid,
+              };
+            } else {
+              return {
+                name: item.name,
+                uuid: null,
+              };
+            }
+          });
 
     updateScope({
       id: props.selectedValue?.uuid,
@@ -187,11 +201,11 @@ const handleSubmit = async () => {
       sub_bidang_uuid: model.value.sub_bidang_uuid,
       details:
         model_details.value.length === 1 &&
-          model_details.value?.[0]?.name === ""
+        model_details.value?.[0]?.name === ""
           ? []
           : model_details.value
-            .map((item) => ({ name: item.name }))
-            .filter((item) => item.name !== ""),
+              .map((item) => ({ name: item.name }))
+              .filter((item) => item.name !== ""),
     });
   }
 };
@@ -204,9 +218,9 @@ const setValue = () => {
     props.selectedValue?.details?.length === 0
       ? [{ name: "", id: "0" }]
       : props.selectedValue?.details?.map((item) => ({
-        name: item.name,
-        id: item.uuid,
-      })) || [{ name: "", id: "0" }];
+          name: item.name,
+          id: item.uuid,
+        })) || [{ name: "", id: "0" }];
 };
 
 const resetValue = () => {
@@ -253,28 +267,61 @@ const handleChangeFile = (e: File) => {
   modelUpload.value = e;
 };
 
-const removeSuccess = () => {
+const handleRemove = () => {
   documentValues.value = null;
-  emit("removeSucess");
+  modelUpload.value = null;
 };
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" title="Tambah Scope" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" star label="Nama Scope Tambahan" :rules="rules.name"
-        :custom_symbols="all_characters" />
-      <Input v-model="model.link" label="IK Online ex. (http://google.com)" :custom_symbols="all_characters" />
-      <UploadStream label="File IK" :progress="uploadProgress" :selectedValues="documentValues"
-        @changes="handleChangeFile" @removeSuccess="removeSuccess" :fileType="['doc', 'docx', 'xls', 'xlsx', 'pdf']" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    title="Tambah Scope"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        label="Nama Scope Tambahan"
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+      />
+      <Input
+        v-model="model.link"
+        label="IK Online ex. (http://google.com)"
+        :custom_symbols="all_characters"
+      />
+      <UploadStream
+        label="File IK"
+        :progress="uploadProgress"
+        :selectedValues="documentValues"
+        @changes="handleChangeFile"
+        @handleRemove="handleRemove"
+        :fileType="['doc', 'docx', 'xls', 'xlsx', 'pdf']"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary"
-          :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument" @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue"
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
           :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
-          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument" />
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
+          :loading="isLoadingCreate || isLoadingUpdate || isLoadingDocument"
+        />
       </div>
     </form>
   </Modal>

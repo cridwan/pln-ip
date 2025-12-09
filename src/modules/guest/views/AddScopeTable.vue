@@ -5,7 +5,10 @@ import { useRoute, useRouter } from "vue-router";
 
 import { Breadcrumb, Icon, Table } from "@/components";
 import { useQuery } from "@tanstack/vue-query";
-import type { IPagination, ResponseDocumentInterface } from "@/types/GlobalType";
+import type {
+  IPagination,
+  ResponseDocumentInterface,
+} from "@/types/GlobalType";
 
 import type {
   AddScopeInterface,
@@ -16,8 +19,8 @@ import { useMasterStore } from "@/modules/master/stores/MasterStore";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 import ModalPlay from "@/components/overlays/ModalPlay.vue";
 
-const documentRef = ref<ResponseDocumentInterface | undefined>(undefined)
-const open_modal = ref(false)
+const documentRef = ref<ResponseDocumentInterface | undefined>(undefined);
+const open_modal = ref(false);
 const selected_item = ref<AddScopeInterface>();
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const masterStore = useMasterStore();
@@ -40,7 +43,11 @@ const total_item = ref(0);
 const open_delete = ref(false);
 const timeout = ref(0);
 //--- GET SCOPE
-const { isFetching: isLoadingScope, refetch: refetchScope, data: entitiesScope } = useQuery({
+const {
+  isFetching: isLoadingScope,
+  refetch: refetchScope,
+  data: entitiesScope,
+} = useQuery({
   queryKey: ["getAddScopeGuest"],
   queryFn: async () => {
     try {
@@ -79,20 +86,17 @@ const changeLimit = (e: string) => {
 };
 
 const toDetail = (entity: AddScopeInterfaceTable) => {
-  router.push(
-    {
-      path: `/${route.params.id}/guest/${route.params.id_unit}/${route.params.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/add-scope/${entity.uuid}/scope`,
-      query: {
-        location: entity.inspection_type?.machine?.unit?.location?.name,
-        unit: entity.inspection_type?.machine?.unit?.name,
-        machine: entity.inspection_type?.machine?.name,
-        inspectionType: entity.inspection_type?.name,
-        addScope: entity.name,
-        inspection: entity.inspection_type?.name,
-      }
+  router.push({
+    path: `/${route.params.id}/guest/${route.params.id_unit}/${route.params.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/add-scope/${entity.uuid}/scope`,
+    query: {
+      location: entity.inspection_type?.machine?.unit?.location?.name,
+      unit: entity.inspection_type?.machine?.unit?.name,
+      machine: entity.inspection_type?.machine?.name,
+      inspectionType: entity.inspection_type?.name,
+      addScope: entity.name,
+      inspection: entity.inspection_type?.name,
     },
-
-  );
+  });
 };
 
 function searchTable() {
@@ -110,8 +114,8 @@ const handleDelete = (e: AddScopeInterface) => {
 
 const clickVideo = (document: ResponseDocumentInterface) => {
   documentRef.value = document;
-  open_modal.value = true
-}
+  open_modal.value = true;
+};
 onMounted(() => {
   breadcrumb.value = [
     {
@@ -135,7 +139,7 @@ onMounted(() => {
       url: "",
     },
     {
-      name: "CONSUMABLE MATERIAL STANDART",
+      name: "ADDITIONAL SCOPE",
       as_link: false,
       url: "",
     },
@@ -146,9 +150,21 @@ onMounted(() => {
 <template>
   <div class="relative w-full">
     <Breadcrumb :items="breadcrumb" />
-    <Table label-create="Asset" :columns="ColumnsScopeGuest" :entities="entitiesScope?.data" :loading="isLoadingScope"
-      :pagination="pagination" :is-create="false" v-model:model-search="params.search" @delete="handleDelete"
-      @change-page="changePage" @change-limit="changeLimit" @search="searchTable" :is-action="true" :is_logging="false">
+    <Table
+      label-create="Asset"
+      :columns="ColumnsScopeGuest"
+      :entities="entitiesScope?.data"
+      :loading="isLoadingScope"
+      :pagination="pagination"
+      :is-create="false"
+      v-model:model-search="params.search"
+      @delete="handleDelete"
+      @change-page="changePage"
+      @change-limit="changeLimit"
+      @search="searchTable"
+      :is-action="true"
+      :is_logging="false"
+    >
       <template #header_action>
         <div class="px-3 py-1.5">
           <p class="v-table-th-text">Action</p>
@@ -156,12 +172,20 @@ onMounted(() => {
       </template>
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-2">
-          <Icon name="eye" class="cursor-pointer text-white" @click="toDetail(entity)" />
+          <Icon
+            name="eye"
+            class="cursor-pointer text-white"
+            @click="toDetail(entity)"
+          />
         </div>
       </template>
       <template #column_video="{ entity }">
-        <span class="text-white cursor-pointer underline" v-if="entity.sequence?.document"
-          @click="clickVideo(entity.sequence.document)">{{ entity.sequence?.document?.document_name || '-' }}</span>
+        <span
+          class="text-white cursor-pointer underline"
+          v-if="entity.sequence?.document"
+          @click="clickVideo(entity.sequence.document)"
+          >{{ entity.sequence?.document?.document_name || "-" }}</span
+        >
         <span class="text-white">-</span>
       </template>
     </Table>
