@@ -51,7 +51,7 @@ const handleStepNavigation = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push({ name: 'login' });
+  router.push({ name: "login" });
 };
 
 const login = () => {
@@ -83,14 +83,26 @@ const toReport = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <button v-if="authStore.users" class="user-info" @click="router.push('/profile')">
+        <button
+          v-if="authStore.users"
+          class="user-info"
+          @click="router.push('/profile')"
+        >
           <p>User : {{ authStore.users?.email }}</p>
         </button>
         <button class="menu-button" @click="router.push('/')">Location</button>
-        <button class="menu-button" :class="{ active: route.path.includes('create') }" @click="toCreate">
+        <button
+          class="menu-button"
+          :class="{ active: route.path.includes('create') }"
+          @click="toCreate"
+        >
           Generate Scope
         </button>
-        <button v-if="authStore.users?.role === 'planner'" class="menu-button" @click="router.push('/master/user')">
+        <button
+          v-if="authStore.users?.role === 'planner'"
+          class="menu-button"
+          @click="router.push('/master/user')"
+        >
           Master
         </button>
         <!-- <button class="menu-button">Preview</button>
@@ -102,27 +114,39 @@ const toReport = () => {
         <button class="sign-out-button" @click="login" v-else>Login</button>
       </div>
       <div class="navigation">
-        <div class="page-info">
+        <!-- <div class="page-info">
           <p>{{ titleHeader }}</p>
-        </div>
+        </div> -->
         <!-- <div class="home-button" @click="toHome">
           <Icon name="home" class="text-white text-xl" />
         </div> -->
-        <div class="arrow-buttons">
-          <button class="arrow-button back" :disabled="disabledBack" @click="handleBack">
+        <!-- <div class="arrow-buttons">
+          <button
+            class="arrow-button back"
+            :disabled="disabledBack"
+            @click="handleBack"
+          >
             Back
           </button>
-          <button v-if="!isFinish && !isRemoveNext" class="arrow-button next" :disabled="disabledNext"
-            @click="handleNext">
+          <button
+            v-if="!isFinish && !isRemoveNext"
+            class="arrow-button next"
+            :disabled="disabledNext"
+            @click="handleNext"
+          >
             Next
           </button>
-          <button v-if="isFinish && !isRemoveNext" class="arrow-button next" :disabled="disabledNext"
-            @click="handleSave">
+          <button
+            v-if="isFinish && !isRemoveNext"
+            class="arrow-button next"
+            :disabled="disabledNext"
+            @click="handleSave"
+          >
             Save
           </button>
-        </div>
+        </div> -->
       </div>
-      <div v-if="isStepNavigation" class="step-navigation">
+      <!-- <div v-if="isStepNavigation" class="step-navigation">
         <Icon name="double-arrow-left" class="text-[24px] text-buttonGray cursor-pointer hover:text-cyan-500"
           @click="handleStepNavigation" />
       </div>
@@ -130,7 +154,7 @@ const toReport = () => {
         <button :disabled="disabledNext" @click="handleAddScope">
           Add Scope
         </button>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

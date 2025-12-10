@@ -248,14 +248,13 @@ const className = computed(() => {
   <Toast ref="toastRef" />
   <div>
     <div v-if="props.selectedValues" class="relative">
-      <div
+      <!-- <div
         v-if="isLoadingDeleteDocument"
         class="bg-red-500 size-6 flex items-center justify-center rounded-sm !cursor-pointer absolute right-1 top-1 z-50"
       >
         <span class="animate-pulse">...</span>
-      </div>
+      </div> -->
       <div
-        v-else
         class="bg-red-500 size-6 flex items-center justify-center rounded-sm !cursor-pointer absolute right-1 top-1 z-50"
         @click="handleRemove"
       >
