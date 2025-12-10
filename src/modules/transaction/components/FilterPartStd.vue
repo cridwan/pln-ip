@@ -150,7 +150,7 @@ const {
   isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
   queryKey: ["getSubBidangScope"],
-  enabled: !props.selectedValue && !is_loading_sub_bidang.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getSubBidang({

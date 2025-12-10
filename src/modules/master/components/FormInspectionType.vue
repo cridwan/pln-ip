@@ -51,7 +51,10 @@ const rules = computed(() => {
       required: helpers.withMessage(`This field is required`, required),
     },
     sequence_uuid: {
-      required: helpers.withMessage(`This field is required`, requiredIf(true)),
+      required: helpers.withMessage(
+        `This field is required`,
+        requiredIf(false)
+      ),
     },
   };
 });
@@ -268,7 +271,6 @@ watch(
       />
       <Select
         v-model="model.sequence_uuid"
-        star
         label="Sequence"
         options_label="label"
         options_value="value"

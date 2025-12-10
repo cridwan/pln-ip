@@ -100,7 +100,7 @@ defineExpose({
             text="Cancel"
             size="sm"
             rounded="full"
-            color="grey"
+            color="red"
             :disabled="loading"
             @click="cancel"
           />

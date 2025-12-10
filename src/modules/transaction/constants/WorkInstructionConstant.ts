@@ -16,7 +16,7 @@ export const ColumnsWorkInstruction: TableColumnType[] = [
   },
   {
     key: "preview",
-    label: "Preview",
+    label: "Ik Doc",
     align: "left",
     sort: false,
     width: "150",

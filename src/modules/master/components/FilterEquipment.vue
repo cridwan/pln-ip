@@ -274,7 +274,7 @@ const {
   isFetchingNextPage: isFetchingNextPageBidang,
 } = useInfiniteQuery({
   queryKey: ["getBidangFilterEquipmentMaster"],
-  enabled: !props.selectedValue && !is_loading_bidang.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getBidang({
@@ -322,7 +322,7 @@ const {
   isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
   queryKey: ["getSubBidangFilterEquipmentMaster"],
-  enabled: !props.selectedValue && !is_loading_sub_bidang.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getSubBidang({
@@ -371,7 +371,7 @@ const {
   isFetchingNextPage: isFetchingNextPageScope,
 } = useInfiniteQuery({
   queryKey: ["getScopeFilterEquipmentMaster"],
-  enabled: !props.selectedValue && !is_loading_scope.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getScope({

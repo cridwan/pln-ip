@@ -184,7 +184,6 @@ const {
   isFetchingNextPage: isFetchingNextPageScope,
 } = useInfiniteQuery({
   queryKey: ["getScopeFilterPartStd"],
-  //   enabled: !props.selectedValue && !is_loading_scope.value,
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {

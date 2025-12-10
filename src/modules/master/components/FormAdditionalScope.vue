@@ -64,7 +64,10 @@ const rules = computed(() => {
       required: helpers.withMessage(`This field is required`, required),
     },
     sequence_uuid: {
-      required: helpers.withMessage(`This field is required`, requiredIf(true)),
+      required: helpers.withMessage(
+        `This field is required`,
+        requiredIf(false)
+      ),
     },
   };
 });

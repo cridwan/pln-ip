@@ -93,7 +93,7 @@ const {
   hasNextPage: hasNextPageBidang,
   isFetchingNextPage: isFetchingNextPageBidang,
 } = useInfiniteQuery({
-  queryKey: ["getBidangScope"],
+  queryKey: ["getBidangFilterPartStdGuestDetail"],
   enabled: !props.selectedValue && !is_loading_bidang.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -141,7 +141,7 @@ const {
   hasNextPage: hasNextPageSubBidang,
   isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
-  queryKey: ["getSubBidangScope"],
+  queryKey: ["getSubBidangFilterPartStdGuestDetail"],
   //   enabled: !props.selectedValue && !is_loading_sub_bidang.value,
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
@@ -183,8 +183,7 @@ const {
   hasNextPage: hasNextPageScope,
   isFetchingNextPage: isFetchingNextPageScope,
 } = useInfiniteQuery({
-  queryKey: ["getScopeFilterPartStd"],
-  //   enabled: !props.selectedValue && !is_loading_scope.value,
+  queryKey: ["getScopeFilterPartStdGuestDetail"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -228,7 +227,7 @@ const {
   hasNextPage: hasNextPageEquipment,
   isFetchingNextPage: isFetchingNextPageEquipment,
 } = useInfiniteQuery({
-  queryKey: ["getEquipmentFIlterPartStd"],
+  queryKey: ["getEquipmentFilterPartStdGuestDetail"],
   //   enabled: !props.selectedValue && !is_loading_equipment.value,
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
@@ -273,7 +272,7 @@ const {
   hasNextPage: hasNextPageActivity,
   isFetchingNextPage: isFetchingNextPageActivity,
 } = useInfiniteQuery({
-  queryKey: ["getActivityFilterPartStd"],
+  queryKey: ["getActivityFilterPartStdGuestDetail"],
   //   enabled: !props.selectedValue && !is_loading_activity.value,
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {

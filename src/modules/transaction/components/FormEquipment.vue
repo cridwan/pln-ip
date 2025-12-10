@@ -28,16 +28,16 @@ const props = defineProps({
   },
   isAdditional: {
     type: Boolean,
-    default: false
+    default: false,
   },
   id: {
     type: String,
-    default: ''
+    default: "",
   },
   orignal_uuid: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
 type OptionType = {
@@ -78,7 +78,10 @@ const rules = computed(() => {
 const { mutate: createEquipmentClone, isPending: isLoadingScope } = useMutation(
   {
     mutationFn: async (payload: FormEquipmentCloneInterface) => {
-      return transaction.cloneEquipment(payload, props.isAdditional ? '/add-scope/detail' : '');
+      return transaction.cloneEquipment(
+        payload,
+        props.isAdditional ? "/add-scope/detail" : ""
+      );
     },
     onSuccess: (data) => {
       modelValue.value = false;
@@ -133,13 +136,17 @@ const params_Equipment = reactive({
   filters: [],
   currentPage: 1,
   perPage: 10,
-  ...(props.isAdditional ? {
-    scope_standart_uuid: props.orignal_uuid as string,
-    additional_scope_uuid: route.query.original_uuid as string,
-  } : {
-    scope_standart_uuid: props.orignal_uuid as string,
-    inspection_type_uuid: route.params.id_inspection as string,
-  })
+  ...(props.isAdditional
+    ? {
+        scope_standart_uuid: props.orignal_uuid as string,
+        additional_scope_uuid: route.query.original_uuid as string,
+        project_uuid: route.params.id_project as string,
+      }
+    : {
+        scope_standart_uuid: props.orignal_uuid as string,
+        inspection_type_uuid: route.params.id_inspection as string,
+        project_uuid: route.params.id_project as string,
+      }),
 });
 const {
   data: dataEquipment,
@@ -152,10 +159,13 @@ const {
   enabled: !is_loading_Equipment.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await transaction.getSelectEquipment({
-        ...params_Equipment,
-        currentPage: pageParam,
-      }, props.isAdditional ? '/add-scope/detail' : '');
+      const { data } = await transaction.getSelectEquipment(
+        {
+          ...params_Equipment,
+          currentPage: pageParam,
+        },
+        props.isAdditional ? "/add-scope/detail" : ""
+      );
 
       //   const response = data as IPagination<EquipmentInterface[]>;
       const response = data.data as IPagination<EquipmentInterface[]>;
@@ -211,26 +221,61 @@ watch(
   { deep: true, immediate: true }
 );
 
-watch(() => props.orignal_uuid, () => {
-  params_Equipment.scope_standart_uuid = props.orignal_uuid as string
-  refetchEquipment();
-}, { immediate: true, deep: true })
+watch(
+  () => props.orignal_uuid,
+  () => {
+    params_Equipment.scope_standart_uuid = props.orignal_uuid as string;
+    refetchEquipment();
+  },
+  { immediate: true, deep: true }
+);
 
-defineExpose({ refetchEquipment })
+defineExpose({ refetchEquipment });
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" title="Tambah Equipment" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Select v-model="model.equipment_uuid" label="Equipment" options_label="label" options_value="value"
-        v-model:model-search="params_Equipment.search" :search="true" :loading="is_loading_Equipment"
-        :loading-next-page="isFetchingNextPageEquipment" :rules="rules.equipment_uuid" :options="options_equipment"
-        @scroll="scrollScope" @search="searchScope" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    title="Tambah Equipment"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Select
+        v-model="model.equipment_uuid"
+        label="Equipment"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_Equipment.search"
+        :search="true"
+        :loading="is_loading_Equipment"
+        :loading-next-page="isFetchingNextPageEquipment"
+        :rules="rules.equipment_uuid"
+        :options="options_equipment"
+        @scroll="scrollScope"
+        @search="searchScope"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="false" @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="false" :loading="false" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="false"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="false"
+          :loading="false"
+        />
       </div>
     </form>
   </Modal>

@@ -2592,7 +2592,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail ' : ''} Activity.xlsx`;
+          a.download = `${prefix ? 'Detail ' : ''}Activity.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -2625,7 +2625,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail ' : ''} Activity Template.xlsx`;
+          a.download = `${prefix ? 'Detail ' : ''}Activity Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
