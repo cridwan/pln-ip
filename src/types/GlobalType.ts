@@ -1,3 +1,5 @@
+import type { UserInterface } from "@/modules/master/types/UserType";
+
 export interface IPagination<T> {
   data: T;
   current_page: number;
