@@ -112,10 +112,12 @@ const params_scope = reactive({
     ? {
         sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string,
         additional_scope_uuid: route.query?.original_uuid as string,
+        project_uuid: route.params.id_project as string,
       }
     : {
         inspection_type_uuid: route.params.id_inspection as string,
         sub_bidang_uuid: props.dataForm?.sub_bidang_uuid as string,
+        project_uuid: route.params.id_project as string,
       }),
 });
 const {

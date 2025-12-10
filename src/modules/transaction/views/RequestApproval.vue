@@ -157,15 +157,17 @@ const scrollUser = (e: Event) => {
   }
 };
 //--- END
-
 const handleRequestApprove = async () => {
   const isValid = await v$_form.value.$validate();
 
   if (!isValid) return;
 
+  const query = new URLSearchParams(
+    route.query as Record<string, string>
+  ).toString();
   approveRequestProject({
     user_id: model.value.user_id,
-    uri: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/scope`,
+    uri: `/${route.params?.id}/create/unit/${route.params?.id_unit}/${route.params?.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/scope?${query}`,
   });
 };
 

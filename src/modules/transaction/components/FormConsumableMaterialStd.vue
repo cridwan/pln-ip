@@ -92,10 +92,12 @@ const params_consumable_material = reactive({
     ? {
         activity_uuid: props?.original_uuid as string,
         additional_scope_uuid: route.query.original_uuid as string,
+        project_uuid: route.params.id_project as string,
       }
     : {
         activity_uuid: props.dataForm?.activity_uuid as string,
         inspection_type_uuid: route.params.id_inspection as string,
+        project_uuid: route.params.id_project as string,
       }),
 });
 

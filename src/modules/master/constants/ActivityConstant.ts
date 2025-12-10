@@ -20,12 +20,6 @@ export const ColumnsActivity: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "equipment",
-    label: "Equipment",
-    align: "left",
-    sort: false,
-  },
-  {
     key: "ik_link",
     label: "IK Online",
     align: "left",

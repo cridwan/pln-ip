@@ -16,7 +16,10 @@ import type {
 } from "@/modules/master/types/ManpowerStdType";
 
 import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
-import type { FormManpowerCloneInterface, ManpowerStdTransactionInterface } from "@/modules/transaction/types/ManpowerStdType";
+import type {
+  FormManpowerCloneInterface,
+  ManpowerStdTransactionInterface,
+} from "@/modules/transaction/types/ManpowerStdType";
 
 type OptionType = {
   label: string;
@@ -32,8 +35,8 @@ const props = defineProps({
   },
   original_uuid: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
 const emit = defineEmits(["success", "error"]);
@@ -72,6 +75,7 @@ const params_manpower = reactive<
   IParams & {
     activity_uuid: string;
     additional_scope_uuid: string;
+    project_uuid: string;
   }
 >({
   search: "",
@@ -80,6 +84,7 @@ const params_manpower = reactive<
   perPage: 10,
   additional_scope_uuid: route.query.original_uuid as string,
   activity_uuid: props.original_uuid as string,
+  project_uuid: route.params.id_project as string,
 });
 const {
   data: dataManpower,
@@ -92,10 +97,13 @@ const {
   enabled: !props.selectedValue && !is_loading_manpower.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await transactionStore.getManPowerSelect({
-        ...params_manpower,
-        currentPage: pageParam,
-      }, '/add-scope/detail');
+      const { data } = await transactionStore.getManPowerSelect(
+        {
+          ...params_manpower,
+          currentPage: pageParam,
+        },
+        "/add-scope/detail"
+      );
 
       const response = data as IPagination<ManpowerStdInterface[]>;
 
@@ -118,7 +126,10 @@ const {
 //--- CREATE MANPOWER
 const { mutate: createManpowerStd, isPending: isLoadingCreate } = useMutation({
   mutationFn: async (payload: FormManpowerCloneInterface) => {
-    return await transactionStore.cloneManPowerStd(payload, '/add-scope/detail');
+    return await transactionStore.cloneManPowerStd(
+      payload,
+      "/add-scope/detail"
+    );
   },
   onSuccess: (data) => {
     modelValue.value = false;
@@ -211,9 +222,7 @@ watch(
             label: props.selectedValue?.name,
           },
         ],
-        new_data.filter(
-          (item) => item.value !== props.selectedValue?.uuid
-        )
+        new_data.filter((item) => item.value !== props.selectedValue?.uuid)
       );
     } else {
       const new_data: OptionType[] =
@@ -228,30 +237,62 @@ watch(
   { deep: true, immediate: true }
 );
 
-watch(() => props.original_uuid, (value) => {
-  params_manpower.activity_uuid = props.original_uuid as string;
+watch(
+  () => props.original_uuid,
+  (value) => {
+    params_manpower.activity_uuid = props.original_uuid as string;
 
-  refetchManpower()
-}, { deep: true, immediate: true })
+    refetchManpower();
+  },
+  { deep: true, immediate: true }
+);
 
-defineExpose({ refetchManpower })
+defineExpose({ refetchManpower });
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Select v-model="model.manpower_uuid" label="Manpower" options_label="label" options_value="value"
-        v-model:model-search="params_manpower.search" :search="true" :loading="is_loading_manpower"
-        :loading-next-page="isFetchingNextPageManpower" :rules="rules.manpower_uuid" :options="options_manpower"
-        @scroll="scrollManpower" @search="searchManpower" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Select
+        v-model="model.manpower_uuid"
+        label="Manpower"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_manpower.search"
+        :search="true"
+        :loading="is_loading_manpower"
+        :loading-next-page="isFetchingNextPageManpower"
+        :rules="rules.manpower_uuid"
+        :options="options_manpower"
+        @scroll="scrollManpower"
+        @search="searchManpower"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate"
-          :loading="isLoadingCreate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate"
+          :loading="isLoadingCreate"
+        />
       </div>
     </form>
   </Modal>

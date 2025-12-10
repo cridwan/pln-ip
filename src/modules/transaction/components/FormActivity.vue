@@ -5,16 +5,11 @@ import { Button, Modal } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
-import type {
-  IPagination,
-  IParams,
-} from "@/types/GlobalType";
+import type { IPagination, IParams } from "@/types/GlobalType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
 import Select from "@/components/fields/Select.vue";
 import { useRoute } from "vue-router";
-import type {
-  EquipmentInterface,
-} from "@/modules/master/types/EquipmentType";
+import type { EquipmentInterface } from "@/modules/master/types/EquipmentType";
 import { useTransactionStore } from "../stores/TransactionStore";
 import type { ActivityModelCreateInterface } from "@/modules/master/types/AcitivityType";
 import type {
@@ -28,12 +23,12 @@ const props = defineProps({
   },
   isAdditional: {
     type: Boolean,
-    default: false
+    default: false,
   },
   original_uuid: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
 type OptionType = {
@@ -70,7 +65,10 @@ const rules = computed(() => {
 // --- CREATE EQUIPMENT
 const { mutate: createActivityClone, isPending: isLoadingScope } = useMutation({
   mutationFn: async (payload: FormActivityInterfaceClone) => {
-    return transaction.createActivityClone(payload, props.isAdditional ? '/add-scope/detail' : '');
+    return transaction.createActivityClone(
+      payload,
+      props.isAdditional ? "/add-scope/detail" : ""
+    );
   },
   onSuccess: (data) => {
     modelValue.value = false;
@@ -122,13 +120,17 @@ const params_activity = reactive({
   filters: [],
   currentPage: 1,
   perPage: 10,
-  ...(props.isAdditional ? {
-    equipment_uuid: props.dataForm?.equipment_uuid as string,
-    additional_scope_uuid: route.query.original_uuid as string,
-  } : {
-    equipment_uuid: props.dataForm?.equipment_uuid as string,
-    inspection_type_uuid: route.params.id_inspection as string,
-  })
+  ...(props.isAdditional
+    ? {
+        equipment_uuid: props.dataForm?.equipment_uuid as string,
+        additional_scope_uuid: route.query.original_uuid as string,
+        project_uuid: route.params.id_project as string,
+      }
+    : {
+        equipment_uuid: props.dataForm?.equipment_uuid as string,
+        inspection_type_uuid: route.params.id_inspection as string,
+        project_uuid: route.params.id_project as string,
+      }),
 });
 const {
   data: dataActivity,
@@ -141,10 +143,13 @@ const {
   enabled: !is_loading_activity.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await transaction.getSelectActivity({
-        ...params_activity,
-        currentPage: pageParam,
-      }, props.isAdditional ? '/add-scope/detail' : '');
+      const { data } = await transaction.getSelectActivity(
+        {
+          ...params_activity,
+          currentPage: pageParam,
+        },
+        props.isAdditional ? "/add-scope/detail" : ""
+      );
 
       const response = data.data as IPagination<EquipmentInterface[]>;
       return response;
@@ -199,26 +204,61 @@ watch(
   { deep: true, immediate: true }
 );
 
-watch(() => props.original_uuid, () => {
-  params_activity.equipment_uuid = props.original_uuid as string;
-  refetchActivity();
-}, { deep: true, immediate: true })
+watch(
+  () => props.original_uuid,
+  () => {
+    params_activity.equipment_uuid = props.original_uuid as string;
+    refetchActivity();
+  },
+  { deep: true, immediate: true }
+);
 
-defineExpose({ refetchActivity })
+defineExpose({ refetchActivity });
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" title="Tambah Activity" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Select v-model="model.activity_uuid" label="Activity" options_label="label" options_value="value"
-        v-model:model-search="params_activity.search" :search="true" :loading="is_loading_activity"
-        :loading-next-page="isFetchingNextPageActivity" :rules="rules.activity_uuid" :options="options_scope"
-        @scroll="scrollScope" @search="searchScope" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    title="Tambah Activity"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Select
+        v-model="model.activity_uuid"
+        label="Activity"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_activity.search"
+        :search="true"
+        :loading="is_loading_activity"
+        :loading-next-page="isFetchingNextPageActivity"
+        :rules="rules.activity_uuid"
+        :options="options_scope"
+        @scroll="scrollScope"
+        @search="searchScope"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="false" @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="false" :loading="false" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="false"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="false"
+          :loading="false"
+        />
       </div>
     </form>
   </Modal>

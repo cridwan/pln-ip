@@ -67,7 +67,7 @@ defineExpose({ showToast });
         </ToastAction>
       </ToastRoot>
       <ToastViewport
-        class="fixed top-4 right-4 flex flex-col gap-2 w-96 max-w-full z-[1000000]"
+        class="fixed bottom-4 right-4 flex flex-col gap-2 w-96 max-w-full z-[1000000]"
       />
     </Teleport>
   </ToastProvider>

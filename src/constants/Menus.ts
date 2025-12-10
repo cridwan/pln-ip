@@ -273,7 +273,7 @@ export const MenusGuest: MenuInterface[] = [
   },
   {
     id: 12,
-    name: "Results",
+    name: "Report",
     url: "/results",
     icon: "document-clean",
   },

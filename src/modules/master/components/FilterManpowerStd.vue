@@ -289,7 +289,7 @@ const {
   isFetchingNextPage: isFetchingNextPageBidang,
 } = useInfiniteQuery({
   queryKey: ["getBidangFilterManpowerStdMaster"],
-  enabled: !props.selectedValue && !is_loading_bidang.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getBidang({
@@ -337,7 +337,7 @@ const {
   isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
   queryKey: ["getSubBidangFilterManpowerStdMaster"],
-  enabled: !props.selectedValue && !is_loading_sub_bidang.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getSubBidang({
@@ -386,7 +386,7 @@ const {
   isFetchingNextPage: isFetchingNextPageScope,
 } = useInfiniteQuery({
   queryKey: ["getScopeFilterManpowerStdMaster"],
-  enabled: !props.selectedValue && !is_loading_scope.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getScope({
@@ -427,7 +427,7 @@ const {
   isFetchingNextPage: isFetchingNextPageEquipment,
 } = useInfiniteQuery({
   queryKey: ["getEquipmentFilterManpowerStdMaster"],
-  enabled: !props.selectedValue && !is_loading_equipment.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getEquipment({
@@ -468,7 +468,7 @@ const {
   isFetchingNextPage: isFetchingNextPageActivity,
 } = useInfiniteQuery({
   queryKey: ["getActivityFilterManpowerStdMaster"],
-  enabled: !props.selectedValue && !is_loading_activity.value,
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getActivity({

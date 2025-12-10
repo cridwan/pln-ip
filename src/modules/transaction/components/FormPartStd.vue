@@ -14,7 +14,10 @@ import type {
   PartStdInterface,
 } from "@/modules/master/types/PartStdType";
 
-import type { FormPartCloneInterface, PartStdTransactionInterface } from "../types/PartStdType";
+import type {
+  FormPartCloneInterface,
+  PartStdTransactionInterface,
+} from "../types/PartStdType";
 import { useTransactionStore } from "../stores/TransactionStore";
 
 type OptionType = {
@@ -35,8 +38,8 @@ const props = defineProps({
   },
   original_uuid: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
 const emit = defineEmits(["success", "error"]);
@@ -78,13 +81,15 @@ const params_part = reactive({
   perPage: 10,
   ...(props.isAdditional
     ? {
-      activity_uuid: props.dataForm?.activity_uuid as string,
-      additional_scope_uuid: route.query.original_uuid as string,
-    }
+        activity_uuid: props.dataForm?.activity_uuid as string,
+        additional_scope_uuid: route.query.original_uuid as string,
+        project_uuid: route.params.id_project as string,
+      }
     : {
-      activity_uuid: props.dataForm?.activity_uuid as string,
-      inspection_type_uuid: route.params.id_inspection as string,
-    }),
+        activity_uuid: props.dataForm?.activity_uuid as string,
+        inspection_type_uuid: route.params.id_inspection as string,
+        project_uuid: route.params.id_project as string,
+      }),
 });
 const {
   data: dataPart,
@@ -97,10 +102,13 @@ const {
   enabled: !props.selectedValue && !is_loading_part.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await transactionStore.getPartSelect({
-        ...params_part,
-        currentPage: pageParam,
-      }, props.isAdditional ? '/add-scope/detail' : '');
+      const { data } = await transactionStore.getPartSelect(
+        {
+          ...params_part,
+          currentPage: pageParam,
+        },
+        props.isAdditional ? "/add-scope/detail" : ""
+      );
 
       const response = data as IPagination<PartStdInterface[]>;
 
@@ -123,7 +131,10 @@ const {
 //--- CREATE PART
 const { mutate: createPartStd, isPending: isLoadingCreate } = useMutation({
   mutationFn: async (payload: FormPartCloneInterface) => {
-    return await transactionStore.clonePartStd(payload, props.isAdditional ? '/add-scope/detail' : '');
+    return await transactionStore.clonePartStd(
+      payload,
+      props.isAdditional ? "/add-scope/detail" : ""
+    );
   },
   onSuccess: (data) => {
     modelValue.value = false;
@@ -222,7 +233,10 @@ watch(
         newPart?.pages
           .flatMap((page) => page?.data)
           ?.map((item) => {
-            return { value: item.uuid, label: `${item.part.name} / ${item.part?.global_unit?.name}` };
+            return {
+              value: item.uuid,
+              label: `${item.part.name} / ${item.part?.global_unit?.name}`,
+            };
           }) || [];
       options_part.value = new_data;
     }
@@ -240,23 +254,52 @@ watch(
   { deep: true, immediate: true }
 );
 
-defineExpose({ refetchPart })
+defineExpose({ refetchPart });
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue ? 'Ubah Part' : 'Tambah Part'"
-    v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Select v-model="model.part_uuid" v-model:model-search="params_part.search" label="Part" options_label="label"
-        options_value="value" :search="true" :loading="is_loading_part" :loading-next-page="isFetchingNextPagePart"
-        :rules="rules.part_uuid" :options="options_part" @scroll="scrollPart" @search="searchPart" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Part' : 'Tambah Part'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Select
+        v-model="model.part_uuid"
+        v-model:model-search="params_part.search"
+        label="Part"
+        options_label="label"
+        options_value="value"
+        :search="true"
+        :loading="is_loading_part"
+        :loading-next-page="isFetchingNextPagePart"
+        :rules="rules.part_uuid"
+        :options="options_part"
+        @scroll="scrollPart"
+        @search="searchPart"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate"
-          :loading="isLoadingCreate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate"
+          :loading="isLoadingCreate"
+        />
       </div>
     </form>
   </Modal>
