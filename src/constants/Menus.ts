@@ -255,6 +255,12 @@ export const MenusGuest: MenuInterface[] = [
   },
   {
     id: 11,
+    name: "Tools Std",
+    url: "/tool-std",
+    icon: "tools",
+  },
+  {
+    id: 11,
     name: "Manpower Standart",
     url: "/manpower-std",
     icon: "manpower-std",
@@ -375,6 +381,12 @@ export const MenusGuestAddScope: MenuInterface[] = [
   // },
   {
     id: 4,
+    name: "Tools",
+    url: "/tools-std",
+    icon: "tools",
+  },
+  {
+    id: 4,
     name: "Consumable Material",
     url: "/consumable-material",
     icon: "box",
@@ -468,6 +480,12 @@ export const MenusMaster: MenuInterface[] = [
       },
       {
         id: 7,
+        name: "Tools",
+        url: "/tools",
+        icon: "tools",
+      },
+      {
+        id: 7,
         name: "Consumable Material",
         url: "/consumable-materials",
         icon: "box",
@@ -536,6 +554,12 @@ export const MenusMaster: MenuInterface[] = [
   },
   {
     id: 11,
+    name: "Tools",
+    url: "/tools-std",
+    icon: "tools",
+  },
+  {
+    id: 11,
     name: "Manpower",
     url: "/manpower-std",
     icon: "manpower-std",
@@ -584,6 +608,12 @@ export const MenuAdditional: MenuInterface[] = [
     name: "Activity",
     url: "/master/additional-scope/:id/:name/activity",
     icon: "pulse-line",
+  },
+  {
+    id: 9,
+    name: "Tools",
+    url: "/master/additional-scope/:id/:name/tools-std",
+    icon: "tools",
   },
   {
     id: 7,

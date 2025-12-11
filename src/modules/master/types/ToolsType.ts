@@ -1,32 +1,29 @@
-import type { ActivityInterface } from "./AcitivityType";
 import type { GlobalUnitInterface } from "./GlobalUnitType";
-import type { InspectionTypeInterface } from "./InspectionType";
 
 export interface ToolsInterface {
   uuid: string;
   name: string;
-  qty: number;
-  section: string;
+  merk: number;
+  price: string;
   global_unit_uuid: string;
   global_unit: GlobalUnitInterface;
-  activity_uuid: string;
-  activity: ActivityInterface;
+  status: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface ToolsCreateInterface {
   name: string;
-  qty: number;
-  section: string;
+  merk: string;
+  status: string;
+  price: number;
   global_unit_uuid: string;
-  activity_uuid: string;
 }
 
 export interface ToolsCreateModelInterface {
   name: string;
-  qty: string;
-  section: string;
+  merk: string;
+  price: string;
   global_unit_uuid: string;
-  activity_uuid: string;
+  status: string;
 }

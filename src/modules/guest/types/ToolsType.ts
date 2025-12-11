@@ -1,3 +1,5 @@
+import type { GlobalUnitInterface } from "@/modules/master/types/GlobalUnitType";
+
 export interface ResponseToolsInterface {
   uuid: string;
   name: string;
@@ -17,14 +19,16 @@ export interface ResponseToolsInterface {
 }
 
 export interface ToolsInterface {
-  id: string;
-  tool: string;
-  quantity: string | null;
-  unit: string | null;
-  section: string | null;
+  uuid: string;
+  name: string;
+  qty: string | null;
+  price: string | null;
+  merk: string | null;
+  status: string | null;
   global_unit_uuid: string;
-  project_uuid: string | null;
-  additional_scope_uuid: string | null;
+  global_unit: GlobalUnitInterface;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UpdateToolsInterface {
