@@ -12,6 +12,7 @@ import {
 import type { IPagination, IParams } from "@/types/GlobalType";
 import {
   all_characters,
+  formatToFloat,
   mergeArrays,
   numbers_positive_negative,
 } from "@/helpers/global";
@@ -43,15 +44,25 @@ const masterStore = useMasterStore();
 const modelValue = defineModel<boolean>({ default: false });
 const is_loading_global_unit = ref(false);
 const options_global_unit = ref<OptionType[]>([]);
+const options_status = ref<OptionType[]>([
+  {
+    label: "GENERAL TOOLS",
+    value: "GENERAL TOOLS",
+  },
+  {
+    label: "SPECIAL TOOLS",
+    value: "SPECIAL TOOLS",
+  },
+]);
 const is_loading_activity = ref(false);
 const options_activity = ref<OptionType[]>([]);
 
 const model = ref<ToolsCreateModelInterface>({
   name: "",
-  qty: "",
-  section: "",
+  merk: "",
+  price: "",
   global_unit_uuid: "",
-  activity_uuid: "",
+  status: "",
 });
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
@@ -59,13 +70,13 @@ const rules = computed(() => {
     name: {
       required: helpers.withMessage(`This field is required`, required),
     },
-    activity_uuid: {
+    price: {
       required: helpers.withMessage(`This field is required`, required),
     },
-    qty: {
+    merk: {
       required: helpers.withMessage(`This field is required`, required),
     },
-    section: {
+    status: {
       required: helpers.withMessage(`This field is required`, required),
     },
     global_unit_uuid: {
@@ -104,54 +115,6 @@ const {
       throw error.response;
     } finally {
       is_loading_global_unit.value = false;
-    }
-  },
-  refetchOnWindowFocus: false,
-  getNextPageParam: (lastPage) => {
-    if (!lastPage?.data?.length) return undefined;
-    return lastPage.current_page + 1;
-  },
-  initialPageParam: 1,
-});
-//--- END
-
-//--- GET ACTIVITY
-const params_activity = reactive<IParams>({
-  search: "",
-  filters: [
-    {
-      group: "AND",
-      operator: "NOT_NULL",
-      column: "equipment.scopeStandart.inspection_type_uuid",
-      value: null,
-    }
-  ],
-  currentPage: 1,
-  perPage: 10,
-});
-const {
-  data: dataActivity,
-  refetch: refetchActivity,
-  fetchNextPage: fetchNextPageActivity,
-  hasNextPage: hasNextPageActivity,
-  isFetchingNextPage: isFetchingNextPageActivity,
-} = useInfiniteQuery({
-  queryKey: ["getActivityTools"],
-  enabled: !props.selectedValue && !is_loading_activity.value,
-  queryFn: async ({ pageParam = 1 }) => {
-    try {
-      const { data } = await masterStore.getActivity({
-        ...params_activity,
-        currentPage: pageParam,
-      });
-
-      const response = data.data as IPagination<ActivityInterface[]>;
-
-      return response;
-    } catch (error: any) {
-      throw error.response;
-    } finally {
-      is_loading_activity.value = false;
     }
   },
   refetchOnWindowFocus: false,
@@ -211,38 +174,38 @@ const handleSubmit = async () => {
       id: props.selectedValue?.uuid,
       payload: {
         name: model.value.name,
-        qty: parseFloat(model.value.qty),
-        section: model.value.section,
+        merk: model.value.merk,
+        status: model.value.status,
+        price: formatToFloat(model.value.price),
         global_unit_uuid: model.value.global_unit_uuid,
-        activity_uuid: model.value.activity_uuid,
       },
     });
   } else {
     createTools({
       name: model.value.name,
-      qty: parseFloat(model.value.qty),
-      section: model.value.section,
+      merk: model.value.merk,
+      status: model.value.status,
+      price: formatToFloat(model.value.price),
       global_unit_uuid: model.value.global_unit_uuid,
-      activity_uuid: model.value.activity_uuid,
     });
   }
 };
 
 const setValue = () => {
   model.value.name = props.selectedValue?.name || "";
-  model.value.qty = props.selectedValue?.qty?.toString() || "";
-  model.value.section = props.selectedValue?.section || "";
-
+  model.value.merk = String(props.selectedValue?.merk) || "";
+  model.value.status = props.selectedValue?.status || "";
+  model.value.price =
+    parseFloat(props.selectedValue?.price || "0")?.toString() || "";
   model.value.global_unit_uuid = props.selectedValue?.global_unit_uuid || "";
-  model.value.activity_uuid = props.selectedValue?.activity_uuid || "";
 };
 
 const resetValue = () => {
   model.value = {
     name: "",
-    activity_uuid: "",
-    section: "",
-    qty: "",
+    merk: "",
+    status: "",
+    price: "",
     global_unit_uuid: "",
   };
 };
@@ -266,28 +229,6 @@ const scrollGlobalUnit = (e: Event) => {
     fetchNextPageGlobalUnit();
   }
 };
-
-// activity
-const timeout_activity = ref(0);
-const searchActivity = () => {
-  clearTimeout(timeout_activity.value);
-  timeout_activity.value = window.setTimeout(() => {
-    is_loading_activity.value = true;
-    params_activity.currentPage = 1;
-    refetchActivity();
-  }, 1000);
-};
-const scrollActivity = (e: Event) => {
-  const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLElement;
-  if (
-    scrollTop + clientHeight >= scrollHeight - 1 &&
-    hasNextPageActivity.value &&
-    !isFetchingNextPageActivity.value
-  ) {
-    fetchNextPageActivity();
-  }
-};
-// end
 
 watch(modelValue, (value) => {
   if (!value) {
@@ -337,64 +278,86 @@ watch(
   },
   { deep: true, immediate: true }
 );
-
-watch(
-  [modelValue, dataActivity],
-  ([_, newActivity]) => {
-    if (props.selectedValue) {
-      const new_data: OptionType[] =
-        newActivity?.pages
-          .flatMap((page) => page?.data)
-          ?.map((item) => {
-            return { value: item.uuid, label: item.name };
-          }) || [];
-      options_activity.value = mergeArrays(
-        [
-          {
-            value: props.selectedValue?.activity_uuid,
-            label: props.selectedValue?.activity?.name,
-          },
-        ],
-        new_data.filter(
-          (item) => item.value !== props.selectedValue?.activity_uuid
-        )
-      );
-    } else {
-      const new_data: OptionType[] =
-        newActivity?.pages
-          .flatMap((page) => page?.data)
-          ?.map((item) => {
-            return { value: item.uuid, label: item.name };
-          }) || [];
-
-      options_activity.value = new_data;
-    }
-  },
-  { deep: true, immediate: true }
-);
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" title="Tambah Tools" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" label="Nama" :rules="rules.name" :custom_symbols="all_characters" />
-      <Input v-model="model.qty" label="Quantity" :rules="rules.qty" :custom_symbols="numbers_positive_negative" />
-      <Input v-model="model.section" label="Section" :rules="rules.section" :custom_symbols="all_characters" />
-      <Select v-model="model.global_unit_uuid" label="Global Unit" options_label="label" options_value="value"
-        v-model:model-search="params_global_unit.search" :search="true" :loading="is_loading_global_unit"
-        :loading-next-page="isFetchingNextPageGlobalUnit" :rules="rules.global_unit_uuid" :options="options_global_unit"
-        @scroll="scrollGlobalUnit" @search="searchGlobalUnit" />
-      <Select v-model="model.activity_uuid" label="Aktifitas" options_label="label" options_value="value"
-        v-model:model-search="params_activity.search" :search="true" :loading="is_loading_activity"
-        :loading-next-page="isFetchingNextPageActivity" :rules="rules.activity_uuid" :options="options_activity"
-        @scroll="scrollActivity" @search="searchActivity" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    title="Tambah Tools"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        label="Nama"
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+      />
+      <Input
+        v-model="model.merk"
+        star
+        label="Merk"
+        :rules="rules.merk"
+        :custom_symbols="all_characters"
+      />
+      <Input
+        v-model="model.price"
+        star
+        label="Price"
+        :is_currency="true"
+        :rules="rules.price"
+        :custom_symbols="numbers_positive_negative"
+      />
+      <Select
+        v-model="model.global_unit_uuid"
+        star
+        label="Global Unit"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_global_unit.search"
+        :search="true"
+        :loading="is_loading_global_unit"
+        :loading-next-page="isFetchingNextPageGlobalUnit"
+        :rules="rules.global_unit_uuid"
+        :options="options_global_unit"
+        @scroll="scrollGlobalUnit"
+        @search="searchGlobalUnit"
+      />
+
+      <Select
+        v-model="model.status"
+        star
+        label="Status"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_global_unit.search"
+        :search="true"
+        :rules="rules.status"
+        :options="options_status"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate"
+        />
       </div>
     </form>
   </Modal>

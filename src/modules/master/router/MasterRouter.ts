@@ -147,16 +147,26 @@ export const routeMaster = [
     },
   },
   {
-    path: "/master/additional-scope/:id/:name/tools",
-    name: "master additional tools",
-    component: () =>
-      import("@/modules/master/views/additional-scope/Tools.vue"),
+    path: "/master/additional-scope/:id/:name/tools-std",
+    name: "master additional tools std",
+    component: () => import("@/modules/master/views/additional-scope/ToolStd.vue"),
     meta: {
       layout: MasterAdditionalLayout,
       requireAuth: true,
       role: ["superuser", "planner"],
     },
   },
+  // {
+  //   path: "/master/additional-scope/:id/:name/tools",
+  //   name: "master additional tools",
+  //   component: () =>
+  //     import("@/modules/master/views/additional-scope/Tools.vue"),
+  //   meta: {
+  //     layout: MasterAdditionalLayout,
+  //     requireAuth: true,
+  //     role: ["superuser", "planner"],
+  //   },
+  // },
   {
     path: "/master/additional-scope/:id/:name/sequence",
     name: "master additional sequence",
@@ -354,6 +364,16 @@ export const routeMaster = [
     path: "/master/manpower-std",
     name: "master manpower std",
     component: () => import("@/modules/master/views/ManpowerStd.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
+    path: "/master/tools-std",
+    name: "master tools std",
+    component: () => import("@/modules/master/views/ToolStd.vue"),
     meta: {
       layout: MasterLayout,
       requireAuth: true,

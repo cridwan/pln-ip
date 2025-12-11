@@ -30,6 +30,7 @@ import type { ActivityCreateInterface } from "../types/AcitivityType";
 import type { EquipmentCreateInterface } from "../types/EquipmentType";
 import type { PartStdCreateInterface } from "../types/PartStdType";
 import type { ManpowerStdCreateInterface } from "../types/ManpowerStdType";
+import type { ToolStdCreateInterface } from "../types/ToolStdType";
 import type { ConsumableMaterialStdCreateInterface } from "../types/ConsumableMaterialStdType";
 import type {
   AxiosHeaderValue,
@@ -1314,6 +1315,89 @@ export const useMasterStore = defineStore(
         .delete(`/tools/${id}`)
         .then((res) => {
           return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const downloadTools = async (params?: AxiosRequestConfig["params"]) => {
+      return await api
+        .post(
+          `/tools/export`,
+          {},
+          {
+            responseType: "blob",
+            params,
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `tools.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const templateTools = async () => {
+      return await api
+        .post(
+          `/tools/template`,
+          {},
+          {
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `tools Template.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const importTools = async (payload: File) => {
+      const formData = new FormData();
+      formData.append("file", payload);
+
+      return await api
+        .post(`/tools/import`, formData)
+        .then((resp) => {
+          return Promise.resolve(resp);
         })
         .catch((err) => {
           return Promise.reject(err);
@@ -3065,6 +3149,142 @@ export const useMasterStore = defineStore(
     };
     // END
 
+    // TOOL STD
+    const getToolStd = async (payload: IParams, prefix: string = "") => {
+      return await api
+        .get(`${prefix}/tool-std`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const createToolStd = async (payload: ToolStdCreateInterface) => {
+      return await api
+        .post(`/tool-std`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const updateToolStd = async (
+      id: string,
+      payload: ToolStdCreateInterface
+    ) => {
+      return await api
+        .put(`/tool-std/${id}`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteToolStd = async (id: string, prefix: string = "") => {
+      return await api
+        .delete(`${prefix}/tool-std/${id}`)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const downloadToolStd = async (
+      params?: AxiosRequestConfig["params"],
+      prefix: string = ""
+    ) => {
+      return await api
+        .post(
+          `${prefix}/tool-std/export`,
+          {},
+          {
+            params,
+            responseType: "blob",
+          }
+        )
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${prefix ? 'Detail':''} Standart Tool.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const templateToolStd = async (
+      prefix: string = "",
+      payload: Record<string, any> = {}
+    ) => {
+      return await api
+        .post(`${prefix}/tool-std/template`, payload, {
+          responseType: "blob",
+        })
+        .then((resp) => {
+          const url = window.URL.createObjectURL(
+            new Blob([resp.data], {
+              type: resp.headers["content-type"],
+            })
+          );
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${prefix ? 'Detail':''} Tool Standart Template.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const importToolStd = async (payload: File, prefix: string = "") => {
+      const formData = new FormData();
+      formData.append("file", payload);
+
+      return await api
+        .post(`${prefix}/tool-std/import`, formData)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+    // END
+
     // CONSUMABLE MATERIAL STD
     const getConsumableMaterialStd = async (
       payload: IParams,
@@ -3546,6 +3766,9 @@ export const useMasterStore = defineStore(
       createTools,
       updateTools,
       deleteTools,
+      importTools,
+      downloadTools,
+      templateTools,
       getManpower,
       createManpower,
       updateManpower,
@@ -3625,6 +3848,13 @@ export const useMasterStore = defineStore(
       downloadManpowerStd,
       templateManpowerStd,
       importManpowerStd,
+      getToolStd,
+      createToolStd,
+      updateToolStd,
+      deleteToolStd,
+      downloadToolStd,
+      templateToolStd,
+      importToolStd,
       getConsumableMaterialStd,
       createConsumableMaterialStd,
       updateConsumableMaterialStd,

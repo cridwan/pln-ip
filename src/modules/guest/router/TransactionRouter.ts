@@ -61,6 +61,17 @@ export const routeTransaction = [
     },
   },
   {
+    path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/tool-std",
+    name: "guest tool std",
+    component: () => import("@/modules/guest/views/ToolStd.vue"),
+    meta: {
+      layout: GuestLayout,
+      requireAuth: true,
+      role: ["guest"],
+      except: ["superuser"],
+    },
+  },
+  {
     path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/consumable-material-std",
     name: "guest consumable material std",
     component: () => import("@/modules/guest/views/ConsumableMaterialStd.vue"),
@@ -200,6 +211,18 @@ export const routeTransaction = [
     name: "add scope detail consumable material guest",
     component: () =>
       import("@/modules/guest/views/add-scope-detail/ConsumableMaterial.vue"),
+    meta: {
+      layout: GuestAddScopeLayout,
+      requireAuth: true,
+      role: ["guest"],
+      except: ["superuser"],
+    },
+  },
+  {
+    path: "/:id/guest/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/tools-std",
+    name: "add scope detail tools std guest",
+    component: () =>
+      import("@/modules/guest/views/add-scope-detail/ToolStd.vue"),
     meta: {
       layout: GuestAddScopeLayout,
       requireAuth: true,

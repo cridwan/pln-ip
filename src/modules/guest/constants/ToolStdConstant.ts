@@ -1,14 +1,14 @@
 import type { TableColumnType } from "@/components/tables/Table.vue";
 
-export const ColumnsTools: TableColumnType[] = [
+export const ColumnsToolStd: TableColumnType[] = [
   {
-    key: "name",
+    key: "tool",
     label: "Tool",
     align: "left",
     sort: false,
   },
   {
-    key: "merk",
+    key: "tool.merk",
     label: "Merk",
     align: "left",
     sort: false,
@@ -20,14 +20,20 @@ export const ColumnsTools: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "unit",
-    label: "Satuan",
+    key: "tool.status",
+    label: "Status",
     align: "left",
     sort: false,
   },
   {
-    key: "status",
-    label: "Status",
+    key: "unit",
+    label: "Unit",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "qty",
+    label: "Qty",
     align: "left",
     sort: false,
   },
