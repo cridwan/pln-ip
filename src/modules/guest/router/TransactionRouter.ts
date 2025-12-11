@@ -1,6 +1,7 @@
 import GuestLayout from "@/layouts/GuestLayout.vue";
 import GuestAddScopeLayout from "@/layouts/GuestAddScopeLayout.vue";
 import GuestDefaultLayout from "@/layouts/GuestDefaultLayout.vue";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 export const routeTransaction = [
   {
@@ -19,7 +20,8 @@ export const routeTransaction = [
     name: "guest sequence",
     component: () => import("@/modules/guest/views/Squences.vue"),
     meta: {
-      layout: GuestDefaultLayout,
+      // layout: GuestDefaultLayout,
+      layout: DefaultLayout,
       requireAuth: true,
       role: ["guest"],
       except: ["superuser"],
@@ -162,7 +164,8 @@ export const routeTransaction = [
     name: "add scope detail sequence guest",
     component: () => import("@/modules/guest/views/add-scope-detail/Sequences.vue"),
     meta: {
-      layout: GuestDefaultLayout,
+      // layout: GuestDefaultLayout,
+      layout: DefaultLayout,
       requireAuth: true,
       role: ["guest"],
       except: ["superuser"],
