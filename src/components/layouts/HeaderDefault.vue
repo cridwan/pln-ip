@@ -120,7 +120,7 @@ const toReport = () => {
         <!-- <div class="home-button" @click="toHome">
           <Icon name="home" class="text-white text-xl" />
         </div> -->
-        <!-- <div class="arrow-buttons">
+        <div class="arrow-buttons">
           <button
             class="arrow-button back"
             :disabled="disabledBack"
@@ -144,7 +144,7 @@ const toReport = () => {
           >
             Save
           </button>
-        </div> -->
+        </div>
       </div>
       <!-- <div v-if="isStepNavigation" class="step-navigation">
         <Icon name="double-arrow-left" class="text-[24px] text-buttonGray cursor-pointer hover:text-cyan-500"
