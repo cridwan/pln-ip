@@ -116,28 +116,31 @@ const { data: dataLocation } = useQuery({
 // get location
 
 watch(dataUnit, (value) => {
-  if ((value?.data || []).length > 0) {
-    unit_active.value = value?.[0]?.uuid || "";
-    refetchMachine();
+  if ((value?.data || []).length > 0 && !unit_active.value) {
+    unit_active.value = value?.data?.[0]?.uuid || "";
   }
 });
 
-watch(dataLocation, (value) => {
-  if ((value?.data || []).length > 0) {
-    breadcrumb.value = [
-      {
-        name: value?.data?.[0]?.name || "",
-        as_link: false,
-        url: "",
-      },
-      {
-        name: "Unit",
-        as_link: false,
-        url: "",
-      },
-    ];
-  }
-}, { immediate: true, deep: true })
+watch(
+  dataLocation,
+  (value) => {
+    if ((value?.data || []).length > 0) {
+      breadcrumb.value = [
+        {
+          name: value?.data?.[0]?.name || "",
+          as_link: false,
+          url: "",
+        },
+        {
+          name: "Unit",
+          as_link: false,
+          url: "",
+        },
+      ];
+    }
+  },
+  { immediate: true, deep: true }
+);
 
 const handleClick = (uuid: string, index: number) => {
   bgActive.value = index;
@@ -145,7 +148,6 @@ const handleClick = (uuid: string, index: number) => {
     unit_active.value = null;
   } else {
     unit_active.value = uuid;
-    refetchMachine();
   }
 };
 
@@ -159,6 +161,12 @@ const handleBack = () => {
   router.push(`/${locationId}`);
 };
 
+watch(unit_active, (value) => {
+  if (value) {
+    refetchMachine();
+  }
+});
+
 onMounted(() => {
   titleHeader.value = "Unit";
   disabledNext.value = true;
@@ -171,29 +179,50 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="w-full min-h-screen" :style="{
-    backgroundImage: `url(${dataBg[bgActive]})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  }">
+  <div
+    class="w-full min-h-screen"
+    :style="{
+      backgroundImage: `url(${dataBg[bgActive]})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }"
+  >
     <div class="container-unit">
       <Breadcrumb :items="breadcrumb" />
       <div class="content-unit">
         <div class="wrapper-button-unit">
-          <div v-for="(item, key) in dataUnit?.data" :key="key" class="button-group">
-            <button class="button-unit" :class="{ 'button-active': item.uuid === unit_active }"
-              @click="handleClick(item.uuid, key)">
+          <div
+            v-for="(item, key) in dataUnit?.data"
+            :key="key"
+            class="button-group"
+          >
+            <button
+              class="button-unit"
+              :class="{ 'button-active': item.uuid === unit_active }"
+              @click="handleClick(item.uuid, key)"
+            >
               {{ item.name }}
             </button>
-            <div v-if="isLoadingMachine" :class="[
-              item.uuid === unit_active ? 'flex' : 'hidden',
-              'w-full justify-center py-6',
-            ]">
+            <div
+              v-if="isLoadingMachine"
+              :class="[
+                item.uuid === unit_active ? 'flex' : 'hidden',
+                'w-full justify-center py-6',
+              ]"
+            >
               <p class="text-base font-bold text-neutral-950">Loading...</p>
             </div>
-            <div class="button-group-gt" :class="{ 'children-active': item.uuid === unit_active }">
-              <button v-if="!isLoadingMachine" v-for="(element, index) in dataMachine?.data" :key="index"
-                class="button-gt" @click="toScope(item, element)">
+            <div
+              class="button-group-gt"
+              :class="{ 'children-active': item.uuid === unit_active }"
+            >
+              <button
+                v-if="!isLoadingMachine"
+                v-for="(element, index) in dataMachine?.data"
+                :key="index"
+                class="button-gt"
+                @click="toScope(item, element)"
+              >
                 {{ element.name }}
               </button>
             </div>

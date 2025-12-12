@@ -236,6 +236,7 @@ const selectLocation = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_unit.value = true;
   refetchUnit();
 };
 

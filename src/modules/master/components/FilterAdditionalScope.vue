@@ -381,6 +381,7 @@ const selectLocation = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_unit.value = true;
   refetchUnit();
 };
 
@@ -399,6 +400,7 @@ const selectUnit = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_machine.value = true;
   refetchMachine();
 };
 
@@ -412,6 +414,7 @@ const selectMachine = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_inspection.value = true;
   refetchInspection();
 };
 

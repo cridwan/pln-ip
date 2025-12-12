@@ -236,6 +236,7 @@ const selectBidang = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_sub_bidang.value = true;
   refetchSubBidang();
 };
 

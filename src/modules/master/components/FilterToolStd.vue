@@ -784,6 +784,7 @@ const selectLocation = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_unit.value = true;
   refetchUnit();
 };
 
@@ -823,7 +824,7 @@ const selectUnit = (e: OptionType) => {
       value: e.value,
     },
   ];
-
+  is_loading_machine.value = true;
   refetchMachine();
 };
 
@@ -858,7 +859,7 @@ const selectMachine = (e: OptionType) => {
       value: e.value,
     },
   ];
-
+  is_loading_inspection.value = true;
   refetchInspection();
 };
 
@@ -882,7 +883,7 @@ const selectInspection = (e: OptionType) => {
   model.value.scope_standart_uuid = "";
   model.value.equipment_uuid = "";
   model.value.activity_uuid = "";
-
+  is_loading_bidang.value = true;
   refetchBidang();
 };
 
@@ -908,7 +909,7 @@ const selectBidang = (e: OptionType) => {
       value: e.value,
     },
   ];
-
+  is_loading_sub_bidang.value = true;
   refetchSubBidang();
 };
 
@@ -938,6 +939,7 @@ const selectSubBidang = (e: OptionType) => {
       value: model.value.inspection_type_uuid,
     },
   ];
+  is_loading_scope.value = true;
   refetchScope();
 };
 
@@ -956,6 +958,7 @@ const selectScope = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_equipment.value = true;
   refetchEquipment();
 };
 
@@ -969,6 +972,7 @@ const selectEquipment = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_activity.value = true;
   refetchActivity();
 };
 

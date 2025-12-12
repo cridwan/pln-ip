@@ -349,6 +349,7 @@ const selectBidang = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_sub_bidang.value = true;
   refetchSubBidang();
 };
 
@@ -367,7 +368,7 @@ const selectSubBidang = (e: OptionType) => {
       value: e.value,
     },
   ];
-
+  is_loading_scope.value = true;
   refetchScope();
 };
 // bidang

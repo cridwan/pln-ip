@@ -564,6 +564,7 @@ const selectLocation = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_unit.value = true;
   refetchUnit();
 };
 
@@ -588,6 +589,7 @@ const selectUnit = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_machine.value = true;
   refetchMachine();
 };
 
@@ -607,6 +609,7 @@ const selectMachine = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_inspection.value = true;
   refetchInspection();
 };
 
@@ -615,6 +618,7 @@ const selectInspection = (e: OptionType) => {
   options_sub_bidang.value = [];
   model.value.bidang_uuid = "";
   model.value.sub_bidang_uuid = "";
+  is_loading_bidang.value = true;
   refetchBidang();
 };
 
@@ -628,6 +632,7 @@ const selectBidang = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_sub_bidang.value = true;
   refetchSubBidang();
 };
 
