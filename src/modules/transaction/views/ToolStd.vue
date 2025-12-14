@@ -19,38 +19,25 @@ import type {
   FilterToolStdInterface,
   ToolStdInterface,
 } from "@/modules/master/types/ToolStdType";
-import { ColumnsTool } from "@/modules/transaction/constants/ToolsConstant";
-import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
-import FilterToolStd from "@/modules/transaction/components/add-scope/FilterToolStd.vue";
+import type { ActivityInterface } from "@/modules/master/types/AcitivityType";
 import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
-import type { ProjectInterface } from "../../types/ProjectType";
-import type { UpdateToolInterface } from "../../types/ToolsType";
-import FormQuantity from "../../components/FormQuantity.vue";
-import type { ToolStdTransactionInterface } from "../../types/ToolStdType";
-import FormToolStd from "../../components/FormToolStd.vue";
-import type { ActivitySelectInterface } from "../../types/ActivityType";
+import { ColumnsTool } from "../constants/ToolsConstant";
+import { useTransactionStore } from "../stores/TransactionStore";
+import FilterToolStd from "../components/FilterToolStd.vue";
+import FormToolStd from "../components/FormToolStd.vue";
+import type { ProjectInterface } from "../types/ProjectType";
+import FormQuantity from "../components/FormQuantity.vue";
+import type { UpdateToolInterface } from "../types/ToolsType";
 import TableSummary from "@/components/tables/TableSummary.vue";
+import type { ToolStdTransactionInterface } from "../types/ToolStdType";
 
+const original_uuid = ref<string | undefined>(undefined);
+const formToolStd = ref<InstanceType<typeof FormToolStd> | null>(null);
 const authStore = useAuthStore();
 const { access_token } = storeToRefs(authStore);
-const formToolStd = ref<InstanceType<typeof FormToolStd> | null>(null);
 const transactionStore = useTransactionStore();
 const route = useRoute();
-const params = reactive({
-  search: "",
-  filter: "",
-  filters: [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "activity.equipment.scopeStandart.additional_scope_uuid",
-      value: route.params.id_scope,
-    },
-  ],
-  currentPage: 1,
-  perPage: 10,
-});
 const dataSummary = ref<{
   total_price: Number;
   price: Number;
@@ -60,11 +47,25 @@ const dataSummary = ref<{
   price: 0,
   total_qty: 0,
 });
+const params = reactive({
+  search: "",
+  filter: "",
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity.equipment.scopeStandart.project_uuid",
+      value: route.params.id_project,
+    },
+  ],
+  currentPage: 1,
+  perPage: 10,
+});
 const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
-const original_uuid = ref("");
 const timeout = ref(0);
 const dataForm = ref<FilterToolStdInterface | null>(null);
+const dataActivity = ref<ActivityInterface | null>(null);
 const selected_item = ref<ToolStdTransactionInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
 const open_form = ref(false);
@@ -74,7 +75,7 @@ const quantity = ref<any>(null);
 
 //--- GET STATUS APPROVAL
 const { data: dataApproval } = useQuery({
-  queryKey: ["getApprovalAtToolDetailAddScope"],
+  queryKey: ["getApprovalAtToolStandart"],
   queryFn: async () => {
     const { data } = await transactionStore.getProject(
       route.params.id_project as string
@@ -94,20 +95,17 @@ const {
   isFetching: isLoadingTool,
   refetch: refetchTool,
 } = useQuery({
-  queryKey: ["getToolAtToolDetailAddScope"],
+  queryKey: ["getToolTransaction"],
   queryFn: async () => {
     try {
-      const { data } = await transactionStore.getToolStd(
-        params,
-        "/add-scope/detail"
-      );
-      const response = data as IPagination<ToolStdTransactionInterface[]>;
+      const { data } = await transactionStore.getToolStd(params);
       const summary = data.summary;
       dataSummary.value = {
         total_price: summary.total_price,
         price: summary.price,
         total_qty: summary.total_qty,
       };
+      const response = data as IPagination<ToolStdTransactionInterface[]>;
       total_item.value = response.total;
       is_loading_filter.value = false;
 
@@ -118,6 +116,7 @@ const {
       throw err.response;
     }
   },
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -135,7 +134,6 @@ const { mutate: deleteToolStd, isPending: isLoadingDelete } = useMutation({
     });
     open_delete.value = false;
     refetchTool();
-
     if (formToolStd.value?.refetchTool) {
       formToolStd.value.refetchTool();
     }
@@ -148,6 +146,7 @@ const { mutate: deleteToolStd, isPending: isLoadingDelete } = useMutation({
       type: "error",
     });
   },
+  retry: 0,
 });
 //--- END
 
@@ -236,11 +235,6 @@ const handleCreate = () => {
   open_form.value = true;
 };
 
-const handleUpdate = (item: ToolStdTransactionInterface) => {
-  selected_item.value = item;
-  open_form.value = true;
-};
-
 const handleDelete = (item: ToolStdTransactionInterface) => {
   selected_item.value = item;
   open_delete.value = true;
@@ -255,8 +249,8 @@ const setFilter = () => {
     {
       group: "AND",
       operator: "EQ",
-      column: "activity.equipment.scopeStandart.additional_scope_uuid",
-      value: route.params.id_scope,
+      column: "activity.equipment.scopeStandart.project_uuid",
+      value: route.params.id_project,
     },
     {
       group: "AND",
@@ -269,6 +263,8 @@ const setFilter = () => {
 
 const resetFilter = () => {
   dataForm.value = null;
+  original_uuid.value = undefined;
+  dataActivity.value = null;
   params.filters = [
     {
       group: "AND",
@@ -276,22 +272,17 @@ const resetFilter = () => {
       column: "activity.equipment.scopeStandart.project_uuid",
       value: route.params.id_project,
     },
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "activity.original_uuid",
-      value: "",
-    },
   ];
 };
 
 const handleOnFilter = (
   data: FilterToolStdInterface,
-  activity: ActivitySelectInterface
+  activity: ActivityInterface
 ) => {
   is_loading_filter.value = true;
-  original_uuid.value = activity.original_uuid;
   dataForm.value = data;
+  dataActivity.value = activity;
+  original_uuid.value = activity.original_uuid as string;
   setFilter();
   refetchTool();
 };
@@ -341,7 +332,7 @@ onMounted(() => {
       url: "",
     },
     {
-      name: route.query?.scope as string,
+      name: "TOOL",
       as_link: false,
       url: "",
     },
@@ -378,8 +369,8 @@ onMounted(() => {
         <div class="max-w-full min-w-full">
           <Breadcrumb :items="breadcrumb" />
           <Table
-            label-create="Tool"
             :is_logging="false"
+            label-create="Tool"
             :columns="ColumnsTool"
             :entities="dataTool?.data || []"
             :loading="isLoadingTool"
@@ -399,15 +390,16 @@ onMounted(() => {
             <template #column_action="{ entity }">
               <div class="flex items-center justify-center gap-4">
                 <Icon
+                  v-if="dataForm?.activity_uuid"
                   name="trash"
                   class="icon-action-table"
                   @click="handleDelete(entity)"
-                  v-if="dataForm?.activity_uuid"
                 />
               </div>
             </template>
+
             <template #column_tool="{ entity }">
-              <p class="text-base text-neutral-50 text-left">
+              <p class="text-neutral-50">
                 {{ entity.name ?? "-" }}
               </p>
             </template>
@@ -425,7 +417,7 @@ onMounted(() => {
                 v-else
                 ref="quantity"
                 :value="entity.total_qty?.toString() || ''"
-                :label="entity?.name"
+                :label="entity.name"
                 :loading="isLoadingUpdate"
                 :disabled="
                   dataApproval?.status === 'approve' ||
@@ -436,19 +428,17 @@ onMounted(() => {
                 @save="(e) => saveQuantity(e, entity)"
               />
             </template>
-
-            <template #column_price="{ entity }">
-              <p v-if="!entity?.price">-</p>
+            <template #column_price="{ entity, index }">
+              <p v-if="!entity.price">-</p>
               <p
                 v-else
                 class="text-base text-neutral-50 text-left whitespace-nowrap"
               >
-                Rp. {{ Number(entity.price).toLocaleString("id") }}
+                Rp. {{ Number(entity.price)?.toLocaleString("id") ?? "-" }}
               </p>
             </template>
-
-            <template #column_total="{ entity }">
-              <p v-if="!entity.total_qty && !entity?.price">-</p>
+            <template #column_total="{ entity, index }">
+              <p v-if="!entity.total_qty && !entity.price">-</p>
               <p
                 v-else
                 class="text-base text-neutral-50 text-left whitespace-nowrap"
@@ -467,6 +457,12 @@ onMounted(() => {
                 {{ entity.unit ?? "-" }}
               </p>
             </template>
+
+            <template #column_number_drawing="{ entity }">
+              <p class="text-base text-neutral-50 text-left">
+                {{ entity.no_drawing ?? "-" }}
+              </p>
+            </template>
           </Table>
           <TableSummary
             :total_price="Number(dataSummary.total_price)"
@@ -480,15 +476,14 @@ onMounted(() => {
 
   <Toast ref="toastRef" />
   <FormToolStd
-    ref="formToolStd"
-    :is-additional="true"
-    :original_uuid="original_uuid"
     v-model="open_form"
     :data-form="dataForm"
     :selected-value="selected_item"
     @success="handleSuccess"
+    :original_uuid="original_uuid"
     @error="handleError"
     @removeSucess="handleRemoveSuccess"
+    ref="formToolStd"
   />
   <ModalDelete
     v-model="open_delete"

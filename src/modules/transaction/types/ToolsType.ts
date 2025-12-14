@@ -35,3 +35,8 @@ export interface UpdateToolsInterface {
   project_uuid: string | null;
   additional_scope_uuid: string | null;
 }
+
+export interface UpdateToolInterface {
+  qty: number;
+}
+

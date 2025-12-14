@@ -38,6 +38,11 @@ const Data = ref<ResultsInterface[]>([
     uuid: "manpower",
     manpower: "Manpower",
   },
+  {
+    id: 6,
+    uuid: "tools",
+    manpower: "Tools",
+  },
 ]);
 
 const breadcrumb = ref<BreadcrumbType[]>([]);
@@ -171,7 +176,7 @@ const { refetch: refetchDownloadTools } = useQuery({
   queryFn: async () => {
     try {
       await transactionStore.getDownloadResultTools(
-        route.params.id_project as string
+        route.params.id_inspection as string
       );
       is_loading.value = null;
 
@@ -311,8 +316,15 @@ onMounted(() => {
     REPORT
   </p>
   <Breadcrumb :items="breadcrumb" />
-  <Table :is-create="false" :is-search="false" :is-action="false" :columns="ColumnsResultsGuest" :entities="Data"
-    :is_logging="false" :is-pagination="false">
+  <Table
+    :is-create="false"
+    :is-search="false"
+    :is-action="false"
+    :columns="ColumnsResultsGuest"
+    :entities="Data"
+    :is_logging="false"
+    :is-pagination="false"
+  >
     <template #column_download="{ entity }">
       <div class="flex justify-center">
         <button class="button-download" @click="handleDownload(entity)">

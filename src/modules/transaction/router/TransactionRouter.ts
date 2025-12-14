@@ -49,6 +49,17 @@ export const routeTransaction = [
     },
   },
   {
+    path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/tools-std",
+    name: "transaction tools std",
+    component: () => import("@/modules/transaction/views/ToolStd.vue"),
+    meta: {
+      layout: MainLayout,
+      requireAuth: true,
+      role: ["planner", "approval"],
+      except: ["superuser"],
+    },
+  },
+  {
     path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/manpower-std",
     name: "transaction manpower std",
     component: () => import("@/modules/transaction/views/ManpowerStd.vue"),
@@ -255,6 +266,18 @@ export const routeTransaction = [
     name: "add scope detail part",
     component: () =>
       import("@/modules/transaction/views/add-scope-detail/Part.vue"),
+    meta: {
+      layout: AddScopeLayout,
+      requireAuth: true,
+      role: ["planner", "approval"],
+      except: ["superuser"],
+    },
+  },
+  {
+    path: "/:id/create/unit/:id_unit/:id_machine/:menu/:id_project/:id_inspection/add-scope/:id_scope/tools",
+    name: "add scope detail tools",
+    component: () =>
+      import("@/modules/transaction/views/add-scope-detail/Tools.vue"),
     meta: {
       layout: AddScopeLayout,
       requireAuth: true,

@@ -434,6 +434,65 @@ export const useTransactionStore = defineStore(
         });
     };
 
+    const getToolStd = async (payload: IParams, prefix: string = '') => {
+      return await api
+        .get(`${prefix}/transaction/tools/resource/grouping`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getToolStdSelect = async (payload: IParams, prefix: string = '') => {
+      return await api
+        .get(`${prefix}/transaction/tools/resource/select/options`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const updateToolStd = async (payload: UpdateToolsInterface, id: string) => {
+      return await api
+        .put(`/transaction/tools/${id}`, payload)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const cloneToolStd = async (payload: any, prefix: string = '') => {
+      return await api
+        .post(`${prefix}/transaction/tools/resource/clone`, payload)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const deleteToolStd = async (id: string) => {
+      return await api
+        .delete(`/transaction/tools/${id}`)
+        .then((res) => {
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
     const getHse = async (payload: IParams) => {
       return await api
         .get(`/transaction/hse/resource/pagination`, {
@@ -955,6 +1014,11 @@ export const useTransactionStore = defineStore(
       deletePartStd,
       getTools,
       updateTools,
+      getToolStd,
+      getToolStdSelect,
+      updateToolStd,
+      cloneToolStd,
+      deleteToolStd,
       getHse,
       createHse,
       updateHse,

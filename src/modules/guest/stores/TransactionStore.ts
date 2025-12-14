@@ -716,11 +716,11 @@ export const useTransactionStore = defineStore(
         });
     };
 
-    const getDownloadResultTools = async (project_uuid: string) => {
+    const getDownloadResultTools = async (inspection_type_uuid: string) => {
       return await api
-        .get(`/transaction/result/resource/export/tools`, {
+        .get(`/result/export/tools`, {
           params: {
-            project_uuid,
+            inspection_type_uuid,
           },
           responseType: "blob",
         })
