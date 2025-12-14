@@ -50,11 +50,11 @@ const Data = ref<ResultsInterface[]>([
     uuid: "manpower",
     manpower: "Manpower",
   },
-  // {
-  //   id: 5,
-  //   uuid: "tools",
-  //   manpower: "Tools",
-  // },
+  {
+    id: 5,
+    uuid: "tools",
+    manpower: "Tools",
+  },
   {
     id: 6,
     uuid: "hse",

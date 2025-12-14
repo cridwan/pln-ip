@@ -384,7 +384,6 @@ onMounted(() => {
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"
-                v-show="Number(entity.has_transaction) == 0"
               />
             </div>
           </template>

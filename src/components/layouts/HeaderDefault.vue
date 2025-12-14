@@ -146,15 +146,18 @@ const toReport = () => {
           </button>
         </div>
       </div>
-      <!-- <div v-if="isStepNavigation" class="step-navigation">
-        <Icon name="double-arrow-left" class="text-[24px] text-buttonGray cursor-pointer hover:text-cyan-500"
-          @click="handleStepNavigation" />
+      <div v-if="isStepNavigation" class="step-navigation">
+        <Icon
+          name="double-arrow-left"
+          class="text-[24px] text-buttonGray cursor-pointer hover:text-cyan-500"
+          @click="handleStepNavigation"
+        />
       </div>
       <div v-if="isAddScope" class="add-scope">
         <button :disabled="disabledNext" @click="handleAddScope">
           Add Scope
         </button>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>

@@ -50,6 +50,12 @@ export const Menus: MenuInterface[] = [
   // },
   {
     id: 11,
+    name: "Tools Standart",
+    url: "/tools-std",
+    icon: "tools",
+  },
+  {
+    id: 11,
     name: "Part Standart",
     url: "/part-std",
     icon: "part-std",
@@ -322,6 +328,12 @@ export const MenusAddScope: MenuInterface[] = [
   //   url: "/activity",
   //   icon: "pulse-line",
   // },
+  {
+    id: 5,
+    name: "Tools",
+    url: "/tools",
+    icon: "tools",
+  },
   {
     id: 5,
     name: "Consumable Material",

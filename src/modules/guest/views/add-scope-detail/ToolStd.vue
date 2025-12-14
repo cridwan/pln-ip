@@ -44,12 +44,6 @@ const params = reactive({
       column: "activity.equipment.scopeStandart.additional_scope_uuid",
       value: route.params.id_scope,
     },
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "activity_uuid",
-      value: "",
-    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -277,6 +271,7 @@ onMounted(() => {
         <Table
           label-create="User"
           :columns="ColumnsToolStd"
+          :is_logging="false"
           :entities="dataToolStd?.data || []"
           :loading="isLoadingToolStd"
           :pagination="pagination"
