@@ -2812,7 +2812,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail ' :''} Equipment.xlsx`;
+          a.download = `${prefix ? 'Detail ' : ''} Equipment.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -2845,7 +2845,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail ' :''} Equipment Template.xlsx`;
+          a.download = `${prefix ? 'Detail ' : ''} Equipment Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3085,7 +3085,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail':''} Standart Manpower.xlsx`;
+          a.download = `${prefix ? 'Detail' : ''} Standart Manpower.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3118,7 +3118,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail':''} Manpower Standart Template.xlsx`;
+          a.download = `${prefix ? 'Detail' : ''} Manpower Standart Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3153,6 +3153,19 @@ export const useMasterStore = defineStore(
     const getToolStd = async (payload: IParams, prefix: string = "") => {
       return await api
         .get(`${prefix}/tool-std`, {
+          params: payload,
+        })
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    const getToolStdGrouping = async (payload: IParams, prefix: string = "") => {
+      return await api
+        .get(`${prefix}/tool-std/grouping`, {
           params: payload,
         })
         .then((resp) => {
@@ -3221,7 +3234,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail':''} Standart Tool.xlsx`;
+          a.download = `${prefix ? 'Detail' : ''} Standart Tool.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3254,7 +3267,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail':''} Tool Standart Template.xlsx`;
+          a.download = `${prefix ? 'Detail' : ''} Tool Standart Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3365,7 +3378,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail':''} Consumable Material Standart.xlsx`;
+          a.download = `${prefix ? 'Detail' : ''} Consumable Material Standart.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3398,7 +3411,7 @@ export const useMasterStore = defineStore(
 
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${prefix ? 'Detail':''} Consumable Material Standart Template.xlsx`;
+          a.download = `${prefix ? 'Detail' : ''} Consumable Material Standart Template.xlsx`;
 
           document.body.appendChild(a);
           a.click();
@@ -3895,6 +3908,7 @@ export const useMasterStore = defineStore(
       downloadGeneratorType,
       templateGeneratorType,
       importGeneratorType,
+      getToolStdGrouping
     };
   },
   {
