@@ -14,12 +14,6 @@ export const ColumnsToolStd: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "price",
-    label: "Price",
-    align: "left",
-    sort: false,
-  },
-  {
     key: "tool.status",
     label: "Status",
     align: "left",
@@ -32,7 +26,7 @@ export const ColumnsToolStd: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "qty",
+    key: "total_qty",
     label: "Qty",
     align: "left",
     sort: false,
