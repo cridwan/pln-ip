@@ -65,7 +65,7 @@ const {
   queryKey: ["getToolStdAdditionalScopeGuest"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getToolStd(
+      const { data } = await masterStore.getToolStdGrouping(
         params,
         "/add-scope/detail"
       );
@@ -260,43 +260,19 @@ onMounted(() => {
   <div class="relative w-full">
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterToolStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterToolStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table
-          label-create="User"
-          :columns="ColumnsToolStd"
-          :is_logging="false"
-          :entities="dataToolStd?.data || []"
-          :loading="isLoadingToolStd"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          class="mt-6"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table label-create="User" :columns="ColumnsToolStd" :is_logging="false" :entities="dataToolStd?.data || []"
+          :loading="isLoadingToolStd" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+          class="mt-6" @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
-              <Icon
-                v-if="Number(entity?.has_transaction || 0) === 0"
-                name="pencil"
-                class="icon-action-table"
-                @click="handleUpdate(entity)"
-              />
-              <Icon
-                v-if="Number(entity?.has_transaction || 0) === 0"
-                name="trash"
-                class="icon-action-table"
-                @click="handleDelete(entity)"
-                v-show="Number(entity.has_transaction) == 0"
-              />
+              <Icon v-if="Number(entity?.has_transaction || 0) === 0" name="pencil" class="icon-action-table"
+                @click="handleUpdate(entity)" />
+              <Icon v-if="Number(entity?.has_transaction || 0) === 0" name="trash" class="icon-action-table"
+                @click="handleDelete(entity)" v-show="Number(entity.has_transaction) == 0" />
             </div>
           </template>
           <template #column_tool="{ entity }">

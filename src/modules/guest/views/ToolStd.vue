@@ -64,7 +64,7 @@ const {
   queryKey: ["getToolStdGuest"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getToolStd(params);
+      const { data } = await masterStore.getToolStdGrouping(params);
       const response = data as IPagination<ToolStdInterface[]>;
 
       total_item.value = response.total;
@@ -265,29 +265,13 @@ onMounted(() => {
   <div class="relative w-full">
     <div class="flex gap-8">
       <div class="w-[330px]">
-        <FilterToolStd
-          @filter="handleOnFilter"
-          @reset-filter="handleResetFilter"
-          :loading="is_loading_filter"
-        />
+        <FilterToolStd @filter="handleOnFilter" @reset-filter="handleResetFilter" :loading="is_loading_filter" />
       </div>
       <div class="w-full">
         <Breadcrumb :items="breadcrumb" />
-        <Table
-          :is_logging="false"
-          label-create="User"
-          :columns="ColumnsToolStd"
-          :entities="dataToolStd?.data || []"
-          :loading="isLoadingToolStd"
-          :pagination="pagination"
-          :is-create="false"
-          v-model:model-search="params.search"
-          class="mt-6"
-          :is-action="false"
-          @change-page="changePage"
-          @change-limit="changeLimit"
-          @search="searchTable"
-        >
+        <Table :is_logging="false" label-create="User" :columns="ColumnsToolStd" :entities="dataToolStd?.data || []"
+          :loading="isLoadingToolStd" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+          class="mt-6" :is-action="false" @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
           <template #column_tool="{ entity }">
             <p class="text-base text-neutral-50 text-left">
               {{ entity.tool?.name ?? "-" }}
@@ -307,22 +291,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <FormToolStd
-      :data-form="dataForm"
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-      @removeSucess="handleRemoveSuccess"
-      ref="formToolStd"
-    />
+    <FormToolStd :data-form="dataForm" v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
+      @error="handleError" @removeSucess="handleRemoveSuccess" ref="formToolStd" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.tool?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.tool?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>
