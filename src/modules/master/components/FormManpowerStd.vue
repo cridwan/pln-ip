@@ -5,7 +5,11 @@ import { Button, Input, Modal } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
-import { mergeArrays, numbers_positive } from "@/helpers/global";
+import {
+  mergeArrays,
+  numbers_decimals,
+  numbers_positive,
+} from "@/helpers/global";
 
 import { useMasterStore } from "../stores/MasterStore";
 import type {
@@ -356,7 +360,8 @@ defineExpose({ refetchManpower });
         star
         label="Qty"
         :rules="rules.qty"
-        :custom_symbols="numbers_positive"
+        :is_decimal="true"
+        :custom_symbols="numbers_decimals"
       />
 
       <div class="w-full flex items-center gap-4 mt-4">

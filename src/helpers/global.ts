@@ -109,6 +109,7 @@ const all_characters = /[a-zA-Z0-9`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\n ]/;
 const numbers_characters = /[0-9`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\n]/;
 const numbers_letters = /[a-zA-Z0-9\n ]/;
 const numbers_positive = /[0-9\n]/;
+const numbers_decimals = /^\d*\.?\d*$/;
 const numbers_positive_negative = /[0-9-\n]/;
 const letters = /[a-zA-Z\n ]/;
 const letters_characters = /[a-zA-Z`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\n ]/;
@@ -128,6 +129,7 @@ export {
   numbers_characters,
   numbers_letters,
   numbers_positive,
+  numbers_decimals,
   numbers_positive_negative,
   letters,
   letters_characters,
