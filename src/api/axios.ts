@@ -60,17 +60,15 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       // try {
       //   const newAccessToken = await onRefreshToken();
-
       //   const originalRequest = err.config;
       //   if (!originalRequest?.headers) return;
-
       //   originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
       //   return api.request(originalRequest);
       // } catch (refreshError) {
       //   return Promise.reject(refreshError);
       // }
-      authStore.logout();
-      window.location.href = "/login";
+      // authStore.logout();
+      // window.location.href = "/login";
     } else if ((err.response?.data as any)?.message === "Unauthenticated.") {
       // authStore.logout();
       // window.location.href = "/login";

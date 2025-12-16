@@ -1,8 +1,15 @@
+export enum UserEnum {
+  PLANNER = "planner",
+  APPROVAL = "approval",
+  SUPERUSER = "superuser",
+  GUEST = "guest"
+}
+
 export interface UserType {
   name: string;
   email: string;
   id: number;
-  role: string;
+  role: UserEnum;
 }
 
 export interface LoginPayloadInterface {
@@ -24,7 +31,7 @@ export interface LoginInterface {
     updated_at: string;
     guard_name: string;
     id: number;
-    name: string;
+    name: UserEnum;
     uuid: string;
     pivot: {
       model_id: number;

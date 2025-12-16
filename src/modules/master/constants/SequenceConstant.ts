@@ -9,7 +9,7 @@ export const ColumnSequence: TableColumnType[] = [
     },
     {
         key: "document",
-        label: "Link",
+        label: "Video",
         align: "left",
         sort: false,
     },

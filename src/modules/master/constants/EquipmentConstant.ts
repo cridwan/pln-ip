@@ -6,11 +6,5 @@ export const ColumnsEquipment: TableColumnType[] = [
     label: "Equipment",
     align: "left",
     sort: false,
-  },
-  {
-    key: "scope_standart",
-    label: "Scope Standart",
-    align: "left",
-    sort: false,
-  },
+  }
 ];

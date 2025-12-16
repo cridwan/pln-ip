@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { computed, onMounted, reactive, ref } from "vue";
+import { AxiosError } from "axios";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type {
   IPagination,
@@ -20,8 +27,12 @@ import { useMasterStore } from "../../stores/MasterStore";
 import { useRoute } from "vue-router";
 import FormAdScope from "../../components/FormAdScope.vue";
 import FilterAdScope from "../../components/FilterAdScope.vue";
+import ButtonGroup from "../../components/ButtonGroup.vue";
+import { parsedUrl } from "@/helpers/global";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 const masterStore = useMasterStore();
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const route = useRoute();
 const total_item = ref(0);
 const params = reactive<IParams>({
@@ -33,6 +44,12 @@ const params = reactive<IParams>({
       operator: "EQ",
       column: "additional_scope_uuid",
       value: route.params?.id,
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "sub_bidang_uuid",
+      value: "",
     },
   ],
   currentPage: 1,
@@ -54,7 +71,7 @@ const {
   queryKey: ["getScopeMaster"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getScope(params);
+      const { data } = await masterStore.getScope(params, "/add-scope/detail");
       const response = data as IPagination<ScopeInterface[]>;
 
       total_item.value = response.total;
@@ -66,6 +83,10 @@ const {
     }
   },
   refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return Boolean(params.filters?.[1]);
+  }),
+  gcTime: 0,
 });
 //--- END
 
@@ -90,6 +111,58 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.downloadScope(params, "/add-scope/detail");
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.templateScope("/add-scope/detail", {
+      filters: params.filters,
+    });
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- IMPORT
+const { mutate: importScope, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importScope(payload, "/add-scope/detail");
+  },
+  onSuccess: () => {
+    refetchScope();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchScope();
   },
 });
 //--- END
@@ -177,12 +250,19 @@ const setFilter = () => {
 
 const resetFilter = () => {
   dataForm.value = null;
+
   params.filters = [
     {
       group: "AND",
       operator: "EQ",
       column: "additional_scope_uuid",
       value: route.params?.id,
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "sub_bidang_uuid",
+      value: "",
     },
   ];
 };
@@ -209,6 +289,53 @@ const previewDocument = (document: ResponseDocumentInterface) => {
 const handleRemoveSuccess = () => {
   refetchScope();
 };
+
+const handleDownload = () => {
+  downloadScope();
+};
+
+const handleExportTemplate = () => {
+  templateScope();
+};
+
+const handleImport = (file: File) => {
+  toastRef.value?.showToast({
+    title: "Success",
+    description: "Import successfully",
+    type: "success",
+  });
+  importScope(file);
+};
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.addScope),
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
@@ -221,15 +348,24 @@ const handleRemoveSuccess = () => {
   />
 
   <div class="relative w-full">
-    <Button
-      v-if="dataForm?.sub_bidang_uuid"
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <div class="flex items-center gap-2 absolute right-0 top-10">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.sub_bidang_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
+    </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
@@ -240,6 +376,7 @@ const handleRemoveSuccess = () => {
         />
       </div>
       <div class="w-full">
+        <Breadcrumb :items="breadcrumb" class="mb-6" />
         <Table
           label-create="User"
           :columns="ColumnsScope"
@@ -255,25 +392,28 @@ const handleRemoveSuccess = () => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
               />
             </div>
           </template>
           <template #column_document="{ entity }">
-            <p
+            <a
               class="text-base text-neutral-50 text-left underline cursor-pointer"
               v-if="entity.document"
-              @click="previewDocument(entity.document)"
+              :href="parsedUrl(entity.document.document_link)"
             >
               {{ entity.document?.document_name ?? "-" }}
-            </p>
+            </a>
             <p v-else>-</p>
           </template>
           <template #column_link="{ entity }">

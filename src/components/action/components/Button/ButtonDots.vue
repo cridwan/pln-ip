@@ -1,20 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, type PropType } from "vue";
+import { ref } from "vue";
 import {
-  PopoverArrow,
-  PopoverClose,
   PopoverContent,
   PopoverPortal,
   PopoverRoot,
   PopoverTrigger,
-  TabsContent,
-  TabsIndicator,
-  TabsList,
-  TabsRoot,
-  TabsTrigger,
 } from "radix-vue";
 
-import { Input, Icon } from "@/components";
+import { Icon } from "@/components";
 
 const props = defineProps({
   label: {
@@ -35,10 +28,6 @@ const squence = () => {
   emit("squence");
 };
 
-// const drawing = () => {
-//   emit("drawing");
-// };
-
 const detail = () => {
   emit("detail");
 };
@@ -53,16 +42,13 @@ const detail = () => {
     </PopoverTrigger>
     <PopoverPortal>
       <PopoverContent :side-offset="5" class="popover-content-dots">
-        <!-- <button class="popover-content-dots--drawing" @click="drawing">
-          Drawing
-        </button> -->
         <button class="popover-content-dots--drawing" @click="detail">
           Detail
         </button>
-        <button class="popover-content-dots--squences" @click="squence">
+        <!-- <button class="popover-content-dots--squences" @click="squence">
           Squences
         </button>
-        <div class="popover-content-dots--day">{{ day }} Days</div>
+        <div class="popover-content-dots--day">{{ day }} Days</div> -->
       </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>

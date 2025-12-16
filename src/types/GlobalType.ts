@@ -1,3 +1,5 @@
+import type { UserInterface } from "@/modules/master/types/UserType";
+
 export interface IPagination<T> {
   data: T;
   current_page: number;
@@ -11,11 +13,19 @@ export interface IPagination<T> {
   prev_page_url: null | number;
   to: number;
   total: number;
+  summary?: Record<string, any>;
+}
+
+export interface ProjectCardInterface {
+  name: string;
+  status: "Completed" | "In Progress" | "Pending" | "Cancelled"; // 'Completed', 'In Progress', 'Pending', 'Cancelled'
+  createdBy: string;
+  dateCreated: string; // Format ISO
 }
 
 export interface IParams {
   search: string;
-  filter?: string;
+  filter?: string | Record<string, any>;
   filters?: Record<string, any>[] | string;
   currentPage?: number;
   perPage?: number;
@@ -25,6 +35,16 @@ export interface CreateDocumentInterface {
   document: File;
   document_type: string;
   document_uuid: string;
+}
+
+export interface NotificationInterface {
+  uuid: string;
+  uri: string;
+  title: string;
+  summary: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ResponseDocumentInterface {
@@ -38,4 +58,9 @@ export interface ResponseDocumentInterface {
   document_original_name: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface CreateActivityLogSyncInterface {
+  activity_type: string;
+  activity_id: string;
 }

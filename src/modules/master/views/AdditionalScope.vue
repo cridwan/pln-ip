@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { useRouter } from "vue-router";
 
 import {
@@ -12,7 +12,11 @@ import {
   Toast,
 } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
-import type { IPagination, IParams } from "@/types/GlobalType";
+import type {
+  IPagination,
+  IParams,
+  ResponseDocumentInterface,
+} from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 import { ColumnsAdditionalScope } from "../constants/AdditionalScopeConstant";
@@ -23,24 +27,44 @@ import type {
 import { useMasterStore } from "../stores/MasterStore";
 import FormAdditionalScope from "../components/FormAdditionalScope.vue";
 import FilterAdditionalScope from "../components/FilterAdditionalScope.vue";
+import ButtonGroup from "../components/ButtonGroup.vue";
+import {
+  TooltipArrow,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipRoot,
+  TooltipTrigger,
+} from "radix-vue";
+import ModalPlay from "@/components/overlays/ModalPlay.vue";
 
 const masterStore = useMasterStore();
+const documentRef = ref<ResponseDocumentInterface | undefined>(undefined);
 const total_item = ref(0);
 const params = reactive<IParams>({
   search: "",
   filter: "",
   currentPage: 1,
   perPage: 10,
-  filters: [],
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "inspection_type_uuid",
+      value: "",
+    },
+  ],
 });
 const open_form = ref(false);
 const open_delete = ref(false);
+const open_play = ref(false);
 const selected_item = ref<AdditionalScopeInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const router = useRouter();
 const dataForm = ref<AdditionalScopeFilterInterface | null>(null);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET ADDITIONAL SCOPE
 const {
@@ -55,14 +79,20 @@ const {
       const response = data as IPagination<AdditionalScopeInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
   refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return params.filters?.length !== 0;
+  }),
+  gcTime: 0,
 });
 //--- END
 
@@ -88,6 +118,64 @@ const { mutate: deleteAdditionalScope, isPending: isLoadingDelete } =
         description: error?.response?.data?.message || "Something went wrong",
         type: "error",
       });
+    },
+  });
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadAdditionalScope, isPending: isLoadingDownload } =
+  useMutation({
+    mutationFn: async () => {
+      return await masterStore.downloadAdditionalScope(params);
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateAdditionalScope, isPending: isLoadingTemplate } =
+  useMutation({
+    mutationFn: async () => {
+      return await masterStore.templateAdditionalScope();
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+//--- END
+
+//--- IMPORT
+const { mutate: importAdditionalScope, isPending: isLoadingImport } =
+  useMutation({
+    mutationFn: async (payload: File) => {
+      return await masterStore.importAdditionalScope(payload);
+    },
+    onSuccess: () => {
+      toastRef.value?.showToast({
+        title: "Success",
+        description: "Import successfully",
+        type: "success",
+      });
+      refetchAdditionalScope();
+    },
+    onError: (error) => {
+      let message = "Something went wrong";
+
+      if (error instanceof AxiosError) {
+        message = error?.response?.data?.message || "Something went wrong";
+      }
+
+      toastRef.value?.showToast({
+        title: "Error",
+        description: message,
+        type: "error",
+      });
+
+      refetchAdditionalScope();
     },
   });
 //--- END
@@ -160,6 +248,13 @@ const handleShow = (item: AdditionalScopeInterface) => {
   router.push({
     name: "master additional scope standart",
     params: { id: item.uuid, name: item.name },
+    query: {
+      location: item.inspection_type?.machine?.unit?.location?.name ?? "",
+      unit: item.inspection_type?.machine?.unit?.name ?? "",
+      machine: item.inspection_type?.machine?.name ?? "",
+      inspectionType: item.inspection_type.name ?? "",
+      addScope: item.name,
+    },
   });
 };
 
@@ -180,12 +275,14 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: AdditionalScopeFilterInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchAdditionalScope();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchAdditionalScope();
 };
@@ -194,8 +291,25 @@ const handleRemoveSuccess = () => {
   refetchAdditionalScope();
 };
 
+const handleDownload = () => {
+  downloadAdditionalScope();
+};
+
+const handleExportTemplate = () => {
+  templateAdditionalScope();
+};
+
+const handleImport = (file: File) => {
+  importAdditionalScope(file);
+};
+
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Additional Scope",
       as_link: false,
@@ -203,19 +317,33 @@ onMounted(() => {
     },
   ];
 });
+
+const openModalPlay = (document: ResponseDocumentInterface) => {
+  documentRef.value = document;
+  open_play.value = true;
+};
 </script>
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="dataForm?.inspection_type_uuid"
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <div class="flex items-center gap-2 absolute right-0 top-10">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.inspection_type_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
+    </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
@@ -242,22 +370,49 @@ onMounted(() => {
         >
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
+              <TooltipProvider>
+                <TooltipRoot>
+                  <TooltipTrigger>
+                    <Icon
+                      name="eye"
+                      class="icon-action-table"
+                      @click="handleShow(entity)"
+                    />
+                  </TooltipTrigger>
+                  <TooltipPortal>
+                    <TooltipContent
+                      class="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-neutral-950 select-none rounded-[4px] bg-white px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
+                      :side-offset="5"
+                    >
+                      Detail
+                      <TooltipArrow class="fill-white" :width="8" />
+                    </TooltipContent>
+                  </TooltipPortal>
+                </TooltipRoot>
+              </TooltipProvider>
               <Icon
-                name="eye"
-                class="icon-action-table"
-                @click="handleShow(entity)"
-              />
-              <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
               />
             </div>
+          </template>
+          <template #column_sequence_video="{ entity }">
+            <span
+              class="text-white cursor-pointer underline"
+              @click="openModalPlay(entity.sequence?.document)"
+              v-if="entity.sequence?.document"
+              >{{ entity.sequence?.document?.document_name }}</span
+            >
+            <span v-else class="text-white">{{ "-" }}</span>
           </template>
         </Table>
       </div>
@@ -274,6 +429,7 @@ onMounted(() => {
   </div>
 
   <Toast ref="toastRef" />
+  <ModalPlay v-model="open_play" :document="documentRef" />
   <ModalDelete
     v-model="open_delete"
     :title="selected_item?.name"

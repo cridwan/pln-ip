@@ -13,3 +13,6 @@ export interface UnitCreateInterface {
   name: string;
   location_uuid: string;
 }
+export interface UnitTypeModelCreateInterface {
+  location_uuid: string;
+}

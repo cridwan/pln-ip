@@ -2,6 +2,12 @@ import type { TableColumnType } from "@/components/tables/Table.vue";
 
 export const ColumnsActivity: TableColumnType[] = [
   {
+    key: "serial_number",
+    label: "No Urut",
+    align: "left",
+    sort: false,
+  },
+  {
     key: "name",
     label: "Activity",
     align: "left",
@@ -9,7 +15,40 @@ export const ColumnsActivity: TableColumnType[] = [
   },
   {
     key: "duration",
-    label: "Duration",
+    label: "Duration (jam)",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "ik_link",
+    label: "IK Online",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "ik_doc",
+    label: "IK Doc",
+    align: "left",
+    sort: false,
+  },
+];
+
+export const ColumnsActivityGuest: TableColumnType[] = [
+  {
+    key: "serial_number",
+    label: "No Urut",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "name",
+    label: "Activity",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "duration",
+    label: "Duration (Jam)",
     align: "left",
     sort: false,
   },

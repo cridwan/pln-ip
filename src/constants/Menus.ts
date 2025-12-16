@@ -19,40 +19,76 @@ export const Menus: MenuInterface[] = [
     icon: "home",
   },
   {
+    id: 1,
+    name: "Sequence",
+    url: "/sequence",
+    icon: "forward-message",
+  },
+  {
     id: 5,
     name: "Scope",
     url: "/scope",
     icon: "document",
   },
   {
+    id: 5,
+    name: "Instruksi Kerja",
+    url: "/work-instruction",
+    icon: "megaphone",
+  },
+  // {
+  //   id: 11,
+  //   name: "Equipment",
+  //   url: "/equipment",
+  //   icon: "wrench",
+  // },
+  // {
+  //   id: 11,
+  //   name: "Activity",
+  //   url: "/activity",
+  //   icon: "pulse-line",
+  // },
+  {
     id: 11,
-    name: "Equipment",
-    url: "/equipment",
-    icon: "wrench",
+    name: "Tools Standart",
+    url: "/tools-std",
+    icon: "tools",
   },
   {
     id: 11,
-    name: "Activity",
-    url: "/activity",
-    icon: "pulse-line",
-  },
-  {
-    id: 11,
-    name: "Part Std",
+    name: "Part Standart",
     url: "/part-std",
     icon: "part-std",
   },
   {
     id: 11,
-    name: "Manpower Std",
+    name: "Manpower Standart",
     url: "/manpower-std",
     icon: "manpower-std",
   },
   {
     id: 11,
-    name: "Consumable Material Std",
+    name: "Consumable Material Standart",
     url: "/consumable-material-std",
     icon: "consumable-material-std",
+  },
+  {
+    id: 10,
+    name: "QC Plan",
+    url: "/qc-plan",
+    icon: "mind-gear",
+  },
+  {
+    id: 10,
+    name: "HSE DOC",
+    url: "/hse-doc",
+    icon: "hse-doc",
+  },
+  {
+    id: 12,
+    name: "Approval",
+    url: "/approval",
+    icon: "check-list",
   },
   {
     id: 13,
@@ -60,6 +96,24 @@ export const Menus: MenuInterface[] = [
     url: "/additional-scope",
     icon: "login",
   },
+  {
+    id: 12,
+    name: "Request Approval",
+    url: "/request-approval",
+    icon: "check-list",
+  },
+  {
+    id: 12,
+    name: "Results",
+    url: "/results",
+    icon: "document-clean",
+  },
+  // {
+  //   id: 11,
+  //   name: "Preview",
+  //   url: "/preview",
+  //   icon: "magnifying-glass",
+  // },
   // {
   //   id: 2,
   //   name: "Sequences",
@@ -180,6 +234,63 @@ export const Menus: MenuInterface[] = [
   // },
 ];
 
+export const MenusGuest: MenuInterface[] = [
+  {
+    id: 1,
+    name: "Home",
+    url: "/",
+    icon: "home",
+  },
+  {
+    id: 2,
+    name: "Sequence",
+    url: "/sequence",
+    icon: "forward-message",
+  },
+  {
+    id: 5,
+    name: "Scope",
+    url: "/scope",
+    icon: "document",
+  },
+  {
+    id: 11,
+    name: "Part Standart",
+    url: "/part-std",
+    icon: "part-std",
+  },
+  {
+    id: 11,
+    name: "Tools Std",
+    url: "/tool-std",
+    icon: "tools",
+  },
+  {
+    id: 11,
+    name: "Manpower Standart",
+    url: "/manpower-std",
+    icon: "manpower-std",
+  },
+  {
+    id: 11,
+    name: "Consumable Material Standart",
+    url: "/consumable-material-std",
+    icon: "consumable-material-std",
+  },
+  {
+    id: 13,
+    name: "Additional Scope",
+    url: "/additional-scope",
+    icon: "login",
+  },
+  {
+    id: 12,
+    name: "Report",
+    url: "/results",
+    icon: "document-clean",
+  },
+];
+
 export const MenusAddScope: MenuInterface[] = [
   {
     id: 1,
@@ -189,49 +300,102 @@ export const MenusAddScope: MenuInterface[] = [
   },
   {
     id: 2,
-    name: "Scope",
-    url: "/scope",
-    icon: "document",
-    children: [
-      {
-        id: 201,
-        name: "Mekanik",
-        url: "/scope-mekanik",
-      },
-      {
-        id: 202,
-        name: "Listrik",
-        url: "/scope-listrik",
-      },
-      {
-        id: 203,
-        name: "Instrument",
-        url: "/scope-instrument",
-      },
-    ],
+    name: "Sequence",
+    url: "/sequence",
+    icon: "forward-message",
   },
   {
     id: 3,
+    name: "Scope",
+    url: "/scope",
+    icon: "document",
+  },
+  {
+    id: 4,
     name: "Instruksi Kerja",
     url: "/work-instruction",
-    icon: "checklist",
-    children: [
-      {
-        id: 301,
-        name: "Mekanik",
-        url: "/work-instruction-mekanik",
-      },
-      {
-        id: 302,
-        name: "Listrik",
-        url: "/work-instruction-listrik",
-      },
-      {
-        id: 303,
-        name: "Instrument",
-        url: "/work-instruction-instrument",
-      },
-    ],
+    icon: "megaphone",
+  },
+  // {
+  //   id: 2,
+  //   name: "Equipment",
+  //   url: "/equipment",
+  //   icon: "wrench",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Activity",
+  //   url: "/activity",
+  //   icon: "pulse-line",
+  // },
+  {
+    id: 5,
+    name: "Tools",
+    url: "/tools",
+    icon: "tools",
+  },
+  {
+    id: 5,
+    name: "Consumable Material",
+    url: "/consumable-material",
+    icon: "box",
+  },
+  {
+    id: 6,
+    name: "Manpower",
+    url: "/manpower",
+    icon: "male",
+  },
+  {
+    id: 7,
+    name: "Part",
+    url: "/part",
+    icon: "trolley-items",
+  },
+];
+
+export const MenusGuestAddScope: MenuInterface[] = [
+  {
+    id: 1,
+    name: "Main Menu",
+    url: "/",
+    icon: "out",
+  },
+  {
+    id: 2,
+    name: "Sequence",
+    url: "/sequence",
+    icon: "forward-message",
+  },
+  {
+    id: 2,
+    name: "Scope",
+    url: "/scope",
+    icon: "document",
+  },
+  // {
+  //   id: 2,
+  //   name: "Instruksi Kerja",
+  //   url: "/work-instruction",
+  //   icon: "megaphone",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Equipment",
+  //   url: "/equipment",
+  //   icon: "wrench",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Activity",
+  //   url: "/activity",
+  //   icon: "pulse-line",
+  // },
+  {
+    id: 4,
+    name: "Tools",
+    url: "/tools-std",
+    icon: "tools",
   },
   {
     id: 4,
@@ -251,18 +415,6 @@ export const MenusAddScope: MenuInterface[] = [
     url: "/part",
     icon: "trolley-items",
   },
-  {
-    id: 7,
-    name: "QC Plan",
-    url: "/qc-plan",
-    icon: "mind-gear",
-  },
-  {
-    id: 8,
-    name: "Tools",
-    url: "/tools",
-    icon: "tools",
-  },
 ];
 
 export const MenusMaster: MenuInterface[] = [
@@ -272,54 +424,6 @@ export const MenusMaster: MenuInterface[] = [
     url: "/master-data",
     icon: "arrow",
     children: [
-      {
-        id: 1,
-        name: "Location",
-        url: "/location",
-        icon: "location-pin",
-      },
-      {
-        id: 2,
-        name: "Unit",
-        url: "/unit",
-        icon: "unit",
-      },
-      {
-        id: 3,
-        name: "Machine",
-        url: "/machine",
-        icon: "machine",
-      },
-      {
-        id: 6,
-        name: "Global Unit",
-        url: "/global-unit",
-        icon: "ruler",
-      },
-      {
-        id: 15,
-        name: "Sequence",
-        url: "/sequence",
-        icon: "sequence",
-      },
-      {
-        id: 7,
-        name: "Consumable Material",
-        url: "/consumable-materials",
-        icon: "box",
-      },
-      {
-        id: 8,
-        name: "Manpower",
-        url: "/manpower",
-        icon: "male",
-      },
-      {
-        id: 9,
-        name: "Part",
-        url: "/part",
-        icon: "trolley-items",
-      },
       {
         id: 11,
         name: "User",
@@ -339,10 +443,88 @@ export const MenusMaster: MenuInterface[] = [
         icon: "sub-bidang",
       },
       {
+        id: 14,
+        name: "Area",
+        url: "/area",
+        icon: "area",
+      },
+      {
+        id: 15,
+        name: "Sub Area",
+        url: "/sub-area",
+        icon: "sub-area",
+      },
+      {
+        id: 6,
+        name: "Satuan",
+        url: "/global-unit",
+        icon: "ruler",
+      },
+      {
+        id: 1,
+        name: "Location",
+        url: "/location",
+        icon: "location-pin",
+      },
+      {
+        id: 18,
+        name: "Jenis Pembangkit",
+        url: "/generator-type",
+        icon: "generator",
+      },
+      {
+        id: 2,
+        name: "Unit",
+        url: "/unit",
+        icon: "unit",
+      },
+      {
+        id: 3,
+        name: "Machine",
+        url: "/machine",
+        icon: "machine",
+      },
+      {
+        id: 15,
+        name: "Sequence",
+        url: "/sequence",
+        icon: "sequence",
+      },
+      {
+        id: 7,
+        name: "Tools",
+        url: "/tools",
+        icon: "tools",
+      },
+      {
+        id: 7,
+        name: "Consumable Material",
+        url: "/consumable-materials",
+        icon: "box",
+      },
+      {
+        id: 9,
+        name: "Part",
+        url: "/parts",
+        icon: "trolley-items",
+      },
+      {
+        id: 8,
+        name: "Manpower",
+        url: "/manpowers",
+        icon: "male",
+      },
+      {
         id: 15,
         name: "HSE DOC",
         url: "/hse-doc",
         icon: "hse-doc",
+      },
+      {
+        id: 17,
+        name: "QC Plan",
+        url: "/qc-plan",
+        icon: "tag",
       },
     ],
   },
@@ -378,19 +560,25 @@ export const MenusMaster: MenuInterface[] = [
   },
   {
     id: 11,
-    name: "Part Std",
+    name: "Part",
     url: "/part-std",
     icon: "part-std",
   },
   {
     id: 11,
-    name: "Manpower Std",
+    name: "Tools",
+    url: "/tools-std",
+    icon: "tools",
+  },
+  {
+    id: 11,
+    name: "Manpower",
     url: "/manpower-std",
     icon: "manpower-std",
   },
   {
     id: 11,
-    name: "Consumable Material Std",
+    name: "Consumable Material",
     url: "/consumable-material-std",
     icon: "consumable-material-std",
   },
@@ -405,6 +593,12 @@ export const MenusMaster: MenuInterface[] = [
     name: "Additional Scope",
     url: "/additional-scope",
     icon: "login",
+  },
+  {
+    id: 13,
+    name: "Monitoring Project",
+    url: "/monitoring-project",
+    icon: "chart",
   },
 ];
 
@@ -428,20 +622,26 @@ export const MenuAdditional: MenuInterface[] = [
     icon: "pulse-line",
   },
   {
+    id: 9,
+    name: "Tools",
+    url: "/master/additional-scope/:id/:name/tools-std",
+    icon: "tools",
+  },
+  {
     id: 7,
-    name: "Consumable Material Std",
+    name: "Consumable Material",
     url: "/master/additional-scope/:id/:name/consumable-material",
     icon: "consumable-material-std",
   },
   {
     id: 8,
-    name: "Manpower Std",
+    name: "Manpower",
     url: "/master/additional-scope/:id/:name/manpower",
     icon: "manpower-std",
   },
   {
     id: 9,
-    name: "Part Std",
+    name: "Part",
     url: "/master/additional-scope/:id/:name/part",
     icon: "part-std",
   },

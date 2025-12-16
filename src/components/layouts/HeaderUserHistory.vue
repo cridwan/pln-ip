@@ -13,7 +13,7 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push("/login");
+  router.push({ name: 'login' });
 };
 </script>
 
@@ -22,9 +22,9 @@ const logout = () => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <div class="user-info">
+        <button class="user-info" @click="router.push('/profile')">
           <p>User : superadmin@gmail.com</p>
-        </div>
+        </button>
         <button class="menu-button" @click="router.push('/')">Location</button>
         <button class="menu-button active">User History</button>
         <button class="sign-out-button" @click="logout">Sign Out</button>
@@ -45,6 +45,8 @@ const logout = () => {
       .user-info
         @apply w-[300px] py-2 bg-buttonGray mr-[-22px] text-center
         clip-path: polygon(7.5% 0, 100% 0, 92.5% 100%, 0% 100%)
+        &:hover
+          @apply bg-cyan-500
       .menu-button
         @apply px-6 py-2 bg-buttonGray w-[150px] mr-[-22px]
         clip-path: polygon(15% 0, 100% 0, 85% 100%, 0% 100%)

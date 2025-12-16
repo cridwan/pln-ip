@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
@@ -10,20 +10,15 @@ import { ColumnsTools } from "../constants/ToolsConstant";
 import type { ToolsInterface } from "../types/ToolsType";
 import { useMasterStore } from "../stores/MasterStore";
 import FormTools from "../components/FormTools.vue";
+import { numberFormat } from "@/helpers/global";
+import ButtonGroup from "../components/ButtonGroup.vue";
 
 const masterStore = useMasterStore();
 const total_item = ref(0);
 const params = reactive({
   search: "",
   filter: "",
-  filters: [
-    {
-      group: "AND",
-      operator: "NOT_NULL",
-      column: "activity.equipment.scopeStandart.inspection_type_uuid",
-      value: null,
-    }
-  ],
+  filters: [],
   currentPage: 1,
   perPage: 10,
 });
@@ -78,6 +73,61 @@ const { mutate: deleteTools, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadTools, isPending: isLoadingDownload } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.downloadTools(params);
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateTools, isPending: isLoadingTemplate } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.templateTools();
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- IMPORT
+const { mutate: importTools, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importTools(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchTools();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchTools();
   },
 });
 //--- END
@@ -145,31 +195,91 @@ const handleDelete = (item: ToolsInterface) => {
 const onDelete = () => {
   deleteTools(selected_item.value?.uuid as string);
 };
+
+const handleDownload = () => {
+  downloadTools();
+};
+
+const handleExportTemplate = () => {
+  templateTools();
+};
+
+const handleImport = (file: File) => {
+  importTools(file);
+};
 </script>
 
 <template>
   <Toast ref="toastRef" />
-  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
+  <ModalDelete
+    v-model="open_delete"
+    :title="selected_item?.name"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 
   <div class="relative w-full">
-    <Button icon_only="plus" class="absolute right-0" size="sm" rounded="full" color="blue" @click="handleCreate" />
+    <div class="flex items-center gap-2 absolute right-0">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
+    </div>
 
-    <Table label-create="Tools" :columns="ColumnsTools" :entities="dataTools?.data || []" :loading="isLoadingTools"
-      :pagination="pagination" :is-create="false" v-model:model-search="params.search" @change-page="changePage"
-      @change-limit="changeLimit" @search="searchTable">
+    <Table
+      label-create="Tools"
+      :columns="ColumnsTools"
+      :entities="dataTools?.data || []"
+      :loading="isLoadingTools"
+      :pagination="pagination"
+      :is-create="false"
+      v-model:model-search="params.search"
+      @change-page="changePage"
+      @change-limit="changeLimit"
+      @search="searchTable"
+    >
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-4">
-          <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
-          <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
+          <Icon
+            name="pencil"
+            class="icon-action-table"
+            @click="handleUpdate(entity)"
+          />
+          <Icon
+            name="trash"
+            class="icon-action-table"
+            @click="handleDelete(entity)"
+          />
         </div>
       </template>
-      <template #column_activity="{ entity }">
+      <template #column_price="{ entity }">
         <p class="text-base text-neutral-50 text-center">
-          {{ entity.activity?.name ?? '-' }}
+          {{ numberFormat(entity.price, true) }}
+        </p>
+      </template>
+      <template #column_unit="{ entity }">
+        <p class="text-base text-neutral-50 text-center">
+          {{ entity?.global_unit?.name ?? "-" }}
         </p>
       </template>
     </Table>
 
-    <FormTools v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
+    <FormTools
+      v-model="open_form"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+    />
   </div>
 </template>

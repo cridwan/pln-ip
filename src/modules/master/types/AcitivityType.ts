@@ -4,6 +4,7 @@ import type { EquipmentInterface } from "./EquipmentType";
 export interface ActivityInterface {
   uuid: string;
   name: string;
+  original_uuid?: string;
   document: ResponseDocumentInterface;
   document_uuid: string;
   equipment_uuid: string;
@@ -13,6 +14,8 @@ export interface ActivityInterface {
   updated_at: string;
   link_ik1: null;
   link_ik2: null;
+  has_transaction?: number;
+  serial_number:string;
 }
 
 export interface ActivityCreateInterface {
@@ -20,6 +23,7 @@ export interface ActivityCreateInterface {
   link_ik1: string;
   duration: string;
   equipment_uuid: string;
+  serial_number:string;
 }
 
 export interface ActivityModelCreateInterface {

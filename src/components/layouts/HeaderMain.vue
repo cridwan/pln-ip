@@ -16,21 +16,24 @@ const toHome = () => {
 
 const logout = () => {
   authStore.logout();
-  router.push("/login");
+  router.push({ name: "login" });
 };
 
 const login = () => {
-  router.push({ name: 'login' });
-}
+  router.push({ name: "login" });
+};
 
 const getMenuActive = computed(() => {
-  if (route.params.menu === "ci") {
-    return "Combustion Inspection";
-  } else if (route.params.menu === "ti") {
-    return "Turbine Inspection";
-  } else if (route.params.menu === "mi") {
-    return "Major Inspection";
-  }
+  // if (route.params.menu === "ci") {
+  //   return "Combustion Inspection";
+  // } else if (route.params.menu === "ti") {
+  //   return "Turbine Inspection";
+  // } else if (route.params.menu === "mi") {
+  //   return "Major Inspection";
+  // } else {
+  //   return route.params.menu;
+  // }
+  return String(route.params?.menu).toUpperCase();
 });
 </script>
 
@@ -39,13 +42,34 @@ const getMenuActive = computed(() => {
     <img :src="imgUrl" @click="toHome" />
     <div class="menu-bar">
       <div class="menu-wrapper">
-        <div class="user-info" v-if="authStore.users">
+        <button
+          v-if="authStore.users"
+          class="user-info-main"
+          @click="router.push('/profile')"
+        >
           <p>User : {{ authStore.users?.email }}</p>
-        </div>
-        <button class="menu-button" @click="router.push('/')">Location</button>
-        <button class="menu-button active">{{ getMenuActive }}</button>
-        <button class="sign-out-button" @click="logout" v-if="authStore.users">Sign Out</button>
-        <button class="sign-out-button" @click="login" v-else>Login</button>
+        </button>
+        <button class="menu-button-main" @click="router.push('/')">
+          Location
+        </button>
+        <!-- <button class="menu-button-main active">{{ getMenuActive }}</button> -->
+        <button
+          v-if="authStore.users?.role === 'planner'"
+          class="menu-button-main"
+          @click="router.push('/master/user')"
+        >
+          Master
+        </button>
+        <button
+          class="sign-out-button-main"
+          @click="logout"
+          v-if="authStore.users"
+        >
+          Sign Out
+        </button>
+        <button class="sign-out-button-main" @click="login" v-else>
+          Login
+        </button>
       </div>
     </div>
   </div>
@@ -60,17 +84,19 @@ const getMenuActive = computed(() => {
     @apply h-full flex flex-col gap-2
     .menu-wrapper
       @apply flex text-sm text-neutral-50
-      .user-info
+      .user-info-main
         @apply w-[300px] py-2 bg-buttonGray mr-[-22px] text-center
         clip-path: polygon(7.5% 0, 100% 0, 92.5% 100%, 0% 100%)
-      .menu-button
-        @apply px-6 py-2 bg-buttonGray w-[300px] mr-[-22px]
-        clip-path: polygon(7.5% 0, 100% 0, 92.5% 100%, 0% 100%)
+        &:hover
+          @apply bg-cyan-500
+      .menu-button-main
+        @apply px-6 py-2 bg-buttonGray w-[200px] mr-[-22px]
+        clip-path: polygon(11.5% 0, 100% 0, 88.5% 100%, 0% 100%)
         &:hover
           @apply bg-cyan-500
       .active
         @apply bg-cyan-500
-      .sign-out-button
+      .sign-out-button-main
         @apply px-6 py-2 bg-red-500 w-[150px]
         clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%)
         &:hover

@@ -144,6 +144,7 @@ watch(modelValue, (value) => {
     >
       <Input
         v-model="model.name"
+        star
         :rules="rules.name"
         :custom_symbols="all_characters"
         label="Nama"

@@ -8,21 +8,21 @@ export const ColumnsConsMat: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "price",
-    label: "Harga",
-    align: "center",
-    sort: false,
-  },
-  {
     key: "merk",
     label: "Merk",
-    align: "center",
+    align: "left",
     sort: false,
   },
   {
     key: "global_unit",
     label: "Satuan",
-    align: "center",
+    align: "left",
     sort: false,
   },
+  {
+    key: "price",
+    label: "Harga",
+    align: "left",
+    sort: false,
+  }
 ];

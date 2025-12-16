@@ -10,13 +10,13 @@ export const ColumnsMachine: TableColumnType[] = [
   {
     key: "unit",
     label: "Unit",
-    align: "center",
+    align: "left",
     sort: false,
   },
   {
     key: "location",
     label: "Lokasi",
-    align: "center",
+    align: "left",
     sort: false,
   },
 ];

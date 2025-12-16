@@ -6,7 +6,6 @@ import {
   ref,
   useSlots,
   watch,
-  nextTick,
   onBeforeUnmount,
   type PropType,
 } from "vue";
@@ -110,6 +109,10 @@ const props = defineProps({
     type: Boolean,
     value: false,
   },
+  is_decimal: {
+    type: Boolean,
+    value: false,
+  },
   allow_symbols: {
     type: Boolean,
     default: false,
@@ -157,6 +160,10 @@ const props = defineProps({
   autocomplete: {
     type: String,
     default: "off",
+  },
+  star: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -397,6 +404,19 @@ function onKeyPress(e: KeyboardEvent) {
         ) {
           e.preventDefault();
         }
+      } else if (props.is_decimal) {
+        let val = model.value;
+
+        // hapus selain angka & titik
+        val = val.replace(/[^0-9.]/g, "");
+
+        // 🔥 hanya boleh 1 titik
+        const parts = val.split(".");
+        if (parts.length > 2) {
+          val = parts[0] + "." + parts[1];
+        }
+
+        model.value = val;
       } else {
         let char_text = String.fromCharCode(e.keyCode);
         let disabled_char_text =
@@ -608,14 +628,38 @@ onMounted(() => {
     observer.disconnect();
   });
 });
+const isFirstTime = ref(true);
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (props.is_currency && isFirstTime) {
+      isFirstTime.value = false;
+      const value = newVal
+        .replace(/[^0-9 .]*/g, "")
+        .split(".")
+        .join("");
+      if (value === "") {
+        emit("update:modelValue", "");
+        emit("input", "");
+      } else {
+        emit("update:modelValue", numberFormat(parseInt(value), false));
+        emit("input", numberFormat(parseInt(value), false));
+      }
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
   <div class="pln-input">
     <div class="pln-input--label" v-if="label !== undefined">
-      <label :for="id" class="pln-input--label--text" :class="classLabel">
-        {{ label }}
-      </label>
+      <div class="flex gap-1">
+        <label :for="id" class="pln-input--label--text" :class="classLabel">
+          {{ label }}
+        </label>
+        <div v-if="star" class="text-red-500">*</div>
+      </div>
       <slot name="instruction">
         <div class="pln-input--label--instruction">{{ instruction }}</div>
       </slot>

@@ -11,7 +11,9 @@ import {
   VisuallyHidden,
 } from "radix-vue";
 import { computed, ref, watch } from "vue";
+
 import { Icon } from "@/components";
+import { useModalStack } from "@/helpers/useModalStack";
 
 const props = defineProps({
   width: {
@@ -38,6 +40,7 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const show = ref(props.modelValue);
+const { overlayZ, contentZ } = useModalStack();
 
 watch(
   () => props.modelValue,
@@ -57,6 +60,8 @@ const styles = computed(() => {
     styleData["max-height"] = `${props.height}px`;
   }
 
+  styleData["zIndex"] = contentZ.toString();
+
   return styleData;
 });
 
@@ -72,7 +77,7 @@ function handleOpenChange(value: boolean) {
       <slot name="trigger" />
     </DialogTrigger>
     <DialogPortal>
-      <DialogOverlay class="v-modal-overlay" />
+      <DialogOverlay class="v-modal-overlay" :style="{ zIndex: overlayZ }" />
       <DialogContent class="v-modal-content" :style="styles">
         <VisuallyHidden>
           <DialogDescription />
@@ -97,7 +102,7 @@ function handleOpenChange(value: boolean) {
 
 <style lang="sass">
 .v-modal-overlay
-  @apply backdrop-blur-[25px] fixed inset-0 z-[9999] flex items-center justify-center bg-neutral-500/30
+  @apply backdrop-blur-[25px] fixed inset-0 flex items-center justify-center bg-neutral-500/30
   &[data-state="open"]
     @apply animate-[overlayModalShow_150ms_cubic-bezier(0.16,_1,_0.3,_1)]
 
@@ -105,7 +110,7 @@ function handleOpenChange(value: boolean) {
   @apply text-lg font-bold text-blue-900 px-4 py-2
 
 .v-modal-content
-  @apply bg-white fixed top-[50%] left-[50%] w-full translate-x-[-50%] translate-y-[-50%] rounded shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none z-[999999]
+  @apply bg-white fixed top-[50%] left-[50%] w-full translate-x-[-50%] translate-y-[-50%] rounded shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none
   max-height: fit-content !important
   &[data-state="open"]
     @apply animate-[contentModalShow_300ms_cubic-bezier(0.16,_1,_0.3,_1)]

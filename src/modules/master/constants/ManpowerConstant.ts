@@ -9,8 +9,8 @@ export const ColumnsManpower: TableColumnType[] = [
   },
   {
     key: "price",
-    label: "Harga",
-    align: "center",
+    label: "Harga (Harian)",
+    align: "left",
     sort: false,
   },
 ];

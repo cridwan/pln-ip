@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -25,8 +25,10 @@ import type {
   ManpowerStdInterface,
 } from "../types/ManpowerStdType";
 import { ColumnsManpowerStd } from "../constants/ManpowerStdConstant";
+import ButtonGroup from "../components/ButtonGroup.vue";
 
 const dataForm = ref<ManpowerStdCreateModelInterface | null>(null);
+const formManpowerStd = ref<InstanceType<typeof FormManpowerStd> | null>(null);
 const masterStore = useMasterStore();
 const total_item = ref(0);
 const params = reactive({
@@ -39,6 +41,12 @@ const params = reactive({
       column: "activity.equipment.scopeStandart.inspection_type_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -49,32 +57,40 @@ const selected_item = ref<ManpowerStdInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
-//--- GET SCOPE
+//--- GET MANPOWER STD
 const {
-  data: dataScope,
-  isFetching: isLoadingScope,
-  refetch: refetchScope,
+  data: dataManpowerStd,
+  isFetching: isLoadingManpowerStd,
+  refetch: refetchManpowerStd,
 } = useQuery({
   queryKey: ["getManpowerStd"],
   queryFn: async () => {
     try {
       const { data } = await masterStore.getManpowerStd(params);
       const response = data.data as IPagination<ManpowerStdInterface[]>;
+
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
   refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return params.filters.some((e) => e.value !== "");
+  }),
+  gcTime: 0,
 });
 //--- END
 
-//--- DELETE SCOPE
-const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
+//--- DELETE MANPOWER STD
+const { mutate: deleteManpowerStd, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
     return await masterStore.deleteManpowerStd(id);
   },
@@ -85,7 +101,10 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       type: "success",
     });
     open_delete.value = false;
-    refetchScope();
+    refetchManpowerStd();
+    if (formManpowerStd.value?.refetchManpower) {
+      formManpowerStd.value.refetchManpower();
+    }
   },
   onError: (error: any) => {
     toastRef.value?.showToast({
@@ -93,6 +112,63 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadManpowerStd, isPending: isLoadingDownload } =
+  useMutation({
+    mutationFn: async () => {
+      return await masterStore.downloadManpowerStd(params);
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateManpowerStd, isPending: isLoadingTemplate } =
+  useMutation({
+    mutationFn: async () => {
+      return await masterStore.templateManpowerStd();
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+//--- END
+
+//--- IMPORT
+const { mutate: importManpowerStd, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importManpowerStd(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchManpowerStd();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchManpowerStd();
   },
 });
 //--- END
@@ -107,20 +183,20 @@ const pagination = computed(() => {
 
 const changePage = (e: number) => {
   params.currentPage = e;
-  refetchScope();
+  refetchManpowerStd();
 };
 
 const changeLimit = (e: string) => {
   params.perPage = parseInt(e);
   params.currentPage = 1;
-  refetchScope();
+  refetchManpowerStd();
 };
 
 const searchTable = () => {
   clearTimeout(timeout.value);
   timeout.value = window.setTimeout(() => {
     params.currentPage = 1;
-    refetchScope();
+    refetchManpowerStd();
   }, 1000);
 };
 
@@ -131,7 +207,10 @@ const handleSuccess = () => {
     type: "success",
   });
   params.currentPage = 1;
-  refetchScope();
+  refetchManpowerStd();
+  if (formManpowerStd.value?.refetchManpower) {
+    formManpowerStd.value.refetchManpower();
+  }
 };
 
 const handleError = (error: any) => {
@@ -158,11 +237,17 @@ const handleDelete = (item: ManpowerStdInterface) => {
 };
 
 const onDelete = () => {
-  deleteScope(selected_item.value?.uuid as string);
+  deleteManpowerStd(selected_item.value?.uuid as string);
 };
 
 const setFilter = () => {
   params.filters = [
+    {
+      group: "AND",
+      operator: "NOT_NULL",
+      column: "inspection_type_uuid",
+      value: "",
+    },
     {
       group: "AND",
       operator: "EQ",
@@ -178,21 +263,29 @@ const resetFilter = () => {
     {
       group: "AND",
       operator: "NOT_NULL",
-      column: "inspection_type_uuid",
+      column: "activity.equipment.scopeStandart.inspection_type_uuid",
+      value: "",
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
       value: "",
     },
   ];
 };
 
 const handleOnFilter = (data: ManpowerStdCreateModelInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
-  refetchScope();
+  refetchManpowerStd();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
-  refetchScope();
+  refetchManpowerStd();
 };
 
 const previewDocument = (document: ResponseDocumentInterface) => {
@@ -204,11 +297,28 @@ const previewDocument = (document: ResponseDocumentInterface) => {
 };
 
 const handleRemoveSuccess = () => {
-  refetchScope();
+  refetchManpowerStd();
+};
+
+const handleDownload = () => {
+  downloadManpowerStd();
+};
+
+const handleExportTemplate = () => {
+  templateManpowerStd();
+};
+
+const handleImport = (file: File) => {
+  importManpowerStd(file);
 };
 
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Manpower Std",
       as_link: false,
@@ -220,22 +330,31 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="dataForm?.activity_uuid"
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <div class="flex items-center gap-2 absolute right-0 top-10">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.activity_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
+    </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
         <FilterManpowerStd
           @filter="handleOnFilter"
           @reset-filter="handleResetFilter"
-          :loading="isLoadingScope"
+          :loading="is_loading_filter"
         />
       </div>
       <div class="w-full">
@@ -243,8 +362,8 @@ onMounted(() => {
         <Table
           label-create="User"
           :columns="ColumnsManpowerStd"
-          :entities="dataScope?.data || []"
-          :loading="isLoadingScope"
+          :entities="dataManpowerStd?.data || []"
+          :loading="isLoadingManpowerStd"
           :pagination="pagination"
           :is-create="false"
           v-model:model-search="params.search"
@@ -256,21 +375,22 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
               />
             </div>
           </template>
           <template #column_manpower="{ entity }">
-            <p
-              class="text-base text-neutral-50 text-left underline cursor-pointer"
-            >
+            <p class="text-base text-neutral-50 text-left">
               {{ entity.manpower?.name ?? "-" }}
             </p>
           </template>
@@ -285,13 +405,14 @@ onMounted(() => {
       @success="handleSuccess"
       @error="handleError"
       @removeSucess="handleRemoveSuccess"
+      ref="formManpowerStd"
     />
   </div>
 
   <Toast ref="toastRef" />
   <ModalDelete
     v-model="open_delete"
-    :title="selected_item?.uuid"
+    :title="selected_item?.manpower?.name"
     :loading="isLoadingDelete"
     @delete="onDelete"
   />

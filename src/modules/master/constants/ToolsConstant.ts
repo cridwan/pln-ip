@@ -8,15 +8,27 @@ export const ColumnsTools: TableColumnType[] = [
     sort: false,
   },
   {
-    key: "qty",
-    label: "Quantity",
-    align: "center",
+    key: "merk",
+    label: "Merk",
+    align: "left",
     sort: false,
   },
   {
-    key: "activity",
-    label: "Aktifitas",
-    align: "center",
+    key: "price",
+    label: "Price",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "unit",
+    label: "Satuan",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "status",
+    label: "Status",
+    align: "left",
     sort: false,
   },
 ];

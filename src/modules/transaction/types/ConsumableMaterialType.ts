@@ -31,10 +31,5 @@ export interface ResponseConsMatInterface {
 }
 
 export interface UpdateConsMatInterface {
-  name: string;
-  merk: string;
   qty: number;
-  global_unit_uuid: string;
-  project_uuid: string | null;
-  additional_scope_uuid: string | null;
 }

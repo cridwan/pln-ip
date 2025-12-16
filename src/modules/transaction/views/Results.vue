@@ -1,33 +1,52 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import type { AxiosError } from "axios";
+import { storeToRefs } from "pinia";
+import { useRoute } from "vue-router";
 
-import { Loading, Table } from "@/components";
+import { Breadcrumb, Loading, Table } from "@/components";
 import { useQuery } from "@tanstack/vue-query";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import type { ResultsInterface } from "../types/ResultsType";
 import { ColumnsResults } from "../constants/ResultsConstant";
-import { useRoute } from "vue-router";
 import { useTransactionStore } from "../stores/TransactionStore";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
+const params_type = ref<string>("SCOPE STANDART");
 
 const Data = ref<ResultsInterface[]>([
   {
     id: 1,
+    uuid: "budget_activity",
+    manpower: "Budget Activity",
+  },
+  {
+    id: 1,
+    uuid: "budget_activity_add",
+    manpower: "Budget Activity Additional",
+  },
+  {
+    id: 2,
     uuid: "scope",
     manpower: "Scope",
   },
   {
     id: 2,
+    uuid: "scope_add",
+    manpower: "Additional Scope",
+  },
+  {
+    id: 3,
     uuid: "consumable_material",
     manpower: "Consumable Material",
   },
   {
-    id: 3,
+    id: 4,
     uuid: "part_list",
     manpower: "Part List",
   },
   {
-    id: 4,
+    id: 5,
     uuid: "manpower",
     manpower: "Manpower",
   },
@@ -48,17 +67,21 @@ const Data = ref<ResultsInterface[]>([
   },
 ]);
 
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const is_loading = ref<string | null>(null);
 
-//--- DOWNLOAD SCOPE
-const { refetch: refetchDownloadScope } = useQuery({
-  queryKey: ["downloadResultScope"],
+//--- DOWNLOAD BUDGET ACTIVITY
+const { refetch: refetchDownloadBudgetActivity } = useQuery({
+  queryKey: ["downloadResultBudgetActivity"],
   queryFn: async () => {
     try {
-      await transactionStore.getDownloadResultScope(
-        route.params.id_project as string
+      await transactionStore.getDownloadResultBudgetActivity(
+        route.params.id_project as string,
+        params_type.value
       );
       is_loading.value = null;
 
@@ -71,6 +94,32 @@ const { refetch: refetchDownloadScope } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
+
+//--- DOWNLOAD SCOPE
+const { refetch: refetchDownloadScope } = useQuery({
+  queryKey: ["downloadResultScope"],
+  queryFn: async () => {
+    try {
+      await transactionStore.getDownloadResultScope(
+        route.params.id_project as string,
+        params_type.value
+      );
+      is_loading.value = null;
+
+      return true;
+    } catch (error: any) {
+      const err = error as AxiosError;
+      is_loading.value = null;
+
+      throw err.response;
+    }
+  },
+  enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -94,6 +143,7 @@ const { refetch: refetchDownloadConsMat } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -117,6 +167,7 @@ const { refetch: refetchDownloadPart } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -140,6 +191,7 @@ const { refetch: refetchDownloadManpower } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -163,6 +215,7 @@ const { refetch: refetchDownloadTools } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -186,6 +239,7 @@ const { refetch: refetchDownloadHse } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -209,6 +263,7 @@ const { refetch: refetchDownloadQcPlan } = useQuery({
     }
   },
   enabled: false,
+  retry: 0,
   refetchOnWindowFocus: false,
 });
 //--- END
@@ -217,7 +272,23 @@ const handleDownload = (item: ResultsInterface) => {
   is_loading.value = item.uuid;
 
   switch (item.uuid) {
+    case "budget_activity":
+      params_type.value = "SCOPE STANDART";
+      refetchDownloadBudgetActivity();
+      break;
+
+    case "budget_activity_add":
+      params_type.value = "ADDITONAL SCOPE";
+      refetchDownloadBudgetActivity();
+      break;
+
     case "scope":
+      params_type.value = "SCOPE STANDART";
+      refetchDownloadScope();
+      break;
+
+    case "scope_add":
+      params_type.value = "ADDITIONAL SCOPE";
       refetchDownloadScope();
       break;
 
@@ -246,14 +317,45 @@ const handleDownload = (item: ResultsInterface) => {
       break;
   }
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: ((route.query?.inspection as string) || "").toUpperCase(),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "RESULTS",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
+  <Breadcrumb :items="breadcrumb" class="mb-10" />
   <p class="text-center w-full font-bold text-2xl text-blue-900 mb-10">
     REPORT
   </p>
   <Table
-    label-create="Manpower"
+    :is_logging="false"
     :is-create="false"
     :is-search="false"
     :is-action="false"

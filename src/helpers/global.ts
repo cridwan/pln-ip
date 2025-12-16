@@ -22,6 +22,19 @@ function useScreen() {
   return { screenWidth, screenHeight };
 }
 
+
+function formatToFloat(input: string) {
+  const number = input.replace(/\./g, '')
+
+  return parseFloat(number);
+}
+
+function dateToYear(date: string) {
+  const dateInstance = new Date(date)
+
+  return dateInstance.getFullYear();
+}
+
 function numberFormat(inputNumber: number | string, isCurrency = false) {
   const number =
     typeof inputNumber === "string" ? parseInt(inputNumber, 10) : inputNumber;
@@ -42,6 +55,24 @@ function numberFormat(inputNumber: number | string, isCurrency = false) {
   }
 
   return data;
+}
+
+
+function dateFormatId(date: string) {
+  const instanceDate = new Date(date);
+
+  return instanceDate.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+function parsedUrl(url: string) {
+  return (
+    import.meta.env.VITE_API_BASE_URL.replace("api", "") +
+    url
+  )
 }
 
 function convertToKebabCase(input: string): string {
@@ -78,6 +109,7 @@ const all_characters = /[a-zA-Z0-9`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\n ]/;
 const numbers_characters = /[0-9`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\n]/;
 const numbers_letters = /[a-zA-Z0-9\n ]/;
 const numbers_positive = /[0-9\n]/;
+const numbers_decimals = /^\d*\.?\d*$/;
 const numbers_positive_negative = /[0-9-\n]/;
 const letters = /[a-zA-Z\n ]/;
 const letters_characters = /[a-zA-Z`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\n ]/;
@@ -97,6 +129,7 @@ export {
   numbers_characters,
   numbers_letters,
   numbers_positive,
+  numbers_decimals,
   numbers_positive_negative,
   letters,
   letters_characters,
@@ -105,4 +138,8 @@ export {
   phone,
   email,
   character_search,
+  dateFormatId,
+  formatToFloat,
+  parsedUrl,
+  dateToYear
 };

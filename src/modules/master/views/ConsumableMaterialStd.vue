@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -22,8 +22,12 @@ import type {
 } from "../types/ConsumableMaterialStdType";
 import { ColumnConsumableMaterialStd } from "../constants/ConsumableMaterialStdConstant";
 import FormConsumableMaterialStd from "../components/FormConsumableMaterialStd.vue";
+import ButtonGroup from "../components/ButtonGroup.vue";
 
 const dataForm = ref<ConsumableMaterialStdCreateModelInterface | null>(null);
+const formConsumableMaterialStd = ref<InstanceType<
+  typeof FormConsumableMaterialStd
+> | null>(null);
 const masterStore = useMasterStore();
 const total_item = ref(0);
 const params = reactive({
@@ -36,6 +40,12 @@ const params = reactive({
       column: "activity.equipment.scopeStandart.inspection_type_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -46,12 +56,13 @@ const selected_item = ref<ConsumableMaterialStdInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
-//--- GET SCOPE
+//--- GET CONSUMABLE MATERIAL STD
 const {
-  data: dataScope,
-  isFetching: isLoadingScope,
-  refetch: refetchScope,
+  data: dataConsMatStd,
+  isFetching: isLoadingConsMatStd,
+  refetch: refetchConsMatStd,
 } = useQuery({
   queryKey: ["getConsumableMaterialStd"],
   queryFn: async () => {
@@ -60,22 +71,29 @@ const {
       const response = data.data as IPagination<
         ConsumableMaterialStdInterface[]
       >;
+
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
   refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return params.filters.some((e) => e.value !== "");
+  }),
+  gcTime: 0,
 });
 //--- END
 
-//--- DELETE SCOPE
-const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
+//--- DELETE CONSUMABLE MATERIAL STD
+const { mutate: deleteConsMatStd, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteManpowerStd(id);
+    return await masterStore.deleteConsumableMaterialStd(id);
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -84,7 +102,11 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       type: "success",
     });
     open_delete.value = false;
-    refetchScope();
+    refetchConsMatStd();
+
+    if (formConsumableMaterialStd.value?.refetchConsumableMaterial) {
+      formConsumableMaterialStd.value.refetchConsumableMaterial();
+    }
   },
   onError: (error: any) => {
     toastRef.value?.showToast({
@@ -92,6 +114,63 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadConsMatStd, isPending: isLoadingDownload } =
+  useMutation({
+    mutationFn: async () => {
+      return await masterStore.downloadConsumableMaterialStd(params);
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateConsMatStd, isPending: isLoadingTemplate } =
+  useMutation({
+    mutationFn: async () => {
+      return await masterStore.templateConsumableMaterialStd();
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+//--- END
+
+//--- IMPORT
+const { mutate: importConsMatStd, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importConsumableMaterialStd(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchConsMatStd();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchConsMatStd();
   },
 });
 //--- END
@@ -106,20 +185,20 @@ const pagination = computed(() => {
 
 const changePage = (e: number) => {
   params.currentPage = e;
-  refetchScope();
+  refetchConsMatStd();
 };
 
 const changeLimit = (e: string) => {
   params.perPage = parseInt(e);
   params.currentPage = 1;
-  refetchScope();
+  refetchConsMatStd();
 };
 
 const searchTable = () => {
   clearTimeout(timeout.value);
   timeout.value = window.setTimeout(() => {
     params.currentPage = 1;
-    refetchScope();
+    refetchConsMatStd();
   }, 1000);
 };
 
@@ -130,7 +209,11 @@ const handleSuccess = () => {
     type: "success",
   });
   params.currentPage = 1;
-  refetchScope();
+  refetchConsMatStd();
+
+  if (formConsumableMaterialStd.value?.refetchConsumableMaterial) {
+    formConsumableMaterialStd.value.refetchConsumableMaterial();
+  }
 };
 
 const handleError = (error: any) => {
@@ -157,7 +240,7 @@ const handleDelete = (item: ConsumableMaterialStdInterface) => {
 };
 
 const onDelete = () => {
-  deleteScope(selected_item.value?.uuid as string);
+  deleteConsMatStd(selected_item.value?.uuid as string);
 };
 
 const setFilter = () => {
@@ -177,29 +260,48 @@ const resetFilter = () => {
     {
       group: "AND",
       operator: "NOT_NULL",
-      column: "inspection_type_uuid",
+      column: "activity.equipment.scopeStandart.inspection_type_uuid",
       value: "",
     },
   ];
 };
 
 const handleOnFilter = (data: ConsumableMaterialStdCreateModelInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
-  refetchScope();
+  refetchConsMatStd();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
-  refetchScope();
+  refetchConsMatStd();
 };
 
 const handleRemoveSuccess = () => {
-  refetchScope();
+  refetchConsMatStd();
+};
+
+const handleDownload = () => {
+  downloadConsMatStd();
+};
+
+const handleExportTemplate = () => {
+  templateConsMatStd();
+};
+
+const handleImport = (file: File) => {
+  importConsMatStd(file);
 };
 
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Consumable Material Std",
       as_link: false,
@@ -211,22 +313,31 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="dataForm?.activity_uuid"
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <div class="flex items-center gap-2 absolute right-0 top-10">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.activity_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
+    </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
         <FilterConsumableMaterialStd
           @filter="handleOnFilter"
           @reset-filter="handleResetFilter"
-          :loading="isLoadingScope"
+          :loading="is_loading_filter"
         />
       </div>
       <div class="w-full">
@@ -234,8 +345,8 @@ onMounted(() => {
         <Table
           label-create="User"
           :columns="ColumnConsumableMaterialStd"
-          :entities="dataScope?.data || []"
-          :loading="isLoadingScope"
+          :entities="dataConsMatStd?.data || []"
+          :loading="isLoadingConsMatStd"
           :pagination="pagination"
           :is-create="false"
           v-model:model-search="params.search"
@@ -247,22 +358,28 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
               />
             </div>
           </template>
           <template #column_cons_mat="{ entity }">
-            <p
-              class="text-base text-neutral-50 text-left underline cursor-pointer"
-            >
+            <p class="text-base text-neutral-50 text-left">
               {{ entity.consmat?.name ?? "-" }}
+            </p>
+          </template>
+          <template #column_globalUnit="{ entity }">
+            <p class="text-base text-neutral-50 text-left">
+              {{ entity.consmat?.global_unit?.name ?? "-" }}
             </p>
           </template>
         </Table>
@@ -276,13 +393,14 @@ onMounted(() => {
       @success="handleSuccess"
       @error="handleError"
       @removeSucess="handleRemoveSuccess"
+      ref="formConsumableMaterialStd"
     />
   </div>
 
   <Toast ref="toastRef" />
   <ModalDelete
     v-model="open_delete"
-    :title="selected_item?.uuid"
+    :title="`${selected_item?.consmat?.name} / ${selected_item?.consmat?.global_unit?.name}`"
     :loading="isLoadingDelete"
     @delete="onDelete"
   />

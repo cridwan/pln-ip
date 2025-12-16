@@ -5,6 +5,22 @@ export const routeInspection = [
     path: "/:id/create/unit/:id_unit/:id_machine",
     name: "inspection",
     component: () => import("@/modules/inspection/views/Index.vue"),
-    meta: { layout: ScopeLayout, requireAuth: false, role: "planner" },
+    meta: {
+      layout: ScopeLayout,
+      requireAuth: true,
+      role: ["planner", "approval", "guest"],
+      except: ["superuser"],
+    },
+  },
+  {
+    path: "/:id/project-monitoring",
+    name: "project monitoring inspection",
+    component: () => import("@/modules/inspection/views/ProjectMonitoring.vue"),
+    meta: {
+      layout: ScopeLayout,
+      requireAuth: true,
+      role: ["planner", "approval", "guest"],
+      except: ["superuser"],
+    },
   },
 ];

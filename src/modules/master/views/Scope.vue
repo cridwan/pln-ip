@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -26,6 +26,7 @@ import { useMasterStore } from "../stores/MasterStore";
 import FormScope from "../components/FormScope.vue";
 import type { SequenceInterface } from "../types/SequenceTypes";
 import FilterScope from "../components/FilterScope.vue";
+import ButtonGroup from "../components/ButtonGroup.vue";
 
 const dataForm = ref<ScopeCreateModelInterface | null>(null);
 const masterStore = useMasterStore();
@@ -40,6 +41,18 @@ const params = reactive({
       column: "inspection_type_uuid",
       value: "",
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "inspection_type_uuid",
+      value: "",
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "sub_bidang_uuid",
+      value: "",
+    },
   ],
   currentPage: 1,
   perPage: 10,
@@ -50,6 +63,7 @@ const selected_item = ref<ScopeInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET SCOPE
 const {
@@ -64,14 +78,18 @@ const {
       const response = data as IPagination<ScopeInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
+  enabled: computed(() => params.filters.some((e) => e.value !== "")),
   refetchOnWindowFocus: false,
+  gcTime: 0,
 });
 //--- END
 
@@ -96,6 +114,61 @@ const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadScope, isPending: isLoadingDownload } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.downloadScope(params);
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateScope, isPending: isLoadingTemplate } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.templateScope();
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- IMPORT
+const { mutate: importScope, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importScope(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchScope();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchScope();
   },
 });
 //--- END
@@ -204,12 +277,14 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: ScopeCreateModelInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchScope();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchScope();
 };
@@ -226,8 +301,25 @@ const handleRemoveSuccess = () => {
   refetchScope();
 };
 
+const handleDownload = () => {
+  downloadScope();
+};
+
+const handleExportTemplate = () => {
+  templateScope();
+};
+
+const handleImport = (file: File) => {
+  importScope(file);
+};
+
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Scope",
       as_link: false,
@@ -239,22 +331,31 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      v-if="dataForm?.inspection_type_uuid && dataForm.sub_bidang_uuid"
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <div class="flex items-center gap-2 absolute right-0 top-10">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.inspection_type_uuid && dataForm.sub_bidang_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
+    </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
         <FilterScope
           @filter="handleOnFilter"
           @reset-filter="handleResetFilter"
-          :loading="isLoadingScope"
+          :loading="is_loading_filter"
         />
       </div>
       <div class="w-full">
@@ -275,14 +376,17 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
               />
             </div>
           </template>

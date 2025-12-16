@@ -95,44 +95,159 @@ const rules = computed(() => {
   };
 });
 
-//--- GET SCOPE
-const params_scope = reactive<IParams>({
+//--- GET LOCATION
+const params_location = reactive<IParams>({
   search: "",
-  filter: "",
-  filters: [
-    {
-      group: "AND",
-      operator: "NOT_NULL",
-      column: "inspection_type_uuid",
-      value: "",
-    },
-  ],
+  filters: "",
   currentPage: 1,
   perPage: 10,
 });
 const {
-  data: dataScope,
-  refetch: refetchScope,
-  fetchNextPage: fetchNextPageScope,
-  hasNextPage: hasNextPageScope,
-  isFetchingNextPage: isFetchingNextPageScope,
+  data: dataLocation,
+  refetch: refetchLocation,
+  fetchNextPage: fetchNextPageLocation,
+  hasNextPage: hasNextPageLocation,
+  isFetchingNextPage: isFetchingNextPageLocation,
 } = useInfiniteQuery({
-  queryKey: ["getScopeEquipment"],
-  enabled: !props.selectedValue && !is_loading_scope.value,
+  queryKey: ["getLocationFilterEquipmentMaster"],
+  enabled: !props.selectedValue && !is_loading_location.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await masterStore.getScope({
-        ...params_scope,
+      const { data } = await masterStore.getLocation({
+        ...params_location,
         currentPage: pageParam,
       });
 
-      const response = data as IPagination<ScopeInterface[]>;
+      const response = data.data as IPagination<LocationInterface[]>;
 
       return response;
     } catch (error: any) {
       throw error.response;
     } finally {
-      is_loading_scope.value = false;
+      is_loading_location.value = false;
+    }
+  },
+  refetchOnWindowFocus: false,
+  getNextPageParam: (lastPage) => {
+    if (!lastPage?.data?.length) return undefined;
+    return lastPage.current_page + 1;
+  },
+  initialPageParam: 1,
+});
+//--- END
+
+//--- GET UNIT
+const params_unit = reactive<IParams>({
+  search: "",
+  filters: "",
+  currentPage: 1,
+  perPage: 10,
+});
+const {
+  data: dataUnit,
+  refetch: refetchUnit,
+  fetchNextPage: fetchNextPageUnit,
+  hasNextPage: hasNextPageUnit,
+  isFetchingNextPage: isFetchingNextPageUnit,
+} = useInfiniteQuery({
+  queryKey: ["getUnitFilterEquipmentMaster"],
+  enabled: false,
+  queryFn: async ({ pageParam = 1 }) => {
+    try {
+      const { data } = await masterStore.getUnit({
+        ...params_unit,
+        currentPage: pageParam,
+      });
+
+      const response = data.data as IPagination<UnitInterface[]>;
+
+      return response;
+    } catch (error: any) {
+      throw error.response;
+    } finally {
+      is_loading_unit.value = false;
+    }
+  },
+  refetchOnWindowFocus: false,
+  getNextPageParam: (lastPage) => {
+    if (!lastPage?.data?.length) return undefined;
+    return lastPage.current_page + 1;
+  },
+  initialPageParam: 1,
+});
+//--- END
+
+//--- GET MACHINE
+const params_machine = reactive<IParams>({
+  search: "",
+  filters: "",
+  currentPage: 1,
+  perPage: 10,
+});
+const {
+  data: dataMachine,
+  refetch: refetchMachine,
+  fetchNextPage: fetchNextPageMachine,
+  hasNextPage: hasNextPageMachine,
+  isFetchingNextPage: isFetchingNextPageMachine,
+} = useInfiniteQuery({
+  queryKey: ["getMachineFilterEquipmentMaster"],
+  enabled: false,
+  queryFn: async ({ pageParam = 1 }) => {
+    try {
+      const { data } = await masterStore.getMachine({
+        ...params_machine,
+        currentPage: pageParam,
+      });
+
+      const response = data.data as IPagination<MachineInterface[]>;
+
+      return response;
+    } catch (error: any) {
+      throw error.response;
+    } finally {
+      is_loading_machine.value = false;
+    }
+  },
+  refetchOnWindowFocus: false,
+  getNextPageParam: (lastPage) => {
+    if (!lastPage?.data?.length) return undefined;
+    return lastPage.current_page + 1;
+  },
+  initialPageParam: 1,
+});
+//--- END
+
+//--- GET INSPECTION
+const params_inspection = reactive<IParams>({
+  search: "",
+  filters: "",
+  currentPage: 1,
+  perPage: 10,
+});
+const {
+  data: dataInspection,
+  refetch: refetchInspection,
+  fetchNextPage: fetchNextPageInspection,
+  hasNextPage: hasNextPageInspection,
+  isFetchingNextPage: isFetchingNextPageInspection,
+} = useInfiniteQuery({
+  queryKey: ["getInspectionFilterEquipmentMaster"],
+  enabled: false,
+  queryFn: async ({ pageParam = 1 }) => {
+    try {
+      const { data } = await masterStore.getInspectionType({
+        ...params_inspection,
+        currentPage: pageParam,
+      });
+
+      const response = data.data as IPagination<InspectionTypeInterface[]>;
+
+      return response;
+    } catch (error: any) {
+      throw error.response;
+    } finally {
+      is_loading_inspection.value = false;
     }
   },
   refetchOnWindowFocus: false,
@@ -158,8 +273,8 @@ const {
   hasNextPage: hasNextPageBidang,
   isFetchingNextPage: isFetchingNextPageBidang,
 } = useInfiniteQuery({
-  queryKey: ["getBidangScope"],
-  enabled: !props.selectedValue && !is_loading_bidang.value,
+  queryKey: ["getBidangFilterEquipmentMaster"],
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getBidang({
@@ -206,8 +321,8 @@ const {
   hasNextPage: hasNextPageSubBidang,
   isFetchingNextPage: isFetchingNextPageSubBidang,
 } = useInfiniteQuery({
-  queryKey: ["getSubBidangScope"],
-  enabled: !props.selectedValue && !is_loading_sub_bidang.value,
+  queryKey: ["getSubBidangFilterEquipmentMaster"],
+  enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
       const { data } = await masterStore.getSubBidang({
@@ -233,159 +348,44 @@ const {
 });
 //--- END
 
-//--- GET LOCATION
-const params_location = reactive<IParams>({
+//--- GET SCOPE
+const params_scope = reactive<IParams>({
   search: "",
-  filters: "",
+  filter: "",
+  filters: [
+    {
+      group: "AND",
+      operator: "NOT_NULL",
+      column: "inspection_type_uuid",
+      value: "",
+    },
+  ],
   currentPage: 1,
   perPage: 10,
 });
 const {
-  data: dataLocation,
-  refetch: refetchLocation,
-  fetchNextPage: fetchNextPageLocation,
-  hasNextPage: hasNextPageLocation,
-  isFetchingNextPage: isFetchingNextPageLocation,
+  data: dataScope,
+  refetch: refetchScope,
+  fetchNextPage: fetchNextPageScope,
+  hasNextPage: hasNextPageScope,
+  isFetchingNextPage: isFetchingNextPageScope,
 } = useInfiniteQuery({
-  queryKey: ["getLocationManpower"],
-  enabled: !props.selectedValue && !is_loading_location.value,
-  queryFn: async ({ pageParam = 1 }) => {
-    try {
-      const { data } = await masterStore.getLocation({
-        ...params_location,
-        currentPage: pageParam,
-      });
-
-      const response = data.data as IPagination<LocationInterface[]>;
-
-      return response;
-    } catch (error: any) {
-      throw error.response;
-    } finally {
-      is_loading_location.value = false;
-    }
-  },
-  refetchOnWindowFocus: false,
-  getNextPageParam: (lastPage) => {
-    if (!lastPage?.data?.length) return undefined;
-    return lastPage.current_page + 1;
-  },
-  initialPageParam: 1,
-});
-//--- END
-
-//--- GET UNIT
-const params_unit = reactive<IParams>({
-  search: "",
-  filters: "",
-  currentPage: 1,
-  perPage: 10,
-});
-const {
-  data: dataUnit,
-  refetch: refetchUnit,
-  fetchNextPage: fetchNextPageUnit,
-  hasNextPage: hasNextPageUnit,
-  isFetchingNextPage: isFetchingNextPageUnit,
-} = useInfiniteQuery({
-  queryKey: ["getUnitManpower"],
+  queryKey: ["getScopeFilterEquipmentMaster"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
-      const { data } = await masterStore.getUnit({
-        ...params_unit,
+      const { data } = await masterStore.getScope({
+        ...params_scope,
         currentPage: pageParam,
       });
 
-      const response = data.data as IPagination<UnitInterface[]>;
+      const response = data as IPagination<ScopeInterface[]>;
 
       return response;
     } catch (error: any) {
       throw error.response;
     } finally {
-      is_loading_unit.value = false;
-    }
-  },
-  refetchOnWindowFocus: false,
-  getNextPageParam: (lastPage) => {
-    if (!lastPage?.data?.length) return undefined;
-    return lastPage.current_page + 1;
-  },
-  initialPageParam: 1,
-});
-//--- END
-
-//--- GET MACHINE
-const params_machine = reactive<IParams>({
-  search: "",
-  filters: "",
-  currentPage: 1,
-  perPage: 10,
-});
-const {
-  data: dataMachine,
-  refetch: refetchMachine,
-  fetchNextPage: fetchNextPageMachine,
-  hasNextPage: hasNextPageMachine,
-  isFetchingNextPage: isFetchingNextPageMachine,
-} = useInfiniteQuery({
-  queryKey: ["getMachineManpower"],
-  enabled: false,
-  queryFn: async ({ pageParam = 1 }) => {
-    try {
-      const { data } = await masterStore.getMachine({
-        ...params_machine,
-        currentPage: pageParam,
-      });
-
-      const response = data.data as IPagination<MachineInterface[]>;
-
-      return response;
-    } catch (error: any) {
-      throw error.response;
-    } finally {
-      is_loading_machine.value = false;
-    }
-  },
-  refetchOnWindowFocus: false,
-  getNextPageParam: (lastPage) => {
-    if (!lastPage?.data?.length) return undefined;
-    return lastPage.current_page + 1;
-  },
-  initialPageParam: 1,
-});
-//--- END
-
-//--- GET INSPECTION
-const params_inspection = reactive<IParams>({
-  search: "",
-  filters: "",
-  currentPage: 1,
-  perPage: 10,
-});
-const {
-  data: dataInspection,
-  refetch: refetchInspection,
-  fetchNextPage: fetchNextPageInspection,
-  hasNextPage: hasNextPageInspection,
-  isFetchingNextPage: isFetchingNextPageInspection,
-} = useInfiniteQuery({
-  queryKey: ["getInspectionManpower"],
-  enabled: false,
-  queryFn: async ({ pageParam = 1 }) => {
-    try {
-      const { data } = await masterStore.getInspectionType({
-        ...params_inspection,
-        currentPage: pageParam,
-      });
-
-      const response = data.data as IPagination<InspectionTypeInterface[]>;
-
-      return response;
-    } catch (error: any) {
-      throw error.response;
-    } finally {
-      is_loading_inspection.value = false;
+      is_loading_scope.value = false;
     }
   },
   refetchOnWindowFocus: false,
@@ -439,7 +439,6 @@ const resetValue = () => {
   emit("resetFilter");
 };
 
-// scope
 const timeout_scope = ref(0);
 const searchScope = () => {
   clearTimeout(timeout_scope.value);
@@ -459,7 +458,7 @@ const scrollScope = (e: Event) => {
     fetchNextPageScope();
   }
 };
-// bidang
+
 const timeout_bidang = ref(0);
 const searchBidang = () => {
   clearTimeout(timeout_bidang.value);
@@ -479,9 +478,7 @@ const scrollBidang = (e: Event) => {
     fetchNextPageBidang();
   }
 };
-// end
 
-// sub bidang
 const timeout_sub_bidang = ref(0);
 const searchSubBidang = () => {
   clearTimeout(timeout_sub_bidang.value);
@@ -501,7 +498,6 @@ const scrollSubBidang = (e: Event) => {
     fetchNextPageSubBidang();
   }
 };
-// end
 
 const timeout_location = ref(0);
 const searchLocation = () => {
@@ -597,8 +593,111 @@ watch(modelValue, (value) => {
   }
 });
 
+const selectLocation = (e: OptionType) => {
+  queryClient.removeQueries({ queryKey: ["getMachineFilterEquipmentMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getInspectionFilterEquipmentMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getBidangFilterEquipmentMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getSubBidangFilterEquipmentMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterEquipmentMaster"] });
+  options_machine.value = [];
+  options_inspection.value = [];
+  options_bidang.value = [];
+  options_sub_bidang.value = [];
+  options_scope.value = [];
+  model.value.unit_uuid = "";
+  model.value.machine_uuid = "";
+  model.value.inspection_type_uuid = "";
+  model.value.bidang_uuid = "";
+  model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
+  params_unit.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "location_uuid",
+      value: e.value,
+    },
+  ];
+  is_loading_unit.value = true;
+  refetchUnit();
+};
+
+const selectUnit = (e: OptionType) => {
+  queryClient.removeQueries({
+    queryKey: ["getInspectionFilterEquipmentMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getBidangFilterEquipmentMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getSubBidangFilterEquipmentMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterEquipmentMaster"] });
+  options_inspection.value = [];
+  options_bidang.value = [];
+  options_sub_bidang.value = [];
+  options_scope.value = [];
+  model.value.machine_uuid = "";
+  model.value.inspection_type_uuid = "";
+  model.value.bidang_uuid = "";
+  model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
+  params_machine.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "unit_uuid",
+      value: e.value,
+    },
+  ];
+  is_loading_machine.value = true;
+  refetchMachine();
+};
+
+const selectMachine = (e: OptionType) => {
+  queryClient.removeQueries({ queryKey: ["getBidangFilterEquipmentMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getSubBidangFilterEquipmentMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterEquipmentMaster"] });
+  options_bidang.value = [];
+  options_sub_bidang.value = [];
+  options_scope.value = [];
+  model.value.inspection_type_uuid = "";
+  model.value.bidang_uuid = "";
+  model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
+  params_inspection.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "machine_uuid",
+      value: e.value,
+    },
+  ];
+  is_loading_inspection.value = true;
+  refetchInspection();
+};
+
+const selectInspection = (e: OptionType) => {
+  queryClient.removeQueries({
+    queryKey: ["getSubBidangFilterEquipmentMaster"],
+  });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterEquipmentMaster"] });
+  options_sub_bidang.value = [];
+  options_scope.value = [];
+  model.value.bidang_uuid = "";
+  model.value.sub_bidang_uuid = "";
+  model.value.scope_standart_uuid = "";
+  is_loading_bidang.value = true;
+  refetchBidang();
+};
+
 const selectBidang = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getSubBidangScope"] });
+  queryClient.removeQueries({ queryKey: ["getScopeFilterEquipmentMaster"] });
+  options_scope.value = [];
   model.value.sub_bidang_uuid = "";
   params_sub_bidang.filters = [
     {
@@ -608,55 +707,31 @@ const selectBidang = (e: OptionType) => {
       value: e.value,
     },
   ];
+  model.value.scope_standart_uuid = "";
+  is_loading_sub_bidang.value = true;
   refetchSubBidang();
 };
 
-const selectLocation = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getMachineManpower"] });
-  queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
-  model.value.unit_uuid = "";
-  model.value.machine_uuid = "";
-  model.value.inspection_type_uuid = "";
-  params_unit.filters = [
+const selectSubBidang = (e: OptionType) => {
+  model.value.scope_standart_uuid = "";
+  params_scope.filters = [
     {
       group: "AND",
       operator: "EQ",
-      column: "location_uuid",
+      column: "sub_bidang_uuid",
       value: e.value,
     },
-  ];
-  refetchUnit();
-};
-
-const selectUnit = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
-  model.value.machine_uuid = "";
-  model.value.inspection_type_uuid = "";
-  params_machine.filters = [
     {
       group: "AND",
       operator: "EQ",
-      column: "unit_uuid",
-      value: e.value,
+      column: "inspection_type_uuid",
+      value: model.value.inspection_type_uuid,
     },
   ];
-  refetchMachine();
+  is_loading_scope.value = true;
+  refetchScope();
 };
 
-const selectMachine = (e: OptionType) => {
-  model.value.inspection_type_uuid = "";
-  params_inspection.filters = [
-    {
-      group: "AND",
-      operator: "EQ",
-      column: "machine_uuid",
-      value: e.value,
-    },
-  ];
-  refetchInspection();
-};
-
-// location
 watch(
   [modelValue, dataLocation],
   ([_, newLocation]) => {
@@ -699,7 +774,6 @@ watch(
   { deep: true, immediate: true }
 );
 
-// bidang
 watch(
   dataBidang,
   (newBidang) => {
@@ -737,8 +811,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end bidang
-// sub bidang
+
 watch(
   dataSubBidang,
   (newSubBidang) => {
@@ -774,7 +847,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
-// end sub bidang
+
 watch(
   [modelValue, dataLocation],
   ([_, newLocation]) => {
@@ -1023,42 +1096,133 @@ watch(
 
 <template>
   <div
-    class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md">
-    <span class="text-blue-950 font-semibold">Pilih Jenis Inspeksi</span>
+    class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
+  >
+    <span class="text-blue-950 font-semibold">Filter Equipment</span>
     <form class="" @submit.prevent="handleSubmit">
-      <Select v-model="model.location_uuid" label="Lokasi" options_label="label" options_value="value"
-        v-model:model-search="params_location.search" :search="true" :loading="is_loading_location"
-        :loading-next-page="isFetchingNextPageLocation" :rules="rules.location_uuid" :options="options_location"
-        @scroll="scrollLocation" @search="searchLocation" @select="selectLocation" />
-      <Select v-model="model.unit_uuid" label="Unit" options_label="label" options_value="value"
-        v-model:model-search="params_unit.search" :search="true" :loading="is_loading_unit"
-        :loading-next-page="isFetchingNextPageUnit" :rules="rules.unit_uuid" :options="options_unit"
-        @scroll="scrollUnit" @search="searchUnit" @select="selectUnit" />
-      <Select v-model="model.machine_uuid" label="Mesin" options_label="label" options_value="value"
-        v-model:model-search="params_machine.search" :search="true" :loading="is_loading_machine"
-        :loading-next-page="isFetchingNextPageMachine" :rules="rules.machine_uuid" :options="options_machine"
-        @scroll="scrollMachine" @search="searchMachine" @select="selectMachine" />
-      <Select v-model="model.inspection_type_uuid" label="Tipe Inspeksi" options_label="label" options_value="value"
-        v-model:model-search="params_inspection.search" :search="true" :loading="is_loading_inspection"
-        :loading-next-page="isFetchingNextPageInspection" :rules="rules.inspection_type_uuid"
-        :options="options_inspection" @scroll="scrollInspection" @search="searchInspection" />
-      <Select v-model="model.bidang_uuid" label="Bidang" options_label="label" options_value="value"
-        v-model:model-search="params_bidang.search" :search="true" :loading="is_loading_bidang"
-        :loading-next-page="isFetchingNextPageBidang" :rules="rules.bidang_uuid" :options="options_bidang"
-        @scroll="scrollBidang" @search="searchBidang" @select="selectBidang" />
-      <Select v-model="model.sub_bidang_uuid" label="Sub Bidang" options_label="label" options_value="value"
-        v-model:model-search="params_sub_bidang.search" :search="true" :loading="is_loading_sub_bidang"
-        :loading-next-page="isFetchingNextPageSubBidang" :rules="rules.sub_bidang_uuid" :options="options_sub_bidang"
-        @scroll="scrollSubBidang" @search="searchSubBidang" />
-      <Select v-model="model.scope_standart_uuid" label="Scope" options_label="label" options_value="value"
-        v-model:model-search="params_scope.search" :search="true" :loading="is_loading_scope"
-        :loading-next-page="isFetchingNextPageScope" :rules="rules.scope_standart_uuid" :options="options_scope"
-        @scroll="scrollScope" @search="searchScope" />
+      <div class="flex flex-col gap-2">
+        <Select
+          v-model="model.location_uuid"
+          label="Lokasi"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_location.search"
+          :search="true"
+          :loading="is_loading_location"
+          :loading-next-page="isFetchingNextPageLocation"
+          :rules="rules.location_uuid"
+          :options="options_location"
+          @scroll="scrollLocation"
+          @search="searchLocation"
+          @select="selectLocation"
+        />
+        <Select
+          v-model="model.unit_uuid"
+          label="Unit"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_unit.search"
+          :search="true"
+          :loading="is_loading_unit"
+          :loading-next-page="isFetchingNextPageUnit"
+          :rules="rules.unit_uuid"
+          :options="options_unit"
+          @scroll="scrollUnit"
+          @search="searchUnit"
+          @select="selectUnit"
+        />
+        <Select
+          v-model="model.machine_uuid"
+          label="Mesin"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_machine.search"
+          :search="true"
+          :loading="is_loading_machine"
+          :loading-next-page="isFetchingNextPageMachine"
+          :rules="rules.machine_uuid"
+          :options="options_machine"
+          @scroll="scrollMachine"
+          @search="searchMachine"
+          @select="selectMachine"
+        />
+        <Select
+          v-model="model.inspection_type_uuid"
+          label="Tipe Inspeksi"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_inspection.search"
+          :search="true"
+          :loading="is_loading_inspection"
+          :loading-next-page="isFetchingNextPageInspection"
+          :rules="rules.inspection_type_uuid"
+          :options="options_inspection"
+          @scroll="scrollInspection"
+          @search="searchInspection"
+          @select="selectInspection"
+        />
+        <Select
+          v-model="model.bidang_uuid"
+          label="Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_bidang.search"
+          :search="true"
+          :loading="is_loading_bidang"
+          :loading-next-page="isFetchingNextPageBidang"
+          :rules="rules.bidang_uuid"
+          :options="options_bidang"
+          @scroll="scrollBidang"
+          @search="searchBidang"
+          @select="selectBidang"
+        />
+        <Select
+          v-model="model.sub_bidang_uuid"
+          label="Sub Bidang"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_sub_bidang.search"
+          :search="true"
+          :loading="is_loading_sub_bidang"
+          :loading-next-page="isFetchingNextPageSubBidang"
+          :rules="rules.sub_bidang_uuid"
+          :options="options_sub_bidang"
+          @scroll="scrollSubBidang"
+          @search="searchSubBidang"
+          @select="selectSubBidang"
+        />
+        <Select
+          v-model="model.scope_standart_uuid"
+          label="Scope"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_scope.search"
+          :search="true"
+          :loading="is_loading_scope"
+          :loading-next-page="isFetchingNextPageScope"
+          :rules="rules.scope_standart_uuid"
+          :options="options_scope"
+          @scroll="scrollScope"
+          @search="searchScope"
+        />
+      </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Reset" class="w-full" variant="secondary" :disabled="props.loading" @click="resetValue" />
-        <Button type="submit" text="Terapkan" class="w-full" color="blue" :disabled="props.loading"
-          :loading="props.loading" />
+        <Button
+          text="Reset"
+          class="w-full"
+          variant="secondary"
+          :disabled="props.loading"
+          @click="resetValue"
+        />
+        <Button
+          type="submit"
+          text="Terapkan"
+          class="w-full"
+          color="blue"
+          :disabled="props.loading"
+          :loading="props.loading"
+        />
       </div>
     </form>
   </div>

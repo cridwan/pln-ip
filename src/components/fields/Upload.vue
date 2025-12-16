@@ -363,6 +363,7 @@ function clickUpload() {
               @click="downloadFiles(item)"
             />
             <Icon
+              v-if="!disabled"
               name="trash"
               class="preview-action--icon"
               @click="removeFiles(item)"
@@ -386,8 +387,9 @@ function clickUpload() {
     <span
       v-if="status !== 'default' || checkErrorUpload()"
       :class="classTextStatus"
-      >{{ statusMessage || checkErrorMessageUpload() }}</span
     >
+      {{ statusMessage || checkErrorMessageUpload() }}
+    </span>
   </div>
 </template>
 
@@ -409,7 +411,7 @@ function clickUpload() {
     @apply hidden h-full w-full absolute top-0 left-0 right-0 bottom-0
 
   &--upload
-    @apply relative px-4 py-1 border rounded-full cursor-pointer border-blue-900 hover:border-blue-800 text-sm text-neutral-300 w-fit
+    @apply relative px-4 py-1 border rounded-full cursor-pointer border-neutral-300 hover:border-blue-800 text-sm text-neutral-900 w-fit bg-neutral-300
   &--success
     @apply border-green-500
   &--error

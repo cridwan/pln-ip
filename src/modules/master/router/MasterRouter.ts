@@ -3,46 +3,105 @@ import MasterLayout from "@/layouts/MasterLayout.vue";
 
 export const routeMaster = [
   {
+    path: "/master/monitoring-project",
+    name: "master monitoring project",
+    component: () => import("@/modules/master/views/MonitoringProject.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
     path: "/master/location",
     name: "master location",
     component: () => import("@/modules/master/views/Location.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
+  {
+    path: "/master/generator-type",
+    name: "master generator type",
+    component: () => import("@/modules/master/views/Generator.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
+    path: "/master/qc-plan",
+    name: "QC Plan",
+    component: () => import("@/modules/master/views/QcPlan.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+
   {
     path: "/master/unit",
     name: "master unit",
     component: () => import("@/modules/master/views/Unit.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/machine",
     name: "master machine",
     component: () => import("@/modules/master/views/Machine.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/inspection-type",
     name: "master inspection type",
     component: () => import("@/modules/master/views/InspectionType.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/global-unit",
     name: "master global unit",
     component: () => import("@/modules/master/views/GlobalUnit.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/scope",
     name: "master scope",
     component: () => import("@/modules/master/views/Scope.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/additional-scope",
     name: "master additional scope",
     component: () => import("@/modules/master/views/AdditionalScope.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/additional-scope/:id/:name/scope-standart",
@@ -52,7 +111,7 @@ export const routeMaster = [
     meta: {
       layout: MasterAdditionalLayout,
       requireAuth: true,
-      role: "superuser",
+      role: ["superuser", "planner"],
     },
   },
   {
@@ -63,7 +122,7 @@ export const routeMaster = [
     meta: {
       layout: MasterAdditionalLayout,
       requireAuth: true,
-      role: "superuser",
+      role: ["superuser", "planner"],
     },
   },
   {
@@ -74,7 +133,7 @@ export const routeMaster = [
     meta: {
       layout: MasterAdditionalLayout,
       requireAuth: true,
-      role: "superuser",
+      role: ["superuser", "planner"],
     },
   },
   {
@@ -84,127 +143,251 @@ export const routeMaster = [
     meta: {
       layout: MasterAdditionalLayout,
       requireAuth: true,
-      role: "superuser",
+      role: ["superuser", "planner"],
     },
   },
   {
-    path: "/master/additional-scope/:id/:name/tools",
-    name: "master additional tools",
-    component: () => import("@/modules/master/views/additional-scope/Tools.vue"),
-    meta: { layout: MasterAdditionalLayout, requireAuth: true, role: "superuser" },
+    path: "/master/additional-scope/:id/:name/tools-std",
+    name: "master additional tools std",
+    component: () => import("@/modules/master/views/additional-scope/ToolStd.vue"),
+    meta: {
+      layout: MasterAdditionalLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
+  // {
+  //   path: "/master/additional-scope/:id/:name/tools",
+  //   name: "master additional tools",
+  //   component: () =>
+  //     import("@/modules/master/views/additional-scope/Tools.vue"),
+  //   meta: {
+  //     layout: MasterAdditionalLayout,
+  //     requireAuth: true,
+  //     role: ["superuser", "planner"],
+  //   },
+  // },
   {
     path: "/master/additional-scope/:id/:name/sequence",
     name: "master additional sequence",
-    component: () => import("@/modules/master/views/additional-scope/Sequence.vue"),
-    meta: { layout: MasterAdditionalLayout, requireAuth: true, role: "superuser" },
+    component: () =>
+      import("@/modules/master/views/additional-scope/Sequence.vue"),
+    meta: {
+      layout: MasterAdditionalLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/additional-scope/:id/:name/equipment",
     name: "master additional equipment",
-    component: () => import("@/modules/master/views/additional-scope/Equipment.vue"),
-    meta: { layout: MasterAdditionalLayout, requireAuth: true, role: "superuser" },
+    component: () =>
+      import("@/modules/master/views/additional-scope/Equipment.vue"),
+    meta: {
+      layout: MasterAdditionalLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/additional-scope/:id/:name/activity",
     name: "master additional activity",
-    component: () => import("@/modules/master/views/additional-scope/Activity.vue"),
-    meta: { layout: MasterAdditionalLayout, requireAuth: true, role: "superuser" },
+    component: () =>
+      import("@/modules/master/views/additional-scope/Activity.vue"),
+    meta: {
+      layout: MasterAdditionalLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/consumable-materials",
     name: "master consumable material",
     component: () => import("@/modules/master/views/ConsumableMaterial.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
-    path: "/master/part",
+    path: "/master/parts",
     name: "master part",
     component: () => import("@/modules/master/views/Part.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/tools",
     name: "master tools",
     component: () => import("@/modules/master/views/Tools.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
-    path: "/master/manpower",
+    path: "/master/manpowers",
     name: "master manpower",
     component: () => import("@/modules/master/views/Manpower.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/role",
     name: "master role",
     component: () => import("@/modules/master/views/Role.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/user",
     name: "master user",
     component: () => import("@/modules/master/views/User.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/bidang",
     name: "master bidang",
     component: () => import("@/modules/master/views/Bidang.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
+    path: "/master/area",
+    name: "master area",
+    component: () => import("@/modules/master/views/Area.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/sub-bidang",
     name: "master subbidang",
     component: () => import("@/modules/master/views/SubBidang.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
+    path: "/master/sub-area",
+    name: "master subarea",
+    component: () => import("@/modules/master/views/SubArea.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/hse-doc",
     name: "master hse doc",
     component: () => import("@/modules/master/views/HseDoc.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/hses",
     name: "master hse",
     component: () => import("@/modules/master/views/Hse.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/sequence",
     name: "master sequence",
     component: () => import("@/modules/master/views/Sequence.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/activity",
     name: "master activity",
     component: () => import("@/modules/master/views/Activity.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/equipment",
     name: "master equipment",
     component: () => import("@/modules/master/views/Equipment.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/part-std",
     name: "master part std",
     component: () => import("@/modules/master/views/PartStd.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/manpower-std",
     name: "master manpower std",
     component: () => import("@/modules/master/views/ManpowerStd.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
+  },
+  {
+    path: "/master/tools-std",
+    name: "master tools std",
+    component: () => import("@/modules/master/views/ToolStd.vue"),
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
   {
     path: "/master/consumable-material-std",
     name: "master consumable material std",
     component: () => import("@/modules/master/views/ConsumableMaterialStd.vue"),
-    meta: { layout: MasterLayout, requireAuth: true, role: "superuser" },
+    meta: {
+      layout: MasterLayout,
+      requireAuth: true,
+      role: ["superuser", "planner"],
+    },
   },
 ];

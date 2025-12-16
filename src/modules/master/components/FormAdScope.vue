@@ -8,6 +8,7 @@ import { required, helpers } from "@vuelidate/validators";
 import { useMutation } from "@tanstack/vue-query";
 import { useGlobalStore } from "@/stores/GlobalStore";
 import type {
+  CreateActivityLogSyncInterface,
   CreateDocumentInterface,
   ResponseDocumentInterface,
 } from "@/types/GlobalType";
@@ -103,10 +104,15 @@ const { mutate: updateScope, isPending: isLoadingUpdate } = useMutation({
   },
   onSuccess: async () => {
     if (modelUpload.value) {
+      const type = "App\\Models\\ScopeStandart";
       createDocument({
         document: modelUpload.value as File,
-        document_type: "App\\Models\\ScopeStandart",
+        document_type: type,
         document_uuid: props.selectedValue?.uuid as string,
+      });
+      createActivityLogSync({
+        activity_id: props.selectedValue?.uuid as string,
+        activity_type: type,
       });
     } else {
       modelValue.value = false;
@@ -134,6 +140,14 @@ const { mutate: createDocument, isPending: isLoadingDocument } = useMutation({
   onError: (error) => {
     console.log(error);
     emit("error", error);
+  },
+});
+//--- END
+
+//--- CREATE ACTIVITY LOG SYNC
+const { mutate: createActivityLogSync } = useMutation({
+  mutationFn: async (payload: CreateActivityLogSyncInterface) => {
+    return await globalStore.createActivityLogSync(payload);
   },
 });
 //--- END
@@ -223,6 +237,7 @@ const resetValue = () => {
   };
   model_details.value = [{ name: "", id: "0" }];
   uploadProgress.value = 0;
+  documentValues.value = null;
 };
 
 watch(modelValue, (value) => {
@@ -252,9 +267,9 @@ const handleChangeFile = (e: File) => {
   modelUpload.value = e;
 };
 
-const removeSuccess = () => {
+const handleRemove = () => {
   documentValues.value = null;
-  emit("removeSucess");
+  modelUpload.value = null;
 };
 </script>
 
@@ -272,20 +287,23 @@ const removeSuccess = () => {
     >
       <Input
         v-model="model.name"
-        label="Nama Scope Standart"
+        star
+        label="Nama Scope Tambahan"
         :rules="rules.name"
         :custom_symbols="all_characters"
       />
       <Input
         v-model="model.link"
-        label="Link Online ex. (http://google.com)"
+        label="IK Online ex. (http://google.com)"
         :custom_symbols="all_characters"
       />
       <UploadStream
-        @changes="handleChangeFile"
+        label="File IK"
         :progress="uploadProgress"
         :selectedValues="documentValues"
-        @removeSuccess="removeSuccess"
+        @changes="handleChangeFile"
+        @handleRemove="handleRemove"
+        :fileType="['doc', 'docx', 'xls', 'xlsx', 'pdf']"
       />
 
       <div class="w-full flex items-center gap-4 mt-4">

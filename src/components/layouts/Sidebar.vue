@@ -1,11 +1,41 @@
 <script setup lang="ts">
+import { RouterLink, useRoute } from "vue-router";
+import { computed, ref } from "vue";
+import { storeToRefs } from "pinia";
+
 import { Menus } from "@/constants/Menus";
 import { Icon } from "@/components";
-import { RouterLink, useRoute } from "vue-router";
-import { ref } from "vue";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
+import { UserEnum } from "@/modules/auth/types/AuthType";
+import { useProjectStore } from "@/modules/auth/stores/ProjectStore";
+import { dateToYear } from "@/helpers/global";
 
+const authStore = useAuthStore();
+const projectStore = useProjectStore();
+const { projects } = storeToRefs(projectStore);
+const { users } = storeToRefs(authStore);
 const route = useRoute();
 const selected_menu = ref<number | null>(null);
+
+const ListMenu = computed(() => {
+  return Menus.filter((item) => {
+    if (item.name === "Approval") {
+      if (users.value?.role === UserEnum.APPROVAL) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (item.name === "Request Approval") {
+      if (users.value?.role === UserEnum.PLANNER) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  });
+});
 
 const openChildren = (e: { id: number; name: string; url: string }) => {
   selected_menu.value = e.id;
@@ -25,13 +55,22 @@ const isActive = (item: { id: number; name: string; url: string }) => {
       last_path.startsWith("/work-instruction"))
   );
 };
+
+const projectDetails = computed(() => {
+  // return `${projects.value?.name} Tahun ${dateToYear(projects.value?.created_at as string)} ${projects.value?.inspection_type?.machine?.unit?.location?.name} (Created By ${projects.value?.generate_by?.user?.name})`;
+  return `${projects.value?.name} (Created By ${projects.value?.generate_by?.user?.name})`;
+});
 </script>
 
 <template>
   <div class="sidebar-main">
     <p class="sidebar-main--title">MAIN MENU</p>
     <div class="sidebar-main--menus">
-      <div v-for="(item, key) in Menus" :key="key" class="flex flex-col gap-2">
+      <div
+        v-for="(item, key) in ListMenu"
+        :key="key"
+        class="flex flex-col gap-2"
+      >
         <RouterLink
           v-if="!item.children"
           :to="{
@@ -58,6 +97,7 @@ const isActive = (item: { id: number; name: string; url: string }) => {
           <Icon :name="item.icon" class="menu-icon" />
           <p class="menu-title">{{ item.name }}</p>
         </RouterLink>
+
         <div v-else class="flex flex-col gap-2" @click="openChildren(item)">
           <div class="menu-item" :class="isActive(item) ? 'menu-active' : ''">
             <Icon :name="item.icon" class="menu-icon" />
@@ -87,6 +127,7 @@ const isActive = (item: { id: number; name: string; url: string }) => {
         </div>
       </div>
     </div>
+    <p class="sidebar-main--description">{{ projectDetails }}</p>
   </div>
 </template>
 
@@ -95,6 +136,8 @@ const isActive = (item: { id: number; name: string; url: string }) => {
   @apply w-[240px] z-[2] fixed top-[80px] bottom-[10px] left-[10px] bg-blue-900 rounded-lg px-6 py-4
   &--title
     @apply text-lg font-bold text-neutral-50
+  &--description
+    @apply mt-11 text-neutral-200 text-sm
   &--menus
     @apply flex flex-col gap-2 mt-6
     .menu-active

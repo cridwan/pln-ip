@@ -4,13 +4,11 @@ import { reactive, ref, computed, type PropType, watch } from "vue";
 import { Button, Input, Modal, Select } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import {
-  useInfiniteQuery,
-  useMutation,
-} from "@tanstack/vue-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import type { IPagination, IParams } from "@/types/GlobalType";
 import {
   all_characters,
+  formatToFloat,
   mergeArrays,
   numbers_positive,
 } from "@/helpers/global";
@@ -158,7 +156,7 @@ const handleSubmit = async () => {
       id: props.selectedValue?.uuid,
       payload: {
         name: model.value.name,
-        price: parseFloat(model.value.price),
+        price: formatToFloat(model.value.price),
         merk: model.value.merk,
         no_drawing: model.value.no_drawing,
         global_unit_uuid: model.value.global_unit_uuid,
@@ -167,7 +165,7 @@ const handleSubmit = async () => {
   } else {
     createPart({
       name: model.value.name,
-      price: parseFloat(model.value.price),
+      price: formatToFloat(model.value.price),
       merk: model.value.merk,
       no_drawing: model.value.no_drawing,
       global_unit_uuid: model.value.global_unit_uuid,
@@ -177,7 +175,8 @@ const handleSubmit = async () => {
 
 const setValue = () => {
   model.value.name = props.selectedValue?.name || "";
-  model.value.price = props.selectedValue?.price?.toString() || "";
+  model.value.price =
+    parseFloat(props.selectedValue?.price || "0")?.toString() || "";
   model.value.merk = props.selectedValue?.merk || "";
   model.value.no_drawing = props.selectedValue?.no_drawing || "";
   model.value.global_unit_uuid = props.selectedValue?.global_unit_uuid || "";
@@ -212,7 +211,6 @@ const scrollGlobalUnit = (e: Event) => {
     fetchNextPageGlobalUnit();
   }
 };
-
 
 watch(modelValue, (value) => {
   if (!value) {
@@ -265,25 +263,82 @@ watch(
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false" :title="props.selectedValue ? 'Ubah Part' : 'Tambah Part'"
-    v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" label="Nama" :rules="rules.name" :custom_symbols="all_characters" />
-      <Input v-model="model.merk" label="Merk" :rules="rules.merk" :custom_symbols="all_characters" />
-      <Input v-model="model.no_drawing" label="No. Drawing" :rules="rules.no_drawing"
-        :custom_symbols="all_characters" />
-      <Input v-model="model.price" label="Harga" :rules="rules.price" :custom_symbols="numbers_positive" />
-      <Select v-model="model.global_unit_uuid" label="Global Unit" options_label="label" options_value="value"
-        v-model:model-search="params_global_unit.search" :search="true" :loading="is_loading_global_unit"
-        :loading-next-page="isFetchingNextPageGlobalUnit" :rules="rules.global_unit_uuid" :options="options_global_unit"
-        @scroll="scrollGlobalUnit" @search="searchGlobalUnit" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Part' : 'Tambah Part'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        star
+        label="Nama"
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+        :disabled="Number(props.selectedValue?.has_transaction || 0) > 0"
+      />
+      <Input
+        v-model="model.merk"
+        star
+        label="Merk"
+        :rules="rules.merk"
+        :custom_symbols="all_characters"
+        :disabled="Number(props.selectedValue?.has_transaction || 0) > 0"
+      />
+      <Input
+        v-model="model.no_drawing"
+        star
+        label="No. Drawing"
+        :rules="rules.no_drawing"
+        :custom_symbols="all_characters"
+        :disabled="Number(props.selectedValue?.has_transaction || 0) > 0"
+      />
+      <Input
+        v-model="model.price"
+        star
+        label="Harga"
+        :rules="rules.price"
+        :custom_symbols="numbers_positive"
+        :is_currency="true"
+      />
+      <Select
+        v-model="model.global_unit_uuid"
+        :disabled="Number(props.selectedValue?.has_transaction || 0) > 0"
+        star
+        label="Satuan"
+        options_label="label"
+        options_value="value"
+        v-model:model-search="params_global_unit.search"
+        :search="true"
+        :loading="is_loading_global_unit"
+        :loading-next-page="isFetchingNextPageGlobalUnit"
+        :rules="rules.global_unit_uuid"
+        :options="options_global_unit"
+        @scroll="scrollGlobalUnit"
+        @search="searchGlobalUnit"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate"
+        />
       </div>
     </form>
   </Modal>

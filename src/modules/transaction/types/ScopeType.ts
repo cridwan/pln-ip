@@ -1,6 +1,7 @@
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import type { SubBidangInterface } from "@/modules/master/types/SubBidangType";
 import type { ResponseDocumentInterface } from "@/types/GlobalType";
+import type { EquipmentInterface } from "@/modules/transaction/types/EquipmentType";
 
 interface WithFileInterface {
   note: string;
@@ -11,7 +12,9 @@ export type TColor = "red" | "green" | "yellow" | "";
 
 export interface ScopeInterface {
   id: string;
+  original_uuid?: string;
   asset: string;
+  link?: string;
   asset_welness: {
     color: TColor;
     note: string;
@@ -28,6 +31,7 @@ export interface ScopeInterface {
   //   document: ResponseDocumentInterface | null;
   // }[];
   document: ResponseDocumentInterface | null;
+  children: EquipmentInterface[];
 }
 
 interface Category {
@@ -43,6 +47,7 @@ interface Category {
 
 export interface ResponseScopeInterface {
   uuid: string;
+  original_uuid?: string;
   name: string;
   link: string | null;
   global_unit_uuid: string;
@@ -83,4 +88,11 @@ export interface FilterScopeInterface {
 
 export interface FormScopeInterface {
   scope_standart_uuid: string;
+  project_uuid?: string;
+  additional_scope_uuid?: string;
+}
+
+export interface FormAdScopeInterface {
+  additional_scope_uuid: string;
+  project_uuid: string;
 }

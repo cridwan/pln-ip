@@ -47,7 +47,18 @@ export const useInspectionStore = defineStore(
         });
     };
 
-    return { getInspection, generate, getProject };
+    const deleteProject = async (uuid: string) => {
+      return await api
+        .delete(`/transaction/project/destroy/${uuid}`)
+        .then((resp) => {
+          return Promise.resolve(resp);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    };
+
+    return { getInspection, generate, getProject, deleteProject };
   },
   {
     persist: {

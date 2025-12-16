@@ -88,7 +88,7 @@ const {
   hasNextPage: hasNextPageLocation,
   isFetchingNextPage: isFetchingNextPageLocation,
 } = useInfiniteQuery({
-  queryKey: ["getLocationManpower"],
+  queryKey: ["getLocationFilterAddScopeMaster"],
   enabled: !props.selectedValue && !is_loading_location.value,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -129,7 +129,7 @@ const {
   hasNextPage: hasNextPageUnit,
   isFetchingNextPage: isFetchingNextPageUnit,
 } = useInfiniteQuery({
-  queryKey: ["getUnitManpower"],
+  queryKey: ["getUnitFilterAddScopeMaster"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -170,7 +170,7 @@ const {
   hasNextPage: hasNextPageMachine,
   isFetchingNextPage: isFetchingNextPageMachine,
 } = useInfiniteQuery({
-  queryKey: ["getMachineManpower"],
+  queryKey: ["getMachineFilterAddScopeMaster"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -211,7 +211,7 @@ const {
   hasNextPage: hasNextPageInspection,
   isFetchingNextPage: isFetchingNextPageInspection,
 } = useInfiniteQuery({
-  queryKey: ["getInspectionManpower"],
+  queryKey: ["getInspectionFilterAddScopeMaster"],
   enabled: false,
   queryFn: async ({ pageParam = 1 }) => {
     try {
@@ -364,8 +364,12 @@ watch(modelValue, (value) => {
 });
 
 const selectLocation = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getMachineManpower"] });
-  queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
+  queryClient.removeQueries({ queryKey: ["getMachineFilterAddScopeMaster"] });
+  queryClient.removeQueries({
+    queryKey: ["getInspectionFilterAddScopeMaster"],
+  });
+  options_machine.value = [];
+  options_inspection.value = [];
   model.value.unit_uuid = "";
   model.value.machine_uuid = "";
   model.value.inspection_type_uuid = "";
@@ -377,11 +381,15 @@ const selectLocation = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_unit.value = true;
   refetchUnit();
 };
 
 const selectUnit = (e: OptionType) => {
-  queryClient.removeQueries({ queryKey: ["getInspectionManpower"] });
+  queryClient.removeQueries({
+    queryKey: ["getInspectionFilterAddScopeMaster"],
+  });
+  options_inspection.value = [];
   model.value.machine_uuid = "";
   model.value.inspection_type_uuid = "";
   params_machine.filters = [
@@ -392,6 +400,7 @@ const selectUnit = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_machine.value = true;
   refetchMachine();
 };
 
@@ -405,6 +414,7 @@ const selectMachine = (e: OptionType) => {
       value: e.value,
     },
   ];
+  is_loading_inspection.value = true;
   refetchInspection();
 };
 
@@ -609,67 +619,69 @@ watch(
   <div
     class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] p-5 bg-white shadow-md rounded-md"
   >
-    <span class="text-blue-950 font-semibold">Pilih Scope Standart</span>
+    <span class="text-blue-950 font-semibold">Filter Additional Scope</span>
     <form class="" @submit.prevent="handleSubmit">
-      <Select
-        v-model="model.location_uuid"
-        label="Lokasi"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_location.search"
-        :search="true"
-        :loading="is_loading_location"
-        :loading-next-page="isFetchingNextPageLocation"
-        :rules="rules.location_uuid"
-        :options="options_location"
-        @scroll="scrollLocation"
-        @search="searchLocation"
-        @select="selectLocation"
-      />
-      <Select
-        v-model="model.unit_uuid"
-        label="Unit"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_unit.search"
-        :search="true"
-        :loading="is_loading_unit"
-        :loading-next-page="isFetchingNextPageUnit"
-        :rules="rules.unit_uuid"
-        :options="options_unit"
-        @scroll="scrollUnit"
-        @search="searchUnit"
-        @select="selectUnit"
-      />
-      <Select
-        v-model="model.machine_uuid"
-        label="Mesin"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_machine.search"
-        :search="true"
-        :loading="is_loading_machine"
-        :loading-next-page="isFetchingNextPageMachine"
-        :rules="rules.machine_uuid"
-        :options="options_machine"
-        @scroll="scrollMachine"
-        @search="searchMachine"
-        @select="selectMachine"
-      />
-      <Select
-        v-model="model.inspection_type_uuid"
-        label="Tipe Inspeksi"
-        options_label="label"
-        options_value="value"
-        v-model:model-search="params_inspection.search"
-        :search="true"
-        :loading="is_loading_inspection"
-        :loading-next-page="isFetchingNextPageInspection"
-        :rules="rules.inspection_type_uuid"
-        :options="options_inspection"
-        @scroll="scrollInspection"
-        @search="searchInspection"
-      />
+      <div class="flex flex-col gap-2">
+        <Select
+          v-model="model.location_uuid"
+          label="Lokasi"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_location.search"
+          :search="true"
+          :loading="is_loading_location"
+          :loading-next-page="isFetchingNextPageLocation"
+          :rules="rules.location_uuid"
+          :options="options_location"
+          @scroll="scrollLocation"
+          @search="searchLocation"
+          @select="selectLocation"
+        />
+        <Select
+          v-model="model.unit_uuid"
+          label="Unit"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_unit.search"
+          :search="true"
+          :loading="is_loading_unit"
+          :loading-next-page="isFetchingNextPageUnit"
+          :rules="rules.unit_uuid"
+          :options="options_unit"
+          @scroll="scrollUnit"
+          @search="searchUnit"
+          @select="selectUnit"
+        />
+        <Select
+          v-model="model.machine_uuid"
+          label="Mesin"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_machine.search"
+          :search="true"
+          :loading="is_loading_machine"
+          :loading-next-page="isFetchingNextPageMachine"
+          :rules="rules.machine_uuid"
+          :options="options_machine"
+          @scroll="scrollMachine"
+          @search="searchMachine"
+          @select="selectMachine"
+        />
+        <Select
+          v-model="model.inspection_type_uuid"
+          label="Tipe Inspeksi"
+          options_label="label"
+          options_value="value"
+          v-model:model-search="params_inspection.search"
+          :search="true"
+          :loading="is_loading_inspection"
+          :loading-next-page="isFetchingNextPageInspection"
+          :rules="rules.inspection_type_uuid"
+          :options="options_inspection"
+          @scroll="scrollInspection"
+          @search="searchInspection"
+        />
+      </div>
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button

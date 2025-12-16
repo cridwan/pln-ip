@@ -12,6 +12,7 @@ import type { IPagination } from "@/types/GlobalType";
 import type { UnitInterface } from "@/modules/master/types/UnitType";
 import type { MachineInterface } from "@/modules/master/types/MachineType";
 import { useMasterStore } from "@/modules/master/stores/MasterStore";
+import type { LocationInterface } from "@/modules/master/types/LocationType";
 
 const imgBlok1 = new URL("@/assets/images/bg-blok1.png", import.meta.url).href;
 const imgBlok3 = new URL("@/assets/images/bg-blok3.png", import.meta.url).href;
@@ -26,7 +27,7 @@ const route = useRoute();
 const locationId = route.params.id;
 const breadcrumb = ref([
   {
-    name: "UBP Priok",
+    name: "Loading...",
     as_link: false,
     url: "",
   },
@@ -40,69 +41,6 @@ const breadcrumb = ref([
 const bgActive = ref<number>(0);
 const masterStore = useMasterStore();
 const unit_active = ref<string | null>(null);
-
-// const data = ref([
-//   {
-//     id: 1,
-//     name: "Blok 1/2",
-//     children: [
-//       {
-//         name: "GT 1.1 ABB 13E1",
-//       },
-//       {
-//         name: "GT 1.2 ABB 13E1",
-//       },
-//       {
-//         name: "GT 1.3 ABB 13E1",
-//       },
-//       {
-//         name: "GT 1.4 ABB 13E1",
-//       },
-//       {
-//         name: "GT 2.1 ABB 13E1",
-//       },
-//       {
-//         name: "GT 2.2 ABB 13E1",
-//       },
-//       {
-//         name: "GT 2.3 ABB 13E1",
-//       },
-//       {
-//         name: "GT 2.4 ABB 13E1",
-//       },
-//     ],
-//   },
-//   {
-//     id: 2,
-//     name: "Blok 3",
-//     children: [
-//       {
-//         name: "GT 3.1 MHI 701F3",
-//       },
-//       {
-//         name: "GT 3.2 MHI 701F3",
-//       },
-//       {
-//         name: "GT 3.3 MHI 701F3",
-//       },
-//     ],
-//   },
-//   {
-//     id: 3,
-//     name: "Blok 4",
-//     children: [
-//       {
-//         name: "GT 4.1 MHI 701F4",
-//       },
-//       {
-//         name: "GT 4.2 MHI 701F4",
-//       },
-//       {
-//         name: "GT 4.3 MHI 701F4",
-//       },
-//     ],
-//   },
-// ]);
 
 //--- GET UNIT
 const { data: dataUnit, isFetching: isLoadingUnit } = useQuery({
@@ -155,12 +93,54 @@ const {
 });
 //--- END
 
+// get location
+const { data: dataLocation } = useQuery({
+  queryKey: ["getLocation"],
+  queryFn: async () => {
+    try {
+      const { data } = await masterStore.getLocation({
+        search: "",
+        filter: `uuid,${route.params.id}`,
+        currentPage: 1,
+        perPage: 1000,
+      });
+      const response = data.data as IPagination<LocationInterface[]>;
+      return response;
+    } catch (error: any) {
+      const err = error as AxiosError;
+      throw err.response;
+    }
+  },
+  refetchOnWindowFocus: false,
+});
+// get location
+
 watch(dataUnit, (value) => {
-  if ((value?.data || []).length > 0) {
-    unit_active.value = value?.[0]?.uuid || "";
-    refetchMachine();
+  if ((value?.data || []).length > 0 && !unit_active.value) {
+    unit_active.value = value?.data?.[0]?.uuid || "";
   }
 });
+
+watch(
+  dataLocation,
+  (value) => {
+    if ((value?.data || []).length > 0) {
+      breadcrumb.value = [
+        {
+          name: value?.data?.[0]?.name || "",
+          as_link: false,
+          url: "",
+        },
+        {
+          name: "Unit",
+          as_link: false,
+          url: "",
+        },
+      ];
+    }
+  },
+  { immediate: true, deep: true }
+);
 
 const handleClick = (uuid: string, index: number) => {
   bgActive.value = index;
@@ -168,17 +148,24 @@ const handleClick = (uuid: string, index: number) => {
     unit_active.value = null;
   } else {
     unit_active.value = uuid;
-    refetchMachine();
   }
 };
 
 const toScope = (item: UnitInterface, element: MachineInterface) => {
-  router.push(`/${locationId}/create/unit/${item.uuid}/${element.uuid}`);
+  router.push({
+    path: `/${locationId}/create/unit/${item.uuid}/${element.uuid}`,
+  });
 };
 
 const handleBack = () => {
   router.push(`/${locationId}`);
 };
+
+watch(unit_active, (value) => {
+  if (value) {
+    refetchMachine();
+  }
+});
 
 onMounted(() => {
   titleHeader.value = "Unit";

@@ -5,11 +5,12 @@ export interface ConsMatInterface {
   uuid: string;
   name: string;
   merk: string;
-  price: number;
+  price: string;
   global_unit_uuid: string;
   global_unit: GlobalUnitInterface;
   created_at: string;
   updated_at: string;
+  has_transaction?: number;
 }
 
 export interface ConsMatCreateInterface {

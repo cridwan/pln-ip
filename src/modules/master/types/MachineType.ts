@@ -20,3 +20,9 @@ export interface MachineModelCreateInterface {
   unit_uuid: string;
   location_uuid: string;
 }
+
+export interface MachineTypeModelCreateInterface {
+  name: string;
+  location_uuid: string;
+  unit_uuid: string;
+}

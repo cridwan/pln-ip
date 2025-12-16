@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -10,7 +10,7 @@ import {
   Table,
   Toast,
 } from "@/components";
-import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
@@ -22,6 +22,8 @@ import type {
 import { useMasterStore } from "../stores/MasterStore";
 import FormInspectionType from "../components/FormInspectionType.vue";
 import FilterInspectionType from "../components/FilterInspectionType.vue";
+import ButtonGroup from "../components/ButtonGroup.vue";
+import { parsedUrl } from "@/helpers/global";
 
 const dataForm = ref<InspectionTypeModelCreateInterface | null>(null);
 const masterStore = useMasterStore();
@@ -29,7 +31,14 @@ const total_item = ref(0);
 const params = reactive({
   search: "",
   filter: "",
-  filters: [],
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "machine_uuid",
+      value: "",
+    },
+  ],
   currentPage: 1,
   perPage: 10,
 });
@@ -39,6 +48,7 @@ const selected_item = ref<InspectionTypeInterface | null>(null);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 const timeout = ref(0);
 const breadcrumb = ref<BreadcrumbType[]>([]);
+const is_loading_filter = ref(false);
 
 //--- GET INSPECTION TYPE
 const {
@@ -47,20 +57,25 @@ const {
   refetch: refetchInspectionType,
 } = useQuery({
   queryKey: ["getInspectionTypeMaster"],
+
   queryFn: async () => {
     try {
       const { data } = await masterStore.getInspectionType(params);
       const response = data.data as IPagination<InspectionTypeInterface[]>;
 
       total_item.value = response.total;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
+  enabled: computed(() => params.filters.length > 0),
   refetchOnWindowFocus: false,
+  gcTime: 0,
 });
 //--- END
 
@@ -86,6 +101,64 @@ const { mutate: deleteInspectionType, isPending: isLoadingDelete } =
         description: error?.response?.data?.message || "Something went wrong",
         type: "error",
       });
+    },
+  });
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadInspectionType, isPending: isLoadingDownload } =
+  useMutation({
+    mutationFn: async () => {
+      return await masterStore.downloadInspectionType(params);
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateInspectionType, isPending: isLoadingTemplate } =
+  useMutation({
+    mutationFn: async () => {
+      return await masterStore.templateInspectionType();
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+//--- END
+
+//--- IMPORT
+const { mutate: importInspectionType, isPending: isLoadingImport } =
+  useMutation({
+    mutationFn: async (payload: File) => {
+      return await masterStore.importInspectionType(payload);
+    },
+    onSuccess: () => {
+      toastRef.value?.showToast({
+        title: "Success",
+        description: "Import successfully",
+        type: "success",
+      });
+      refetchInspectionType();
+    },
+    onError: (error) => {
+      let message = "Something went wrong";
+
+      if (error instanceof AxiosError) {
+        message = error?.response?.data?.message || "Something went wrong";
+      }
+
+      toastRef.value?.showToast({
+        title: "Error",
+        description: message,
+        type: "error",
+      });
+
+      refetchInspectionType();
     },
   });
 //--- END
@@ -171,18 +244,37 @@ const resetFilter = () => {
 };
 
 const handleOnFilter = (data: InspectionTypeModelCreateInterface) => {
+  is_loading_filter.value = true;
   dataForm.value = data;
   setFilter();
   refetchInspectionType();
 };
 
 const handleResetFilter = () => {
+  is_loading_filter.value = true;
   resetFilter();
   refetchInspectionType();
 };
 
+const handleDownload = () => {
+  downloadInspectionType();
+};
+
+const handleExportTemplate = () => {
+  templateInspectionType();
+};
+
+const handleImport = (file: File) => {
+  importInspectionType(file);
+};
+
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Inspection Type",
       as_link: false,
@@ -194,22 +286,31 @@ onMounted(() => {
 
 <template>
   <div class="relative w-full">
-    <Button
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-      v-if="dataForm?.machine_uuid"
-    />
+    <div class="flex items-center gap-2 absolute right-0 top-10">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+        v-if="dataForm?.machine_uuid"
+      />
+    </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
         <FilterInspectionType
           @filter="handleOnFilter"
           @reset-filter="handleResetFilter"
-          :loading="isLoadingInspectionType"
+          :loading="is_loading_filter"
         />
       </div>
       <div class="w-full">
@@ -230,11 +331,13 @@ onMounted(() => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"
@@ -242,9 +345,20 @@ onMounted(() => {
             </div>
           </template>
           <template #column_sequence="{ entity }">
-            <p class="text-base text-neutral-50 text-center">
+            <p class="text-base text-neutral-50 text-left">
               {{ entity.sequence?.name || "-" }}
             </p>
+          </template>
+          <template #column_video="{ entity }">
+            <a
+              target="_blank"
+              :href="parsedUrl(entity.sequence?.document?.document_link)"
+              class="text-base text-neutral-50 text-left"
+              v-if="entity.sequence?.document"
+            >
+              {{ entity.sequence.document?.document_name }}
+            </a>
+            <span v-else>-</span>
           </template>
         </Table>
       </div>

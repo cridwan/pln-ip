@@ -34,6 +34,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["save"]);
@@ -85,6 +89,7 @@ defineExpose({
             'button-trigger-active': modelOpenInputData === true,
           },
           value && value?.file?.length > 0 ? 'button-trigger-active' : '',
+          'cursor-pointer',
         ]"
       >
         {{ value && value?.file?.length > 0 ? "Active" : "Add" }}
@@ -94,18 +99,24 @@ defineExpose({
       <PopoverContent :side-offset="5" class="popover-content-upload">
         <p class="popover-title">{{ label }}</p>
         <div class="mt-4">
-          <Upload v-model="modelUpload" :multiple="multiple" :max-count="10" />
+          <Upload
+            v-model="modelUpload"
+            :disabled="disabled"
+            :multiple="multiple"
+            :max-count="10"
+          />
         </div>
         <div class="popover-footer">
           <Button
             text="Cancel"
             size="sm"
             rounded="full"
-            color="grey"
+            color="red"
             :disabled="loading"
             @click="cancel"
           />
           <Button
+            v-if="!disabled"
             text="Save"
             size="sm"
             rounded="full"

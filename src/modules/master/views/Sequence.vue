@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -51,7 +51,7 @@ const {
   isFetching: isLoadingSequence,
   refetch: refetchSequence,
 } = useQuery({
-  queryKey: ["getSequence"],
+  queryKey: ["getSequenceMaster"],
   queryFn: async () => {
     try {
       const { data } = await masterStore.getSequence(params);
@@ -90,6 +90,61 @@ const { mutate: deleteSequence, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadSequence, isPending: isLoadingDownload } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.downloadSequence();
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateSequence, isPending: isLoadingTemplate } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.templateSequence();
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- IMPORT
+const { mutate: importSequence, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importSequence(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchSequence();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchSequence();
   },
 });
 //--- END
@@ -170,8 +225,25 @@ const redirectDocument = (document: ResponseDocumentInterface) => {
   );
 };
 
+const handleDownload = () => {
+  downloadSequence();
+};
+
+const handleExportTemplate = () => {
+  templateSequence();
+};
+
+const handleImport = (file: File) => {
+  importSequence(file);
+};
+
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Master Data",
       as_link: false,
@@ -190,9 +262,12 @@ onMounted(() => {
   <Breadcrumb :items="breadcrumb" />
   <div class="relative w-full mt-6">
     <div class="flex items-center gap-2 absolute right-0">
-      <Button text="Import" rounded="full" color="blue" />
+      <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
-      <Button text="Export Template" rounded="full" color="blue" />
+      <Button text="Export Template" rounded="full" color="blue" /> -->
+      <!-- <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" /> -->
       <Button
         icon_only="plus"
         size="sm"
@@ -231,7 +306,7 @@ onMounted(() => {
       <template #column_document="{ entity }">
         <p
           @click="redirectDocument(entity.document)"
-          class="text-base text-neutral-50 text-center underline cursor-pointer"
+          class="text-base text-neutral-50 text-left underline cursor-pointer"
           v-if="entity.document"
         >
           {{ entity.document?.document_name }}

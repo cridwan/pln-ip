@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -13,12 +13,13 @@ import {
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
 import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
+import { numberFormat } from "@/helpers/global";
 
 import { ColumnsConsMat } from "../constants/ConsumableMaterialConstant";
 import { useMasterStore } from "../stores/MasterStore";
 import type { ConsMatInterface } from "../types/ConsumableMaterialType";
 import FormConsumableMaterial from "../components/FormConsumableMaterial.vue";
-import { numberFormat } from "@/helpers/global";
+import ButtonGroup from "../components/ButtonGroup.vue";
 
 const masterStore = useMasterStore();
 const total_item = ref(0);
@@ -81,6 +82,61 @@ const { mutate: deleteConsMat, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadConsMat, isPending: isLoadingDownload } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.downloadConsMat();
+  },
+  onSuccess: () => { },
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateConsMat, isPending: isLoadingTemplate } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.templateConsMat();
+  },
+  onSuccess: () => { },
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- IMPORT
+const { mutate: importConsMat, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importConsMat(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchConsMat();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchConsMat();
   },
 });
 //--- END
@@ -149,8 +205,25 @@ const onDelete = () => {
   deleteConsMat(selected_item.value?.uuid as string);
 };
 
+const handleDownload = () => {
+  downloadConsMat();
+};
+
+const handleExportTemplate = () => {
+  templateConsMat();
+};
+
+const handleImport = (file: File) => {
+  importConsMat(file);
+};
+
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Master Data",
       as_link: false,
@@ -169,42 +242,22 @@ onMounted(() => {
   <Breadcrumb :items="breadcrumb" />
   <div class="relative w-full mt-6">
     <div class="flex items-center gap-2 absolute right-0">
-      <Button text="Import" rounded="full" color="blue" />
+      <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
-      <Button text="Export Template" rounded="full" color="blue" />
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <Button text="Export Template" rounded="full" color="blue" /> -->
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
     </div>
 
-    <Table
-      label-create="ConsMat"
-      :columns="ColumnsConsMat"
-      :entities="dataConsMat?.data || []"
-      :loading="isLoadingConsMat"
-      :pagination="pagination"
-      :is-create="false"
-      v-model:model-search="params.search"
-      @change-page="changePage"
-      @change-limit="changeLimit"
-      @search="searchTable"
-    >
+    <Table label-create="ConsMat" :columns="ColumnsConsMat" :entities="dataConsMat?.data || []"
+      :loading="isLoadingConsMat" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+      @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-4">
-          <Icon
-            name="pencil"
-            class="icon-action-table"
-            @click="handleUpdate(entity)"
-          />
-          <Icon
-            name="trash"
-            class="icon-action-table"
-            @click="handleDelete(entity)"
-          />
+          <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+          <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
         </div>
       </template>
       <template #column_price="{ entity }">
@@ -219,19 +272,11 @@ onMounted(() => {
       </template>
     </Table>
 
-    <FormConsumableMaterial
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-    />
+    <FormConsumableMaterial v-model="open_form" :selected-value="selected_item" @success="handleSuccess"
+      @error="handleError" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="`${selected_item?.name} / ${selected_item?.global_unit?.name}`"
+    :loading="isLoadingDelete" @delete="onDelete" />
 </template>

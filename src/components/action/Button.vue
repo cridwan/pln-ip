@@ -5,7 +5,7 @@ import { RouterLink } from "vue-router";
 
 type Size = "lg" | "md" | "sm";
 type Variant = "primary" | "secondary" | "skin" | "danger";
-type Color = "default" | "green" | "blue" | "grey";
+type Color = "default" | "green" | "blue" | "grey" | "red";
 type Type = "button" | "submit" | "reset" | undefined;
 type Rounded = "none" | "default" | "sm" | "md" | "lg" | "xl" | "full";
 
@@ -28,7 +28,7 @@ const props = defineProps({
     type: String as PropType<Color>,
     default: "default",
     validator: function (value: string) {
-      return ["default", "green", "blue", "grey"].indexOf(value) !== -1;
+      return ["default", "green", "blue", "grey", "red"].indexOf(value) !== -1;
     },
   },
   text: {
@@ -163,6 +163,17 @@ const widthLoading = computed(() => {
 const heightLoading = computed(() => {
   return props.size === "sm" ? 12 : props.size === "md" ? 20 : 25;
 });
+
+const text = computed(() => {
+  let textButton = props.text
+  if (props.text == "Cancel") {
+    textButton = "Cancel";
+  } else if (props.text == "Save") {
+    textButton = "Simpan";
+  }
+
+  return textButton;
+})
 </script>
 
 <template>
@@ -173,21 +184,37 @@ const heightLoading = computed(() => {
         <Loading :disabled="disabled" :width="widthLoading" :height="heightLoading" />
       </div>
 
-      <div v-show="icon_only !== '' && icon_before === '' && icon_after === ''" class="flex items-center gap-2">
+      <div v-show="!loading &&
+        icon_only !== '' &&
+        icon_before === '' &&
+        icon_after === ''
+        " class="flex items-center gap-2">
         <Icon :name="icon_only" />
       </div>
 
-      <div v-show="icon_before !== '' && icon_after === '' && icon_only === ''" class="flex items-center gap-2">
+      <div v-show="!loading &&
+        icon_before !== '' &&
+        icon_after === '' &&
+        icon_only === ''
+        " class="flex items-center gap-2">
         <Icon :name="icon_before" />
         <span>{{ text }}</span>
       </div>
 
-      <div v-show="icon_after !== '' && icon_before === '' && icon_only === ''" class="flex items-center gap-2">
+      <div v-show="!loading &&
+        icon_after !== '' &&
+        icon_before === '' &&
+        icon_only === ''
+        " class="flex items-center gap-2">
         <span>{{ text }}</span>
         <Icon :name="icon_after" />
       </div>
 
-      <div v-show="icon_after !== '' && icon_before !== '' && icon_only === ''" class="flex items-center gap-2">
+      <div v-show="!loading &&
+        icon_after !== '' &&
+        icon_before !== '' &&
+        icon_only === ''
+        " class="flex items-center gap-2">
         <Icon :name="icon_before" />
         <span>{{ text }}</span>
         <Icon :name="icon_after" />
@@ -210,21 +237,37 @@ const heightLoading = computed(() => {
         <Loading :disabled="disabled" :width="widthLoading" :height="heightLoading" />
       </div>
 
-      <div v-show="icon_only !== '' && icon_before === '' && icon_after === ''" class="flex items-center gap-2">
+      <div v-show="!loading &&
+        icon_only !== '' &&
+        icon_before === '' &&
+        icon_after === ''
+        " class="flex items-center gap-2">
         <Icon :name="icon_only" />
       </div>
 
-      <div v-show="icon_before !== '' && icon_after === '' && icon_only === ''" class="flex items-center gap-2">
+      <div v-show="!loading &&
+        icon_before !== '' &&
+        icon_after === '' &&
+        icon_only === ''
+        " class="flex items-center gap-2">
         <Icon :name="icon_before" />
         <span>{{ text }}</span>
       </div>
 
-      <div v-show="icon_after !== '' && icon_before === '' && icon_only === ''" class="flex items-center gap-2">
+      <div v-show="!loading &&
+        icon_after !== '' &&
+        icon_before === '' &&
+        icon_only === ''
+        " class="flex items-center gap-2">
         <span>{{ text }}</span>
         <Icon :name="icon_after" />
       </div>
 
-      <div v-show="icon_after !== '' && icon_before !== '' && icon_only === ''" class="flex items-center gap-2">
+      <div v-show="!loading &&
+        icon_after !== '' &&
+        icon_before !== '' &&
+        icon_only === ''
+        " class="flex items-center gap-2">
         <Icon :name="icon_before" />
         <span>{{ text }}</span>
         <Icon :name="icon_after" />
@@ -307,6 +350,14 @@ const heightLoading = computed(() => {
         @apply pointer-events-none shadow-none bg-blue-500 border-blue-500 text-neutral-50 #{!important}
       &--loading
         @apply border-blue-900 bg-blue-600 text-neutral-50
+    &--red
+      @apply bg-red-900 border-red-900 text-red-50
+      &:hover
+        @apply bg-red-950 border-red-950
+      &--disabled
+        @apply pointer-events-none shadow-none bg-red-500 border-red-500 text-neutral-50 #{!important}
+      &--loading
+        @apply border-red-900 bg-red-600 text-neutral-50
     &--grey
       @apply bg-[#a5a5a5] border-[#a5a5a5] text-neutral-50
       &:hover

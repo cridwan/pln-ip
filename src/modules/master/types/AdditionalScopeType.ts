@@ -10,6 +10,7 @@ export interface AdditionalScopeInterface {
   name: string;
   sequence_uuid: string;
   sequence: SequenceInterface;
+  has_transaction?: number;
 }
 
 export interface AdditionalScopeDetailInterface {

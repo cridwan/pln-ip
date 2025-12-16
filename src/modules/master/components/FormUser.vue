@@ -15,6 +15,7 @@ import type {
 } from "../types/UserType";
 import { useMasterStore } from "../stores/MasterStore";
 import type { RoleInterface } from "../types/RoleType";
+import type { AreaInterface } from "../types/AreaType";
 
 type OptionType = {
   value: string;
@@ -28,7 +29,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["success", "error"]);
-
+const is_loading_area = ref<boolean>(false);
+const options_area = ref<OptionType[]>([]);
 const masterStore = useMasterStore();
 
 const modelValue = defineModel<boolean>({ default: false });
@@ -40,6 +42,7 @@ const model = ref<UserCreateModelInterface>({
   email: "",
   roles: "",
   password: "",
+  area_uuid: ""
 });
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
@@ -48,6 +51,9 @@ const rules = computed(() => {
       required: helpers.withMessage(`This field is required`, required),
     },
     email: {
+      required: helpers.withMessage(`This field is required`, required),
+    },
+    area_uuid: {
       required: helpers.withMessage(`This field is required`, required),
     },
     roles: {
@@ -64,6 +70,47 @@ const rules = computed(() => {
     },
   };
 });
+
+//--- GET AREA
+const params_area = reactive<IParams>({
+  search: "",
+  filters: "",
+  currentPage: 1,
+  perPage: 10,
+});
+const {
+  data: dataArea,
+  refetch: refetchArea,
+  fetchNextPage: fetchNextPageArea,
+  hasNextPage: hasNextPageArea,
+  isFetchingNextPage: isFetchingNextPageArea,
+} = useInfiniteQuery({
+  queryKey: ["getLocationFilterInspection"],
+  enabled: !props.selectedValue && !is_loading_area.value,
+  queryFn: async ({ pageParam = 1 }) => {
+    try {
+      const { data } = await masterStore.getArea({
+        ...params_area,
+        currentPage: pageParam,
+      });
+
+      const response = data as IPagination<AreaInterface[]>;
+
+      return response;
+    } catch (error: any) {
+      throw error.response;
+    } finally {
+      is_loading_area.value = false;
+    }
+  },
+  refetchOnWindowFocus: false,
+  getNextPageParam: (lastPage) => {
+    if (!lastPage?.data?.length) return undefined;
+    return lastPage.current_page + 1;
+  },
+  initialPageParam: 1,
+});
+//--- END
 
 //--- GET ROLES
 const params_roles = reactive<IParams>({
@@ -157,6 +204,7 @@ const handleSubmit = async () => {
         name: model.value.name,
         roles: [model.value.roles],
         ...(model.value.password && { password: model.value.password }),
+        area_uuid: model.value.area_uuid
       },
     });
   } else {
@@ -165,6 +213,7 @@ const handleSubmit = async () => {
       name: model.value.name,
       roles: [model.value.roles],
       password: model.value.password,
+      area_uuid: model.value.area_uuid
     });
   }
 };
@@ -174,6 +223,7 @@ const setValue = () => {
     name: props.selectedValue?.name || "",
     email: props.selectedValue?.email || "",
     roles: props.selectedValue?.roles?.[0]?.name || "",
+    area_uuid: props.selectedValue?.area_uuid || "",
     password: "",
   };
 };
@@ -184,7 +234,29 @@ const resetValue = () => {
     email: "",
     roles: "",
     password: "",
+    area_uuid: ""
   };
+};
+
+
+const timeout_area = ref(0);
+const searchArea = () => {
+  clearTimeout(timeout_area.value);
+  timeout_area.value = window.setTimeout(() => {
+    is_loading_area.value = true;
+    params_area.currentPage = 1;
+    refetchArea();
+  }, 1000);
+};
+const scrollArea = (e: Event) => {
+  const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLElement;
+  if (
+    scrollTop + clientHeight >= scrollHeight - 1 &&
+    hasNextPageArea.value &&
+    !isFetchingNextPageArea.value
+  ) {
+    fetchNextPageArea();
+  }
 };
 
 const timeout_roles = ref(0);
@@ -255,6 +327,45 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+watch(
+  [modelValue, dataArea],
+  ([newModel, newArea]) => {
+    if (props.selectedValue) {
+      const new_data: OptionType[] =
+        newArea?.pages
+          .flatMap((page) => page?.data)
+          ?.map((item) => {
+            return { value: item.uuid, label: item.name };
+          }) || [];
+
+      options_area.value = mergeArrays(
+        [
+          {
+            value: props.selectedValue?.area_uuid || "",
+            label: props.selectedValue?.area?.name || "",
+          },
+        ],
+        new_data.filter(
+          (item) =>
+            item.value !== props.selectedValue?.area_uuid || ""
+        )
+      ).filter((item) => item.value !== "");
+
+      console.log(options_area.value)
+    } else {
+      const new_data: OptionType[] =
+        newArea?.pages
+          .flatMap((page) => page?.data)
+          ?.map((item) => {
+            return { value: item.uuid, label: item.name };
+          }) || [];
+
+      options_area.value = new_data;
+    }
+  },
+  { deep: true, immediate: true }
+);
 </script>
 
 <template>
@@ -262,14 +373,18 @@ watch(
     v-model="modelValue">
     <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
       @submit.prevent="handleSubmit">
-      <Input v-model="model.name" :rules="rules.name" :custom_symbols="all_characters" label="Nama" />
-      <Input v-model="model.password" :rules="rules.password" :custom_symbols="all_characters" type="password"
-        label="Password" />
-      <Input v-model="model.email" :rules="rules.email" :custom_symbols="email" label="Email" />
-      <Select v-model="model.roles" label="Role" options_label="label" options_value="value"
+      <Input v-model="model.name" star :rules="rules.name" :custom_symbols="all_characters" label="Nama" />
+      <Input v-model="model.password" :star="props.selectedValue ? false : true" :rules="rules.password"
+        :custom_symbols="all_characters" type="password" label="Password" />
+      <Input v-model="model.email" star :rules="rules.email" :custom_symbols="email" label="Email" />
+      <Select v-model="model.roles" star label="Role" options_label="label" options_value="value"
         v-model:model-search="params_roles.search" :search="true" :loading="is_loading_roles"
         :loading-next-page="isFetchingNextPageRoles" :rules="rules.roles" :options="options_roles" @scroll="scrollRoles"
         @search="searchRoles" />
+      <Select v-model="model.area_uuid" star label="Area" options_label="label" options_value="value"
+        v-model:model-search="params_area.search" :search="true" :loading="is_loading_area"
+        :loading-next-page="isFetchingNextPageArea" :rules="rules.area_uuid" :options="options_area"
+        @scroll="scrollArea" @search="searchArea" />
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"

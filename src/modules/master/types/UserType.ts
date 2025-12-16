@@ -1,3 +1,4 @@
+import type { AreaInterface } from "./AreaType";
 import type { RoleInterface } from "./RoleType";
 
 export interface UserInterface {
@@ -8,6 +9,8 @@ export interface UserInterface {
   email: string;
   email_verified_at: string | null;
   roles: RoleInterface[];
+  area_uuid?: string;
+  area: AreaInterface;
 }
 
 export interface UserCreateInterface {
@@ -15,6 +18,7 @@ export interface UserCreateInterface {
   email: string;
   roles: string[];
   password?: string;
+  area_uuid: string;
 }
 
 export interface UserCreateModelInterface {
@@ -22,4 +26,5 @@ export interface UserCreateModelInterface {
   email: string;
   roles: string;
   password: string;
+  area_uuid: string;
 }

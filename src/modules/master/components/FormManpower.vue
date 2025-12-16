@@ -4,11 +4,10 @@ import { reactive, ref, computed, type PropType, watch } from "vue";
 import { Button, Input, Modal } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import {
-  useMutation,
-} from "@tanstack/vue-query";
+import { useMutation } from "@tanstack/vue-query";
 import {
   all_characters,
+  formatToFloat,
   numbers_positive,
 } from "@/helpers/global";
 
@@ -95,26 +94,27 @@ const handleSubmit = async () => {
       id: props.selectedValue?.uuid,
       payload: {
         name: model.value.name,
-        price: parseFloat(model.value.price),
+        price: formatToFloat(model.value.price),
       },
     });
   } else {
     createManpower({
       name: model.value.name,
-      price: parseFloat(model.value.price),
+      price: formatToFloat(model.value.price),
     });
   }
 };
 
 const setValue = () => {
   model.value.name = props.selectedValue?.name || "";
-  model.value.price = props.selectedValue?.price?.toString() || "";
+  model.value.price =
+    parseFloat(props.selectedValue?.price || "0")?.toString() || "";
 };
 
 const resetValue = () => {
   model.value = {
     name: "",
-    price: ""
+    price: "",
   };
 };
 
@@ -131,22 +131,53 @@ watch(modelValue, (value) => {
     }
   }
 });
-
 </script>
 
 <template>
-  <Modal width="440" height="200" :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'" v-model="modelValue">
-    <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
-      @submit.prevent="handleSubmit">
-      <Input v-model="model.name" label="Nama Manpower" :rules="rules.name" :custom_symbols="all_characters" />
-      <Input v-model="model.price" label="harga" :rules="rules.price" :custom_symbols="numbers_positive" />
+  <Modal
+    width="440"
+    height="200"
+    :showButtonClose="false"
+    :title="props.selectedValue ? 'Ubah Manpower' : 'Tambah Manpower'"
+    v-model="modelValue"
+  >
+    <form
+      class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
+      @submit.prevent="handleSubmit"
+    >
+      <Input
+        v-model="model.name"
+        :disabled="Number(props.selectedValue?.has_transaction || 0) > 0"
+        star
+        label="Nama Manpower"
+        :rules="rules.name"
+        :custom_symbols="all_characters"
+      />
+      <Input
+        v-model="model.price"
+        star
+        label="Harga (harian)"
+        :rules="rules.price"
+        :custom_symbols="numbers_positive"
+        :is_currency="true"
+      />
 
       <div class="w-full flex items-center gap-4 mt-4">
-        <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"
-          @click="modelValue = false" />
-        <Button type="submit" text="Simpan" class="w-full" color="blue" :disabled="isLoadingCreate || isLoadingUpdate"
-          :loading="isLoadingCreate || isLoadingUpdate" />
+        <Button
+          text="Batal"
+          class="w-full"
+          variant="secondary"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          @click="modelValue = false"
+        />
+        <Button
+          type="submit"
+          text="Simpan"
+          class="w-full"
+          color="blue"
+          :disabled="isLoadingCreate || isLoadingUpdate"
+          :loading="isLoadingCreate || isLoadingUpdate"
+        />
       </div>
     </form>
   </Modal>

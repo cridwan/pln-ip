@@ -126,6 +126,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  star: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const id = ref(uuidv4());
@@ -209,8 +213,8 @@ const classSelectFreeText = computed(() => {
       ? checkErrorSelect()
         ? `v-select-free-text--error`
         : !checkErrorSelect() && model.value !== "" && model.value.length > 0
-          ? "v-select-free-text--success"
-          : ""
+        ? "v-select-free-text--success"
+        : ""
       : "",
   ];
 });
@@ -421,39 +425,87 @@ onMounted(() => {
 <template>
   <div class="v-select">
     <div class="v-select--label" ref="element_label" v-if="label !== undefined">
-      <label class="v-select--label--text" :class="classLabel" :for="id">
-        {{ label }}</label>
+      <div class="flex gap-1">
+        <label class="v-select--label--text" :class="classLabel" :for="id">
+          {{ label }}
+        </label>
+        <div v-if="star" class="text-red-500">*</div>
+      </div>
       <div class="v-select--label--instruction">{{ instruction }}</div>
     </div>
-    <input v-if="is_free_text && options.length === 0" ref="element_free_text" v-model="model_search"
-      class="v-select-free-text" :placeholder="value_placeholder" :class="[classSelectFreeText]"
-      @input="(e) => search(e)" />
-    <ComboboxRoot class="v-select-root" v-else :id="`${id}-root`" :multiple="multiple" :open="open" @click="click"
-      @update:open="(e) => (open = hide_options ? false : disabled ? false : e)">
+    <input
+      v-if="is_free_text && options.length === 0"
+      ref="element_free_text"
+      v-model="model_search"
+      class="v-select-free-text"
+      :placeholder="value_placeholder"
+      :class="[classSelectFreeText]"
+      @input="(e) => search(e)"
+    />
+    <ComboboxRoot
+      class="v-select-root"
+      v-else
+      :id="`${id}-root`"
+      :multiple="multiple"
+      :open="open"
+      @click="click"
+      @update:open="(e) => (open = hide_options ? false : disabled ? false : e)"
+    >
       <ComboboxAnchor class="v-select-anchor" :id="`${id}-anchor`">
-        <input class="v-select-input" :id="`${id}-element-input`" ref="element_input" v-model="model_search"
-          :disabled="value_disabled" :placeholder="value_placeholder"
-          :class="[classSelectInput, { 'v-select-input--disabled': disabled }]" :style="styleSelectInput"
-          @input="(e) => search(e)" />
+        <input
+          class="v-select-input"
+          :id="`${id}-element-input`"
+          ref="element_input"
+          v-model="model_search"
+          :disabled="value_disabled"
+          :placeholder="value_placeholder"
+          :class="[classSelectInput, { 'v-select-input--disabled': disabled }]"
+          :style="styleSelectInput"
+          @input="(e) => search(e)"
+        />
         <ComboboxTrigger class="v-select-trigger">
           <div class="v-select-trigger--wrapper">
-            <Icon v-if="show_icon_search" name="search" class="v-select-icon-search" />
-            <span ref="element_value" class="v-select-value" :class="classValue">{{ multiple ? "" : model_shadow
-            }}</span>
-            <ComboboxCancel class="v-select-cancel" v-if="clearable && model_search !== '' && open"
-              @click="clearSearch">
+            <Icon
+              v-if="show_icon_search"
+              name="search"
+              class="v-select-icon-search"
+            />
+            <span
+              ref="element_value"
+              class="v-select-value"
+              :class="classValue"
+              >{{ multiple ? "" : model_shadow }}</span
+            >
+            <ComboboxCancel
+              class="v-select-cancel"
+              v-if="clearable && model_search !== '' && open"
+              @click="clearSearch"
+            >
               <Icon name="close-circle" class="v-select-icon-clear" />
             </ComboboxCancel>
-            <Icon v-if="
-              (show_icon_arrow && clearable && model_search !== '') ||
-              (show_icon_arrow && !clearable)
-            " name="caret-down" class="v-select-icon-arrow" :class="{ 'v-select-icon-active': open }" />
+            <Icon
+              v-if="
+                (show_icon_arrow && clearable && model_search !== '') ||
+                (show_icon_arrow && !clearable)
+              "
+              name="caret-down"
+              class="v-select-icon-arrow"
+              :class="{ 'v-select-icon-active': open }"
+            />
           </div>
         </ComboboxTrigger>
       </ComboboxAnchor>
-      <ComboboxContent class="v-select-content" :id="`${id}-content`" position="popper" :style="popoverContent">
-        <div class="v-select-content-wrapper" @scroll="(e) => $emit('scroll', e)">
-          <ComboboxViewport v-if="loading || loadingNextPage">
+      <ComboboxContent
+        class="v-select-content"
+        :id="`${id}-content`"
+        position="popper"
+        :style="popoverContent"
+      >
+        <div
+          class="v-select-content-wrapper"
+          @scroll="(e) => $emit('scroll', e)"
+        >
+          <ComboboxViewport v-if="loading">
             <div class="v-select-item p-2">
               <span class="text-blue-950 font-semibold">Loading...</span>
             </div>
@@ -465,28 +517,43 @@ onMounted(() => {
             <ComboboxEmpty class="v-select-empty" v-if="!loading">
               <p>Not found</p>
             </ComboboxEmpty>
-            <ComboboxItem v-if="!loading" v-for="(item, index) in options" class="v-select-item" :key="index" :value="options_value === undefined ? item : item?.[options_value]
-              " :class="{
+            <ComboboxItem
+              v-if="!loading"
+              v-for="(item, index) in options"
+              class="v-select-item"
+              :key="index"
+              :value="
+                options_value === undefined ? item : item?.[options_value]
+              "
+              :class="{
                 'v-select-item-active':
                   options_value === undefined
                     ? item === model
                     : item?.[options_value] === model,
-              }" @select="(e) => selectItem(e, item)">
+              }"
+              @select="(e) => selectItem(e, item)"
+            >
               <slot name="options_label" :item="item" :index="index">
-                <span>{{
-                  options_label === undefined ? item : item?.[options_label]
-                }}</span>
+                <span>
+                  {{
+                    options_label === undefined ? item : item?.[options_label]
+                  }}
+                </span>
               </slot>
             </ComboboxItem>
-            <div v-if="loadingNextPage" class="v-select-loading">
-              <Loading />
+            <div v-if="loadingNextPage" class="flex justify-center my-3">
+              <span class="text-blue-950 font-semibold">Loading...</span>
+              <!-- <Loading /> -->
             </div>
           </ComboboxViewport>
         </div>
       </ComboboxContent>
       <span v-if="notes !== undefined" class="v-select-notes">{{ notes }}</span>
-      <span v-if="status !== 'default' || checkErrorSelect()" :class="classTextStatus">{{ status_message ||
-        checkErrorMessageSelect() }}</span>
+      <span
+        v-if="status !== 'default' || checkErrorSelect()"
+        :class="classTextStatus"
+        >{{ status_message || checkErrorMessageSelect() }}</span
+      >
       <slot name="support-text" />
     </ComboboxRoot>
   </div>

@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { computed, onMounted, reactive, ref } from "vue";
+import { AxiosError } from "axios";
 import { useRoute } from "vue-router";
 
-import { Button, Icon, ModalDelete, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
 import { ColumnsEquipment } from "../../constants/EquipmentConstant";
 import { useMasterStore } from "../../stores/MasterStore";
@@ -15,8 +23,10 @@ import type {
 } from "../../types/EquipmentType";
 import FormAdEquipment from "../../components/FormAdEquipment.vue";
 import FilterAdEquipment from "../../components/FilterAdEquipment.vue";
+import ButtonGroup from "../../components/ButtonGroup.vue";
 
 const dataForm = ref<EquipmentFilterInterface | null>(null);
+const breadcrumb = ref<BreadcrumbType[]>([]);
 const masterStore = useMasterStore();
 const route = useRoute();
 const total_item = ref(0);
@@ -29,6 +39,12 @@ const params = reactive({
       operator: "EQ",
       column: "scopeStandart.additional_scope_uuid",
       value: route.params?.id,
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "scope_standart_uuid",
+      value: "",
     },
   ],
   currentPage: 1,
@@ -46,10 +62,14 @@ const {
   isFetching: isLoadingEquipment,
   refetch: refetchEquipment,
 } = useQuery({
-  queryKey: ["getEquipmentMaster"],
+  queryKey: ["getAddEquipmentMaster"],
   queryFn: async () => {
     try {
-      const { data } = await masterStore.getEquipment(params);
+      console.log("trigger disini");
+      const { data } = await masterStore.getEquipment(
+        params,
+        "/add-scope/detail"
+      );
       const response = data.data as IPagination<EquipmentInterface[]>;
 
       total_item.value = response.total;
@@ -61,13 +81,17 @@ const {
     }
   },
   refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return Boolean(params.filters?.[1]);
+  }),
+  gcTime: 0,
 });
 //--- END
 
 //--- DELETE EQUIPMENT
 const { mutate: deleteEquipment, isPending: isLoadingDelete } = useMutation({
   mutationFn: async (id: string) => {
-    return await masterStore.deleteEquipment(id);
+    return await masterStore.deleteEquipment(id, "/add-scope/detail");
   },
   onSuccess: () => {
     toastRef.value?.showToast({
@@ -88,6 +112,79 @@ const { mutate: deleteEquipment, isPending: isLoadingDelete } = useMutation({
   },
 });
 //--- END
+
+//--- DOWNLOAD
+const { mutate: downloadEquipment, isPending: isLoadingDownload } = useMutation(
+  {
+    mutationFn: async () => {
+      return await masterStore.downloadEquipment(params, "/add-scope/detail");
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  }
+);
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateEquipment, isPending: isLoadingTemplate } = useMutation(
+  {
+    mutationFn: async () => {
+      return await masterStore.templateEquipment("/add-scope/detail", {
+        filters: params.filters,
+      });
+    },
+    onSuccess: () => {},
+    onError: (error) => {
+      console.log(error);
+    },
+  }
+);
+//--- END
+
+//--- IMPORT
+const { mutate: importEquipment, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importEquipment(payload, "/add-scope/detail");
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchEquipment();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchEquipment();
+  },
+});
+//--- END
+
+const handleDownload = () => {
+  downloadEquipment();
+};
+
+const handleExportTemplate = () => {
+  templateEquipment();
+};
+
+const handleImport = (file: File) => {
+  importEquipment(file);
+};
 
 const pagination = computed(() => {
   return {
@@ -179,6 +276,12 @@ const resetFilter = () => {
       column: "scopeStandart.additional_scope_uuid",
       value: route.params?.id,
     },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "scope_standart_uuid",
+      value: "",
+    },
   ];
 };
 
@@ -196,6 +299,36 @@ const handleResetFilter = () => {
 const handleRemoveSuccess = () => {
   refetchEquipment();
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: String(route.query?.location),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.unit),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.machine),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.inspectionType),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: String(route.query?.addScope),
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
@@ -208,15 +341,24 @@ const handleRemoveSuccess = () => {
   />
 
   <div class="relative w-full">
-    <Button
-      v-if="dataForm?.scope_standart_uuid"
-      icon_only="plus"
-      class="absolute right-0"
-      size="sm"
-      rounded="full"
-      color="blue"
-      @click="handleCreate"
-    />
+    <div class="flex items-center gap-2 absolute right-0 top-10">
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
+      <Button
+        v-if="dataForm?.scope_standart_uuid"
+        icon_only="plus"
+        size="sm"
+        rounded="full"
+        color="blue"
+        @click="handleCreate"
+      />
+    </div>
 
     <div class="flex gap-8">
       <div class="w-[330px]">
@@ -227,6 +369,7 @@ const handleRemoveSuccess = () => {
         />
       </div>
       <div class="w-full">
+        <Breadcrumb :items="breadcrumb" class="mb-6" />
         <Table
           label-create="Sub Bidang"
           :columns="ColumnsEquipment"
@@ -242,14 +385,17 @@ const handleRemoveSuccess = () => {
           <template #column_action="{ entity }">
             <div class="flex items-center justify-center gap-4">
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="pencil"
                 class="icon-action-table"
                 @click="handleUpdate(entity)"
               />
               <Icon
+                v-if="Number(entity?.has_transaction || 0) === 0"
                 name="trash"
                 class="icon-action-table"
                 @click="handleDelete(entity)"
+                v-show="Number(entity.has_transaction) == 0"
               />
             </div>
           </template>

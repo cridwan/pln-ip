@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -19,6 +19,7 @@ import { ColumnsManpower } from "../constants/ManpowerConstant";
 import type { ManpowerInterface } from "../types/ManpowerType";
 import { useMasterStore } from "../stores/MasterStore";
 import FormManpower from "../components/FormManpower.vue";
+import ButtonGroup from "../components/ButtonGroup.vue";
 
 const masterStore = useMasterStore();
 const total_item = ref(0);
@@ -81,6 +82,61 @@ const { mutate: deleteManpower, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadManpower, isPending: isLoadingDownload } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.downloadManpower(params);
+  },
+  onSuccess: () => { },
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateManpower, isPending: isLoadingTemplate } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.templateManpower();
+  },
+  onSuccess: () => { },
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- IMPORT
+const { mutate: importManpower, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importManpower(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchManpower();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchManpower();
   },
 });
 //--- END
@@ -149,8 +205,25 @@ const onDelete = () => {
   deleteManpower(selected_item.value?.uuid as string);
 };
 
+const handleDownload = () => {
+  downloadManpower();
+};
+
+const handleExportTemplate = () => {
+  templateManpower();
+};
+
+const handleImport = (file: File) => {
+  importManpower(file);
+};
+
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Master Data",
       as_link: false,
@@ -169,64 +242,34 @@ onMounted(() => {
   <Breadcrumb :items="breadcrumb" />
   <div class="relative w-full mt-6">
     <div class="flex items-center gap-2 absolute right-0">
-      <Button text="Import" rounded="full" color="blue" />
+      <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
-      <Button text="Export Template" rounded="full" color="blue" />
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <Button text="Export Template" rounded="full" color="blue" /> -->
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
     </div>
 
-    <Table
-      label-create="Manpower"
-      :columns="ColumnsManpower"
-      :entities="dataManpower?.data || []"
-      :loading="isLoadingManpower"
-      :pagination="pagination"
-      :is-create="false"
-      v-model:model-search="params.search"
-      @change-page="changePage"
-      @change-limit="changeLimit"
-      @search="searchTable"
-    >
+    <Table label-create="Manpower" :columns="ColumnsManpower" :entities="dataManpower?.data || []"
+      :loading="isLoadingManpower" :pagination="pagination" :is-create="false" v-model:model-search="params.search"
+      @change-page="changePage" @change-limit="changeLimit" @search="searchTable">
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-4">
-          <Icon
-            name="pencil"
-            class="icon-action-table"
-            @click="handleUpdate(entity)"
-          />
-          <Icon
-            name="trash"
-            class="icon-action-table"
-            @click="handleDelete(entity)"
-          />
+          <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+          <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
         </div>
       </template>
       <template #column_price="{ entity }">
-        <p class="text-base text-neutral-50 text-center">
+        <p class="text-base text-neutral-50 text-left">
           {{ numberFormat(entity.price, true) }}
         </p>
       </template>
     </Table>
 
-    <FormManpower
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-    />
+    <FormManpower v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>

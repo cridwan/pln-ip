@@ -171,7 +171,8 @@ const onDelete = () => {
             </template>
             <template #column_inspection_type="{ entity }">
                 <p class="text-base text-neutral-50 text-center">
-                    {{ entity.inspection_type?.name }}
+                    <!-- {{ entity.inspection_type?.name }} -->
+                    {{ '' }}
                 </p>
             </template>
         </Table>

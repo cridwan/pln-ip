@@ -14,7 +14,7 @@ import {
   TabsTrigger,
 } from "radix-vue";
 import { Button, Input } from "@/components";
-import { numbers_positive_negative } from "@/helpers/global";
+import { numbers_decimals, numbers_positive_negative } from "@/helpers/global";
 
 const props = defineProps({
   value: {
@@ -26,6 +26,10 @@ const props = defineProps({
     default: "",
   },
   loading: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
     type: Boolean,
     default: false,
   },
@@ -71,7 +75,8 @@ defineExpose({
 </script>
 
 <template>
-  <PopoverRoot v-model:open="modelOpenInputData">
+  <p v-if="disabled" class="text-base text-neutral-50 text-left">{{ value }}</p>
+  <PopoverRoot v-else v-model:open="modelOpenInputData">
     <PopoverTrigger>
       <button
         class="button-trigger"
@@ -91,7 +96,8 @@ defineExpose({
           <Input
             v-model="modelQuantity"
             type="text"
-            :custom_symbols="numbers_positive_negative"
+            :is_decimal="true"
+            :custom_symbols="numbers_decimals"
             label="Quantity"
           />
         </div>
@@ -100,7 +106,7 @@ defineExpose({
             text="Cancel"
             size="sm"
             rounded="full"
-            color="grey"
+            color="red"
             :disabled="loading"
             @click="cancel"
           />

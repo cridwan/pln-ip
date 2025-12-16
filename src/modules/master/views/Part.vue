@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -19,6 +19,7 @@ import { ColumnsPart } from "../constants/PartConstant";
 import { useMasterStore } from "../stores/MasterStore";
 import type { PartInterface } from "../types/PartType";
 import FormPart from "../components/FormPart.vue";
+import ButtonGroup from "../components/ButtonGroup.vue";
 
 const masterStore = useMasterStore();
 const total_item = ref(0);
@@ -81,6 +82,61 @@ const { mutate: deletePart, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadPart, isPending: isLoadingDownload } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.downloadPart();
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templatePart, isPending: isLoadingTemplate } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.templatePart();
+  },
+  onSuccess: () => {},
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- IMPORT
+const { mutate: importPart, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importPart(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchPart();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchPart();
   },
 });
 //--- END
@@ -149,8 +205,25 @@ const onDelete = () => {
   deletePart(selected_item.value?.uuid as string);
 };
 
+const handleDownload = () => {
+  downloadPart();
+};
+
+const handleExportTemplate = () => {
+  templatePart();
+};
+
+const handleImport = (file: File) => {
+  importPart(file);
+};
+
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Master Data",
       as_link: false,
@@ -169,9 +242,17 @@ onMounted(() => {
   <Breadcrumb :items="breadcrumb" />
   <div class="relative w-full mt-6">
     <div class="flex items-center gap-2 absolute right-0">
-      <Button text="Import" rounded="full" color="blue" />
+      <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
-      <Button text="Export Template" rounded="full" color="blue" />
+      <Button text="Export Template" rounded="full" color="blue" /> -->
+      <ButtonGroup
+        :loading-import="isLoadingImport"
+        :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate"
+        @download="handleDownload"
+        @template="handleExportTemplate"
+        @import="handleImport"
+      />
       <Button
         icon_only="plus"
         size="sm"
@@ -208,12 +289,12 @@ onMounted(() => {
         </div>
       </template>
       <template #column_price="{ entity }">
-        <p class="text-base text-neutral-50 text-center">
+        <p class="text-base text-neutral-50 text-left">
           {{ numberFormat(entity.price, true) }}
         </p>
       </template>
       <template #column_global_unit="{ entity }">
-        <p class="text-base text-neutral-50 text-center">
+        <p class="text-base text-neutral-50 text-left">
           {{ entity.global_unit?.name ?? "-" }}
         </p>
       </template>
@@ -230,7 +311,7 @@ onMounted(() => {
   <Toast ref="toastRef" />
   <ModalDelete
     v-model="open_delete"
-    :title="selected_item?.name"
+    :title="`${selected_item?.name} / ${selected_item?.global_unit?.name}`"
     :loading="isLoadingDelete"
     @delete="onDelete"
   />

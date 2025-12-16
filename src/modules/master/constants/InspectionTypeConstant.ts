@@ -10,7 +10,13 @@ export const ColumnsInspectionType: TableColumnType[] = [
   {
     key: "sequence",
     label: "Sequence",
-    align: "center",
+    align: "left",
+    sort: false,
+  },
+  {
+    key: "video",
+    label: "Video",
+    align: "left",
     sort: false,
   },
 ];

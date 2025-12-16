@@ -3,9 +3,10 @@
 export interface ManpowerInterface {
   uuid: string;
   name: string;
-  price: number;
+  price: string;
   created_at: string;
   updated_at: string;
+  has_transaction?: number;
 }
 
 export interface ManpowerCreateInterface {

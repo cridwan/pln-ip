@@ -51,7 +51,7 @@ const { mutate: login, isPending: isLoadingLogin } = useMutation({
     });
 
     if (response?.roles?.[0]?.name === "superuser") {
-      router.push("/master/location");
+      router.push("/master/user");
     } else {
       router.push("/");
     }
@@ -109,14 +109,11 @@ watch(
 </script>
 
 <template>
-  <div
-    class="login-container"
-    :style="{
-      backgroundImage: `url(${imgBg})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }"
-  >
+  <div class="login-container" :style="{
+    backgroundImage: `url(${imgBg})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }">
     <div class="login-wrapper">
       <div class="login-card">
         <div class="login-card--wrapper">
@@ -126,38 +123,15 @@ watch(
           </div>
           <form @submit.prevent="onSubmit">
             <div class="form-wrapper">
-              <Input
-                id="email"
-                type="email"
-                prefix_icon="sms"
-                placeholder="Enter your username"
-                autocomplete="on"
-                v-model="model.email"
-                :rules="rules.email"
-                :custom_symbols="emailSymbol"
-                :status="error_message.length > 0 ? 'error' : 'default'"
-                :status_message="error_message"
-              />
-              <Input
-                id="passsword"
-                type="password"
-                prefix_icon="key"
-                placeholder="Enter your password"
-                autocomplete="on"
-                is_password
-                v-model="model.password"
-                :rules="rules.password"
-                :status="error_message.length > 0 ? 'error' : 'default'"
-                :status_message="error_message"
-              />
+              <Input id="email" type="email" prefix_icon="sms" placeholder="Enter your username" autocomplete="on"
+                v-model="model.email" :rules="rules.email" :custom_symbols="emailSymbol"
+                :status="error_message.length > 0 ? 'error' : 'default'" :status_message="error_message" />
+              <Input id="passsword" type="password" prefix_icon="key" placeholder="Enter your password"
+                autocomplete="on" is_password v-model="model.password" :rules="rules.password"
+                :status="error_message.length > 0 ? 'error' : 'default'" :status_message="error_message" />
             </div>
             <p class="forgot-password">Forgot password?</p>
-            <Button
-              text="SIGN IN"
-              type="submit"
-              :loading="isLoadingLogin"
-              :disabled="isLoadingLogin"
-            />
+            <Button text="SIGN IN" type="submit" :loading="isLoadingLogin" :disabled="isLoadingLogin" />
             <p class="title-ubh">Unit Bisnis Pemeliharaan 2025</p>
           </form>
         </div>

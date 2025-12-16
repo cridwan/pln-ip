@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import type { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -18,6 +18,7 @@ import { ColumnsBidang } from "../constants/BidangConstant";
 import { useMasterStore } from "../stores/MasterStore";
 import type { BidangInterface } from "../types/BidangType";
 import FormBidang from "../components/FormBidang.vue";
+import ButtonGroup from "../components/ButtonGroup.vue";
 
 const masterStore = useMasterStore();
 const total_item = ref(0);
@@ -45,8 +46,6 @@ const {
     try {
       const { data } = await masterStore.getBidang(params);
       const response = data.data as IPagination<BidangInterface[]>;
-
-      console.log(response);
 
       total_item.value = response.total;
 
@@ -81,6 +80,61 @@ const { mutate: deleteBidang, isPending: isLoadingDelete } = useMutation({
       description: error?.response?.data?.message || "Something went wrong",
       type: "error",
     });
+  },
+});
+//--- END
+
+//--- DOWNLOAD
+const { mutate: downloadBidang, isPending: isLoadingDownload } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.downloadBidang();
+  },
+  onSuccess: () => { },
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- DOWNLOAD TEMPLATE
+const { mutate: templateBidang, isPending: isLoadingTemplate } = useMutation({
+  mutationFn: async () => {
+    return await masterStore.templateBidang();
+  },
+  onSuccess: () => { },
+  onError: (error) => {
+    console.log(error);
+  },
+});
+//--- END
+
+//--- IMPORT
+const { mutate: importBidang, isPending: isLoadingImport } = useMutation({
+  mutationFn: async (payload: File) => {
+    return await masterStore.importBidang(payload);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Import successfully",
+      type: "success",
+    });
+    refetchBidang();
+  },
+  onError: (error) => {
+    let message = "Something went wrong";
+
+    if (error instanceof AxiosError) {
+      message = error?.response?.data?.message || "Something went wrong";
+    }
+
+    toastRef.value?.showToast({
+      title: "Error",
+      description: message,
+      type: "error",
+    });
+
+    refetchBidang();
   },
 });
 //--- END
@@ -149,8 +203,25 @@ const onDelete = () => {
   deleteBidang(selected_item.value?.uuid as string);
 };
 
+const handleDownload = () => {
+  downloadBidang();
+};
+
+const handleExportTemplate = () => {
+  templateBidang();
+};
+
+const handleImport = (file: File) => {
+  importBidang(file);
+};
+
 onMounted(() => {
   breadcrumb.value = [
+    {
+      name: "Main Menu",
+      as_link: false,
+      url: "",
+    },
     {
       name: "Master Data",
       as_link: false,
@@ -169,61 +240,31 @@ onMounted(() => {
   <Breadcrumb :items="breadcrumb" />
   <div class="relative w-full mt-6">
     <div class="flex items-center gap-2 absolute right-0">
-      <Button text="Import" rounded="full" color="blue" />
+      <!-- <Button text="Import" rounded="full" color="blue" />
       <Button text="Download" rounded="full" color="blue" />
-      <Button text="Export Template" rounded="full" color="blue" />
-      <Button
-        icon_only="plus"
-        size="sm"
-        rounded="full"
-        color="blue"
-        @click="handleCreate"
-      />
+      <Button text="Export Template" rounded="full" color="blue" /> -->
+      <ButtonGroup :loading-import="isLoadingImport" :loading-download="isLoadingDownload"
+        :loading-template="isLoadingTemplate" @download="handleDownload" @template="handleExportTemplate"
+        @import="handleImport" />
+      <Button icon_only="plus" size="sm" rounded="full" color="blue" @click="handleCreate" />
     </div>
 
-    <Table
-      label-create="Bidang"
-      :columns="ColumnsBidang"
-      :entities="dataBidang?.data || []"
-      :loading="isLoadingBidang"
-      :pagination="pagination"
-      :is-create="false"
-      v-model:model-search="params.search"
-      @change-page="changePage"
-      @change-limit="changeLimit"
-      @search="searchTable"
-    >
+    <Table label-create="Bidang" :columns="ColumnsBidang" :entities="dataBidang?.data || []" :loading="isLoadingBidang"
+      :pagination="pagination" :is-create="false" v-model:model-search="params.search" @change-page="changePage"
+      @change-limit="changeLimit" @search="searchTable">
       <template #column_action="{ entity }">
         <div class="flex items-center justify-center gap-4">
-          <Icon
-            name="pencil"
-            class="icon-action-table"
-            @click="handleUpdate(entity)"
-          />
-          <Icon
-            name="trash"
-            class="icon-action-table"
-            @click="handleDelete(entity)"
-          />
+          <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)" />
+          <Icon name="trash" class="icon-action-table" @click="handleDelete(entity)" />
         </div>
       </template>
     </Table>
 
-    <FormBidang
-      v-model="open_form"
-      :selected-value="selected_item"
-      @success="handleSuccess"
-      @error="handleError"
-    />
+    <FormBidang v-model="open_form" :selected-value="selected_item" @success="handleSuccess" @error="handleError" />
   </div>
 
   <Toast ref="toastRef" />
-  <ModalDelete
-    v-model="open_delete"
-    :title="selected_item?.name"
-    :loading="isLoadingDelete"
-    @delete="onDelete"
-  />
+  <ModalDelete v-model="open_delete" :title="selected_item?.name" :loading="isLoadingDelete" @delete="onDelete" />
 </template>
 
 <style lang="sass"></style>

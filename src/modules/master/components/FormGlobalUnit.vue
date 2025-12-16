@@ -27,11 +27,15 @@ const modelValue = defineModel<boolean>({ default: false });
 
 const model = ref<GlobalUnitCreateInterface>({
   name: "",
+  slug: "",
 });
 const v$_form = reactive(useVuelidate());
 const rules = computed(() => {
   return {
     name: {
+      required: helpers.withMessage(`This field is required`, required),
+    },
+    slug: {
       required: helpers.withMessage(`This field is required`, required),
     },
   };
@@ -90,12 +94,14 @@ const handleSubmit = async () => {
 const setValue = () => {
   model.value = {
     name: props.selectedValue?.name || "",
+    slug: props.selectedValue?.slug || "",
   };
 };
 
 const resetValue = () => {
   model.value = {
     name: "",
+    slug: "",
   };
 };
 
@@ -116,10 +122,11 @@ watch(modelValue, (value) => {
 
 <template>
   <Modal width="440" height="200" :showButtonClose="false"
-    :title="props.selectedValue ? 'Ubah Global Unit' : 'Tambah Global Unit'" v-model="modelValue">
+    :title="props.selectedValue ? 'Ubah Satuan' : 'Tambah Satuan'" v-model="modelValue">
     <form class="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto mx-[-20px] px-5"
       @submit.prevent="handleSubmit">
-      <Input v-model="model.name" :rules="rules.name" :custom_symbols="all_characters" label="Nama" />
+      <Input v-model="model.name" star :rules="rules.name" :custom_symbols="all_characters" label="Nama" />
+      <Input v-model="model.slug" star :rules="rules.slug" :custom_symbols="all_characters" label="Singkatan" />
 
       <div class="w-full flex items-center gap-4 mt-4">
         <Button text="Batal" class="w-full" variant="secondary" :disabled="isLoadingCreate || isLoadingUpdate"

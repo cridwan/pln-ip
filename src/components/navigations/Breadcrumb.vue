@@ -17,11 +17,14 @@ const props = defineProps({
       return [];
     },
   },
+  class: {
+    type: String,
+  },
 });
 </script>
 
 <template>
-  <div class="breadcrumb">
+  <div :class="['breadcrumb', props.class]">
     <div v-for="(item, key) in items" :key="key" class="breadcrumb-container">
       <RouterLink
         v-if="item.as_link"
@@ -32,14 +35,14 @@ const props = defineProps({
             ? 'text-cyan-500'
             : 'text-neutral-950 hover:text-[#668415] cursor-pointer'
         "
-        >{{ item.name }}</RouterLink
+        >{{ item.name?.replace("Std", "Standart") }}</RouterLink
       >
       <p
         v-else
         class="breadcrumb-normal"
         :class="key + 1 === items.length ? 'text-cyan-500' : 'text-neutral-950'"
       >
-        {{ item.name }}
+        {{ item.name?.replace("Std", "Standart") }}
       </p>
       <Icon
         v-if="key + 1 !== items.length"
@@ -56,7 +59,7 @@ const props = defineProps({
   .breadcrumb-container
     @apply flex items-center gap-1
     .breadcrumb-link
-      @apply text-base font-bold
+      @apply text-base font-bold uppercase
     .breadcrumb-normal
-      @apply text-base font-bold
+      @apply text-base font-bold uppercase
 </style>

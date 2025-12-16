@@ -10,3 +10,6 @@ export interface BidangInterface {
 export interface BidangCreateInterface {
   name: string;
 }
+export interface BidangTypeModelCreateInterface {
+  uuid: string;
+}

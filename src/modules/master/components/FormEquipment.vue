@@ -1,23 +1,17 @@
 <script setup lang="ts">
 import { reactive, ref, computed, type PropType, watch } from "vue";
 
-import { Button, Input, Modal, Select } from "@/components";
+import { Button, Input, Modal } from "@/components";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
-import { all_characters, mergeArrays } from "@/helpers/global";
-import type { IPagination, IParams } from "@/types/GlobalType";
+import { useMutation } from "@tanstack/vue-query";
+import { all_characters } from "@/helpers/global";
 
 import type {
   EquipmentCreateInterface,
   EquipmentInterface,
 } from "../types/EquipmentType";
 import { useMasterStore } from "../stores/MasterStore";
-
-type OptionType = {
-  value: string;
-  label: string;
-};
 
 const props = defineProps({
   selectedValue: {
@@ -33,8 +27,6 @@ const emit = defineEmits(["success", "error"]);
 const masterStore = useMasterStore();
 
 const modelValue = defineModel<boolean>({ default: false });
-const is_loading_scope = ref(false);
-const options_scope = ref<OptionType[]>([]);
 
 const model = ref<EquipmentCreateInterface>({
   name: "",
@@ -145,6 +137,7 @@ watch(modelValue, (value) => {
     >
       <Input
         v-model="model.name"
+        star
         :rules="rules.name"
         :custom_symbols="all_characters"
         label="Nama"

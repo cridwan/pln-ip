@@ -1,13 +1,22 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import type { AxiosError } from "axios";
 import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 
-import { ButtonDots, Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import type { ValueUploadType } from "@/components/fields/Upload.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { CreateDocumentInterface, IPagination } from "@/types/GlobalType";
 import { useGlobalStore } from "@/stores/GlobalStore";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
 
 import type {
   ResponseAddScopeInterface,
@@ -19,16 +28,33 @@ import type { TColor } from "../types/ScopeType";
 import FormAssetWelness from "../components/FormAssetWelness.vue";
 import FormWithUploadFile from "../components/FormWithUploadFile.vue";
 import { useTransactionStore } from "../stores/TransactionStore";
+import FormAdScope from "../components/FormAdScope.vue";
+import type { ProjectInterface } from "../types/ProjectType";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 
-const entitiesScope = ref<AddScopeInterface[]>([]);
-
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
+const breadcrumb = ref<BreadcrumbType[]>([]);
+const open_form = ref(false);
+const entitiesScope = ref<(AddScopeInterface & { original_uuid: string })[]>(
+  []
+);
+const selected_item = ref<AddScopeInterface>();
+const formAdScope = ref<InstanceType<typeof FormAdScope> | null>(null);
 const transactionStore = useTransactionStore();
 const globalStore = useGlobalStore();
 const router = useRouter();
 const route = useRoute();
 const params = reactive({
   search: "",
-  filters: `project_uuid,${route.params.id_project}`,
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "project_uuid",
+      value: route.params.id_project,
+    },
+  ],
   currentPage: 1,
   perPage: 10,
 });
@@ -46,13 +72,25 @@ const is_loading_create = ref(false);
 const timeout = ref(0);
 const file_deleted = ref("");
 
+//--- GET STATUS APPROVAL
+const { data: dataApproval } = useQuery({
+  queryKey: ["getApprovalAtAdditionalScope"],
+  queryFn: async () => {
+    const { data } = await transactionStore.getProject(
+      route.params.id_project as string
+    );
+    const response = data.data.data as ProjectInterface;
+
+    return response;
+  },
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
+
 //--- GET SCOPE
-const {
-  data: dataScope,
-  isFetching: isLoadingScope,
-  refetch: refetchScope,
-} = useQuery({
-  queryKey: ["getScopeListrik"],
+const { isFetching: isLoadingScope, refetch: refetchScope } = useQuery({
+  queryKey: ["getAddScopeTransaction"],
   queryFn: async () => {
     try {
       const { data } = await transactionStore.getAddScope(params);
@@ -60,10 +98,11 @@ const {
 
       total_item.value = response.total;
 
-      const new_arr: AddScopeInterface[] =
+      const new_arr: (AddScopeInterface & { original_uuid: string })[] =
         response.data?.map((item) => {
           return {
             id: item.uuid,
+            original_uuid: item.original_uuid,
             squence: item.sequence_animation,
             animation: item.animation,
             day: item.day,
@@ -171,7 +210,37 @@ const {
       throw err.response;
     }
   },
+  retry: 0,
   refetchOnWindowFocus: false,
+});
+//--- END
+
+//--- DELETE
+const { mutate: deleteScope, isPending: isLoadingDelete } = useMutation({
+  mutationFn: async (id: string) => {
+    return await transactionStore.deleteAdScope(id);
+  },
+  onSuccess: () => {
+    refetchScope();
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Deleted successfully",
+      type: "success",
+    });
+    open_delete.value = false;
+
+    if (formAdScope.value?.refetchScope) {
+      formAdScope.value.refetchScope();
+    }
+  },
+  onError: (error: any) => {
+    console.log(error);
+    toastRef.value?.showToast({
+      title: "Error",
+      description: error?.response?.data?.message || "Something went wrong",
+      type: "error",
+    });
+  },
 });
 //--- END
 
@@ -233,6 +302,7 @@ const { mutate: createAddScope } = useMutation({
     file.value = null;
     is_loading_create.value = false;
   },
+  retry: 0,
 });
 //--- END
 
@@ -266,6 +336,7 @@ const { mutate: createDocument } = useMutation({
     file.value = null;
     is_loading_create.value = false;
   },
+  retry: 0,
 });
 //--- END
 
@@ -308,7 +379,7 @@ const saveAssetWelness = (
     color: e.color,
     note: e.note,
     category: "asset-welness",
-    scope_standart_uuid: entity.id,
+    additional_scope_uuid: entity.id,
   });
 };
 
@@ -343,14 +414,22 @@ const saveFieldWithFile = (
     color: null,
     note: e.note,
     category: field,
-    scope_standart_uuid: entity.id,
+    additional_scope_uuid: entity.id,
   });
 };
 
-const toDetail = (id: string) => {
-  router.push(
-    `/${route.params.id}/create/unit/${route.params.id_unit}/${route.params.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/add-scope/${id}/scope-mekanik`
-  );
+const toDetail = (
+  id: string,
+  entity: AddScopeInterface & { original_uuid: string }
+) => {
+  router.push({
+    path: `/${route.params.id}/create/unit/${route.params.id_unit}/${route.params.id_machine}/${route.params.menu}/${route.params.id_project}/${route.params.id_inspection}/add-scope/${id}/scope`,
+    query: {
+      ...route.query,
+      original_uuid: entity.original_uuid,
+      scope: entity.asset,
+    },
+  });
 };
 
 const toSquence = (item: AddScopeInterface) => {
@@ -366,101 +445,293 @@ function searchTable() {
     refetchScope();
   }, 1000);
 }
+
+const onDelete = () => {
+  deleteScope(selected_item.value?.id as string);
+};
+
+const handleDelete = (e: AddScopeInterface) => {
+  selected_item.value = e;
+  open_delete.value = true;
+};
+
+const handleCreate = () => {
+  open_form.value = true;
+};
+
+const handleSuccess = () => {
+  toastRef.value?.showToast({
+    title: "Success",
+    description: "Saved successfully",
+    type: "success",
+  });
+  params.currentPage = 1;
+  refetchScope();
+
+  if (formAdScope.value?.refetchScope) {
+    formAdScope.value.refetchScope();
+  }
+};
+
+const handleError = (error: any) => {
+  toastRef.value?.showToast({
+    title: "Error",
+    description: error?.response?.data?.message || "Something went wrong",
+    type: "error",
+  });
+};
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: ((route.query?.inspection as string) || "").toUpperCase(),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: "ADDITIONAL SCOPE",
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
-  <Toast ref="toastRef" />
-  <Table
-    label-create="Asset"
-    :columns="ColumnsScope"
-    :entities="entitiesScope"
-    :loading="isLoadingScope"
-    :pagination="pagination"
-    :is-create="false"
-    v-model:model-search="params.search"
-    @change-page="changePage"
-    @change-limit="changeLimit"
-    @search="searchTable"
-  >
-    <template #header_action>
-      <div class="px-3 py-1.5">
-        <p class="v-table-th-text">Action</p>
-      </div>
-    </template>
-    <template #column_asset_welness="{ entity }">
-      <div class="w-full flex justify-center">
-        <FormAssetWelness
-          ref="asset_welness"
-          :value="entity.asset_welness"
-          :label="entity.asset"
-          :loading="is_loading_create"
-          @save="(e) => saveAssetWelness(e, entity)"
-        />
-      </div>
-    </template>
-    <template #column_oh_recom="{ entity }">
-      <div class="w-full flex justify-center">
-        <FormWithUploadFile
-          ref="oh_recom"
-          :value="entity.oh_recom"
-          :label="entity.asset"
-          :loading="is_loading_create"
-          @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')"
-        />
-      </div>
-    </template>
-    <template #column_wo_priority="{ entity }">
-      <div class="w-full flex justify-center">
-        <FormWithUploadFile
-          ref="wo_priority"
-          :value="entity.wo_priority"
-          :label="entity.asset"
-          :loading="is_loading_create"
-          @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')"
-        />
-      </div>
-    </template>
-    <template #column_history="{ entity }">
-      <div class="w-full flex justify-center">
-        <FormWithUploadFile
-          ref="history"
-          :value="entity.history"
-          :label="entity.asset"
-          :loading="is_loading_create"
-          @save="(e) => saveFieldWithFile(e, entity, 'history')"
-        />
-      </div>
-    </template>
-    <template #column_rla="{ entity }">
-      <div class="w-full flex justify-center">
-        <FormWithUploadFile
-          ref="rla"
-          :value="entity.rla"
-          :label="entity.asset"
-          :loading="is_loading_create"
-          @save="(e) => saveFieldWithFile(e, entity, 'rla')"
-        />
-      </div>
-    </template>
-    <template #column_ncr="{ entity }">
-      <div class="w-full flex justify-center">
-        <FormWithUploadFile
-          ref="ncr"
-          :value="entity.ncr"
-          :label="entity.asset"
-          :loading="is_loading_create"
-          @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
-        />
-      </div>
-    </template>
-    <template #column_action="{ entity }">
-      <div class="flex items-center justify-center gap-2">
-        <ButtonDots
-          :day="entity.day"
-          @detail="toDetail(entity.id)"
-          @squence="toSquence(entity)"
-        />
-      </div>
-    </template>
-  </Table>
+  <div class="relative w-full">
+    <Toast ref="toastRef" />
+    <ModalDelete
+      v-model="open_delete"
+      :title="selected_item?.asset"
+      :loading="isLoadingDelete"
+      @delete="onDelete"
+    />
+    <Button
+      v-if="
+        dataApproval?.status !== 'approve' &&
+        access_token &&
+        authStore.users?.role == 'planner'
+      "
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
+    <Breadcrumb :items="breadcrumb" />
+    <Table
+      :is_logging="false"
+      label-create="Asset"
+      :columns="ColumnsScope"
+      :entities="entitiesScope"
+      :loading="isLoadingScope"
+      :pagination="pagination"
+      :is-create="false"
+      v-model:model-search="params.search"
+      @delete="handleDelete"
+      @change-page="changePage"
+      @change-limit="changeLimit"
+      @search="searchTable"
+    >
+      <template #header_action>
+        <div class="px-3 py-1.5">
+          <p class="v-table-th-text">Action</p>
+        </div>
+      </template>
+      <template #column_asset_welness="{ entity }">
+        <div class="w-full flex justify-center">
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.asset_welness) ||
+              (!access_token && !entity.asset_welness)
+            "
+          >
+            -
+          </p>
+          <FormAssetWelness
+            v-else
+            ref="asset_welness"
+            :value="entity.asset_welness"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
+            @save="(e) => saveAssetWelness(e, entity)"
+          />
+        </div>
+      </template>
+      <template #column_oh_recom="{ entity }">
+        <div class="w-full flex justify-center">
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.oh_recom) ||
+              (!access_token && !entity.oh_recom)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="oh_recom"
+            :value="entity.oh_recom"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
+            @save="(e) => saveFieldWithFile(e, entity, 'oh-recom')"
+          />
+        </div>
+      </template>
+      <template #column_wo_priority="{ entity }">
+        <div class="w-full flex justify-center">
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.wo_priority) ||
+              (!access_token && !entity.wo_priority)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="wo_priority"
+            :value="entity.wo_priority"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
+            @save="(e) => saveFieldWithFile(e, entity, 'wo-priority')"
+          />
+        </div>
+      </template>
+      <template #column_history="{ entity }">
+        <div class="w-full flex justify-center">
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.history) ||
+              (!access_token && !entity.history)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="history"
+            :value="entity.history"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
+            @save="(e) => saveFieldWithFile(e, entity, 'history')"
+          />
+        </div>
+      </template>
+      <template #column_rla="{ entity }">
+        <div class="w-full flex justify-center">
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.rla) ||
+              (!access_token && !entity.rla)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="rla"
+            :value="entity.rla"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
+            @save="(e) => saveFieldWithFile(e, entity, 'rla')"
+          />
+        </div>
+      </template>
+      <template #column_ncr="{ entity }">
+        <div class="w-full flex justify-center">
+          <p
+            v-if="
+              (dataApproval?.status === 'approve' && !entity.ncr) ||
+              (!access_token && !entity.ncr)
+            "
+          >
+            -
+          </p>
+          <FormWithUploadFile
+            v-else
+            ref="ncr"
+            :value="entity.ncr"
+            :label="entity.asset"
+            :loading="is_loading_create"
+            :disabled="
+              dataApproval?.status === 'approve' ||
+              !access_token ||
+              authStore.users?.role != 'planner'
+            "
+            @save="(e) => saveFieldWithFile(e, entity, 'ncr')"
+          />
+        </div>
+      </template>
+      <template #column_action="{ entity }">
+        <div class="flex items-center justify-center gap-2">
+          <!-- <ButtonDots :day="entity.day" @detail="toDetail(entity.id)" @squence="toSquence(entity)" /> -->
+          <Icon
+            name="eye"
+            class="cursor-pointer text-white"
+            @click="toDetail(entity.id, entity)"
+          />
+          <Icon
+            v-if="
+              dataApproval?.status !== 'approve' &&
+              access_token &&
+              authStore.users?.role == 'planner'
+            "
+            name="trash"
+            class="cursor-pointer text-white"
+            @click="handleDelete(entity)"
+          />
+        </div>
+      </template>
+    </Table>
+
+    <FormAdScope
+      ref="formAdScope"
+      v-model="open_form"
+      :selected-value="selected_item"
+      @success="handleSuccess"
+      @error="handleError"
+    />
+  </div>
 </template>

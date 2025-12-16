@@ -1,76 +1,155 @@
 <script setup lang="ts">
 import type { AxiosError } from "axios";
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 
-import { Table, Toast } from "@/components";
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  ModalDelete,
+  Table,
+  Toast,
+} from "@/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import type { IPagination } from "@/types/GlobalType";
-
-import { ColumnsAddScopeDetailPart } from "../../constants/AddScope";
+import type { BreadcrumbType } from "@/components/navigations/Breadcrumb.vue";
 import type {
-  PartInterface,
-  ResponsePartInterface,
-  UpdatePartInterface,
-} from "../../types/PartType";
+  FilterPartStdInterface,
+  PartStdInterface,
+} from "@/modules/master/types/PartStdType";
+import { ColumnsPart } from "@/modules/transaction/constants/PartConstant";
+import { useTransactionStore } from "@/modules/transaction/stores/TransactionStore";
+import FilterPartStd from "@/modules/transaction/components/add-scope/FilterPartStd.vue";
+// import FormPartStd from "@/modules/transaction/components/FormPartStd.vue";
+import { useAuthStore } from "@/modules/auth/stores/AuthStore";
+
+import type { ProjectInterface } from "../../types/ProjectType";
+import type { UpdatePartInterface } from "../../types/PartType";
 import FormQuantity from "../../components/FormQuantity.vue";
-import { useTransactionStore } from "../../stores/TransactionStore";
+import type { PartStdTransactionInterface } from "../../types/PartStdType";
+import FormPartStd from "../../components/FormPartStd.vue";
+import type { ActivitySelectInterface } from "../../types/ActivityType";
+import TableSummary from "@/components/tables/TableSummary.vue";
+// import FormAdPart from "../../components/add-scope/FormAdPart.vue";
 
-const entitiesPart = ref<PartInterface[]>([]);
-
+const authStore = useAuthStore();
+const { access_token } = storeToRefs(authStore);
+const formPartStd = ref<InstanceType<typeof FormPartStd> | null>(null);
 const transactionStore = useTransactionStore();
 const route = useRoute();
 const params = reactive({
   search: "",
-  filter: `additional_scope_uuid,${route.params.id_scope}`,
+  filter: "",
+  filters: [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity.equipment.scopeStandart.additional_scope_uuid",
+      value: route.params.id_scope,
+    },
+  ],
   currentPage: 1,
   perPage: 10,
 });
+const dataSummary = ref<{
+  total_price: Number;
+  price: Number;
+  total_qty: Number;
+}>({
+  total_price: 0,
+  price: 0,
+  total_qty: 0,
+});
 const total_item = ref(0);
 const toastRef = ref<InstanceType<typeof Toast> | null>(null);
+const original_uuid = ref("");
+const timeout = ref(0);
+const dataForm = ref<FilterPartStdInterface | null>(null);
+const selected_item = ref<PartStdTransactionInterface | null>(null);
+const breadcrumb = ref<BreadcrumbType[]>([]);
+const open_form = ref(false);
+const open_delete = ref(false);
+const is_loading_filter = ref(false);
 const quantity = ref<any>(null);
 
-//--- GET PART
+//--- GET STATUS APPROVAL
+const { data: dataApproval } = useQuery({
+  queryKey: ["getApprovalAtPartDetailAddScope"],
+  queryFn: async () => {
+    const { data } = await transactionStore.getProject(
+      route.params.id_project as string
+    );
+    const response = data.data.data as ProjectInterface;
+
+    return response;
+  },
+  retry: 0,
+  refetchOnWindowFocus: false,
+});
+//--- END
+
+//--- GET PART STD
 const {
   data: dataPart,
   isFetching: isLoadingPart,
   refetch: refetchPart,
 } = useQuery({
-  queryKey: ["getAddScopePart"],
+  queryKey: ["getPartAtPartDetailAddScope"],
   queryFn: async () => {
     try {
-      const { data } = await transactionStore.getPart(params);
-      const response = data as IPagination<ResponsePartInterface[]>;
-
+      const { data } = await transactionStore.getPart(
+        params,
+        "/add-scope/detail"
+      );
+      const response = data as IPagination<PartStdTransactionInterface[]>;
+      const summary = data.summary;
+      dataSummary.value = {
+        total_price: summary.total_price,
+        price: summary.price,
+        total_qty: summary.total_qty,
+      };
       total_item.value = response.total;
-
-      const new_arr: PartInterface[] =
-        response.data?.map((item) => {
-          return {
-            id: item.uuid,
-            part: item.name,
-            document: null,
-            quantity: item.qty.toString(),
-            unit: item.global_unit?.name,
-            number_drawing: item.no_drawing,
-            global_unit_uuid: item.global_unit_uuid,
-            project_uuid: item.project_uuid,
-            additional_scope_uuid: item.additional_scope_uuid,
-            note: item.note,
-            size: item?.size || "",
-            location: item?.location || "",
-          };
-        }) || [];
-      console.log("AAA", new_arr);
-      entitiesPart.value = new_arr;
+      is_loading_filter.value = false;
 
       return response;
     } catch (error: any) {
       const err = error as AxiosError;
+      is_loading_filter.value = false;
       throw err.response;
     }
   },
   refetchOnWindowFocus: false,
+});
+//--- END
+
+//--- DELETE PART STD
+const { mutate: deletePartStd, isPending: isLoadingDelete } = useMutation({
+  mutationFn: async (id: string) => {
+    return await transactionStore.deletePartStd(id);
+  },
+  onSuccess: () => {
+    toastRef.value?.showToast({
+      title: "Success",
+      description: "Deleted successfully",
+      type: "success",
+    });
+    open_delete.value = false;
+    refetchPart();
+
+    if (formPartStd.value?.refetchPart) {
+      formPartStd.value.refetchPart();
+    }
+  },
+  onError: (error: any) => {
+    console.log(error);
+    toastRef.value?.showToast({
+      title: "Error",
+      description: error?.response?.data?.message || "Something went wrong",
+      type: "error",
+    });
+  },
 });
 //--- END
 
@@ -124,54 +203,309 @@ const changeLimit = (e: string) => {
   refetchPart();
 };
 
-const saveQuantity = (e: { quantity: string }, entity: PartInterface) => {
+function searchTable() {
+  clearTimeout(timeout.value);
+  timeout.value = window.setTimeout(() => {
+    params.currentPage = 1;
+    refetchPart();
+  }, 1000);
+}
+
+const handleSuccess = () => {
+  toastRef.value?.showToast({
+    title: "Success",
+    description: "Saved successfully",
+    type: "success",
+  });
+  params.currentPage = 1;
+  refetchPart();
+
+  if (formPartStd.value?.refetchPart) {
+    formPartStd.value.refetchPart();
+  }
+};
+
+const handleError = (error: any) => {
+  toastRef.value?.showToast({
+    title: "Error",
+    description: error?.response?.data?.message || "Something went wrong",
+    type: "error",
+  });
+};
+
+const handleCreate = () => {
+  selected_item.value = null;
+  open_form.value = true;
+};
+
+const handleUpdate = (item: PartStdTransactionInterface) => {
+  selected_item.value = item;
+  open_form.value = true;
+};
+
+const handleDelete = (item: PartStdTransactionInterface) => {
+  selected_item.value = item;
+  open_delete.value = true;
+};
+
+const onDelete = () => {
+  deletePartStd(selected_item.value?.uuid as string);
+};
+
+const setFilter = () => {
+  params.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity.equipment.scopeStandart.additional_scope_uuid",
+      value: route.params.id_scope,
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity.uuid",
+      value: String(dataForm.value?.activity_uuid),
+    },
+  ];
+};
+
+const resetFilter = () => {
+  dataForm.value = null;
+  params.filters = [
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity.equipment.scopeStandart.project_uuid",
+      value: route.params.id_project,
+    },
+    {
+      group: "AND",
+      operator: "EQ",
+      column: "activity.original_uuid",
+      value: "",
+    },
+  ];
+};
+
+const handleOnFilter = (
+  data: FilterPartStdInterface,
+  activity: ActivitySelectInterface
+) => {
+  is_loading_filter.value = true;
+  original_uuid.value = activity.original_uuid;
+  dataForm.value = data;
+  setFilter();
+  refetchPart();
+};
+
+const handleResetFilter = () => {
+  is_loading_filter.value = true;
+  resetFilter();
+  refetchPart();
+};
+
+const handleRemoveSuccess = () => {
+  refetchPart();
+};
+
+const saveQuantity = (
+  e: { quantity: string },
+  entity: PartStdTransactionInterface
+) => {
   updatePart({
-    id: entity.id,
+    id: entity.uuid,
     payload: {
-      name: entity.part,
       qty: parseFloat(e.quantity),
-      noDrawing: entity.number_drawing,
-      additional_scope_uuid: entity.additional_scope_uuid,
-      global_unit_uuid: entity.global_unit_uuid,
-      project_uuid: entity.project_uuid,
-      note: entity.note,
     },
   });
 };
+
+onMounted(() => {
+  breadcrumb.value = [
+    {
+      name: route.query?.location as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.unit as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.machine as string,
+      as_link: false,
+      url: "",
+    },
+    {
+      name: ((route.query?.inspection as string) || "").toUpperCase(),
+      as_link: false,
+      url: "",
+    },
+    {
+      name: route.query?.scope as string,
+      as_link: false,
+      url: "",
+    },
+  ];
+});
 </script>
 
 <template>
-  <Toast ref="toastRef" />
-  <Table
-    label-create="Part"
-    :columns="ColumnsAddScopeDetailPart"
-    :entities="entitiesPart"
-    :loading="isLoadingPart"
-    :pagination="pagination"
-    :is-create="false"
-    :is-action="false"
-    @change-page="changePage"
-    @change-limit="changeLimit"
-  >
-    <template #column_quantity="{ entity }">
-      <div class="w-full flex justify-center">
-        <FormQuantity
-          ref="quantity"
-          :value="entity.quantity || ''"
-          :label="entity.part"
-          :loading="isLoadingUpdate"
-          @save="(e) => saveQuantity(e, entity)"
+  <div class="relative w-full">
+    <Button
+      v-if="
+        dataForm?.activity_uuid &&
+        dataApproval?.status !== 'approve' &&
+        access_token &&
+        authStore.users?.role == 'planner'
+      "
+      icon_only="plus"
+      class="absolute right-0"
+      size="sm"
+      rounded="full"
+      color="blue"
+      @click="handleCreate"
+    />
+
+    <div class="flex gap-8">
+      <div class="basis-1/5">
+        <FilterPartStd
+          @filter="handleOnFilter"
+          @reset-filter="handleResetFilter"
+          :loading="is_loading_filter"
         />
       </div>
-    </template>
-    <template #column_unit="{ entity }">
-      <div class="w-full flex justify-center">
-        <div
-          class="border border-neutral-50 rounded-lg px-2 min-w-[100px] text-base text-neutral-50 text-center"
-        >
-          {{ entity.unit }}
+      <div class="flex-1 overflow-auto">
+        <div class="max-w-full min-w-full">
+          <Breadcrumb :items="breadcrumb" />
+          <Table
+            label-create="Part"
+            :is_logging="false"
+            :columns="ColumnsPart"
+            :entities="dataPart?.data || []"
+            :loading="isLoadingPart"
+            :pagination="pagination"
+            :is-create="false"
+            :is-action="
+              dataApproval?.status !== 'approve' &&
+              access_token !== '' &&
+              authStore.users?.role == 'planner'
+            "
+            class="mt-6"
+            v-model:model-search="params.search"
+            @change-page="changePage"
+            @change-limit="changeLimit"
+            @search="searchTable"
+          >
+            <template #column_action="{ entity }">
+              <div class="flex items-center justify-center gap-4">
+                <!-- <Icon name="pencil" class="icon-action-table" @click="handleUpdate(entity)"
+                  v-if="dataForm?.activity_uuid" /> -->
+                <Icon
+                  name="trash"
+                  class="icon-action-table"
+                  @click="handleDelete(entity)"
+                  v-if="dataForm?.activity_uuid"
+                />
+              </div>
+            </template>
+            <template #column_part="{ entity }">
+              <p class="text-base text-neutral-50 text-left">
+                {{ entity.name ?? "-" }}
+              </p>
+            </template>
+
+            <template #column_total_qty="{ entity, index }">
+              <p
+                v-if="
+                  (dataApproval?.status === 'approve' && !entity.total_qty) ||
+                  (!access_token && !entity.total_qty)
+                "
+              >
+                -
+              </p>
+              <FormQuantity
+                v-else
+                ref="quantity"
+                :value="entity.total_qty?.toString() || ''"
+                :label="entity?.name"
+                :loading="isLoadingUpdate"
+                :disabled="
+                  dataApproval?.status === 'approve' ||
+                  !access_token ||
+                  !dataForm?.activity_uuid ||
+                  authStore.users?.role != 'planner'
+                "
+                @save="(e) => saveQuantity(e, entity)"
+              />
+            </template>
+
+            <template #column_price="{ entity }">
+              <p v-if="!entity?.price">-</p>
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
+                Rp. {{ Number(entity.price).toLocaleString("id") }}
+              </p>
+            </template>
+
+            <template #column_total="{ entity }">
+              <p v-if="!entity.total_qty && !entity?.price">-</p>
+              <p
+                v-else
+                class="text-base text-neutral-50 text-left whitespace-nowrap"
+              >
+                Rp.
+                {{
+                  (
+                    Number(entity.price) * Number(entity.total_qty)
+                  ).toLocaleString("id")
+                }}
+              </p>
+            </template>
+
+            <template #column_unit="{ entity }">
+              <p class="text-base text-neutral-50 text-left">
+                {{ entity.unit ?? "-" }}
+              </p>
+            </template>
+
+            <template #column_number_drawing="{ entity }">
+              <p class="text-base text-neutral-50 text-left">
+                {{ entity?.no_drawing ?? "-" }}
+              </p>
+            </template>
+          </Table>
+          <TableSummary
+            :total_price="Number(dataSummary.total_price)"
+            :price="Number(dataSummary.price)"
+            :total_qty="Number(dataSummary.total_qty)"
+          />
         </div>
       </div>
-    </template>
-  </Table>
+    </div>
+  </div>
+
+  <Toast ref="toastRef" />
+  <FormPartStd
+    ref="formPartStd"
+    :is-additional="true"
+    :original_uuid="original_uuid"
+    v-model="open_form"
+    :data-form="dataForm"
+    :selected-value="selected_item"
+    @success="handleSuccess"
+    @error="handleError"
+    @removeSucess="handleRemoveSuccess"
+  />
+  <!-- <FormAdPart v-model="open_form" :data-form="dataForm" :selected-value="selected_item" @success="handleSuccess"
+    @error="handleError" @removeSucess="handleRemoveSuccess" /> -->
+  <ModalDelete
+    v-model="open_delete"
+    :title="`${selected_item?.name} / ${selected_item?.unit}`"
+    :loading="isLoadingDelete"
+    @delete="onDelete"
+  />
 </template>

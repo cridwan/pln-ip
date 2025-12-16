@@ -10,7 +10,7 @@ export const ColumnsUnit: TableColumnType[] = [
   {
     key: "location",
     label: "Lokasi",
-    align: "center",
+    align: "left",
     sort: false,
   },
 ];
