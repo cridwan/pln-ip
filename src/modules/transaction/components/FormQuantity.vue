@@ -14,7 +14,7 @@ import {
   TabsTrigger,
 } from "radix-vue";
 import { Button, Input } from "@/components";
-import { numbers_positive_negative } from "@/helpers/global";
+import { numbers_decimals, numbers_positive_negative } from "@/helpers/global";
 
 const props = defineProps({
   value: {
@@ -96,7 +96,8 @@ defineExpose({
           <Input
             v-model="modelQuantity"
             type="text"
-            :custom_symbols="numbers_positive_negative"
+            :is_decimal="true"
+            :custom_symbols="numbers_decimals"
             label="Quantity"
           />
         </div>

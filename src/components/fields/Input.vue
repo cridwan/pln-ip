@@ -109,6 +109,10 @@ const props = defineProps({
     type: Boolean,
     value: false,
   },
+  is_decimal: {
+    type: Boolean,
+    value: false,
+  },
   allow_symbols: {
     type: Boolean,
     default: false,
@@ -301,8 +305,8 @@ function onKeyPress(e: KeyboardEvent) {
           props.custom_symbols !== undefined
             ? props.custom_symbols
             : props.allow_symbols
-              ? numbers_characters
-              : numbers_positive;
+            ? numbers_characters
+            : numbers_positive;
 
         if (disabled_char_text.test(char_text)) {
           return true;
@@ -400,14 +404,27 @@ function onKeyPress(e: KeyboardEvent) {
         ) {
           e.preventDefault();
         }
+      } else if (props.is_decimal) {
+        let val = model.value;
+
+        // hapus selain angka & titik
+        val = val.replace(/[^0-9.]/g, "");
+
+        // 🔥 hanya boleh 1 titik
+        const parts = val.split(".");
+        if (parts.length > 2) {
+          val = parts[0] + "." + parts[1];
+        }
+
+        model.value = val;
       } else {
         let char_text = String.fromCharCode(e.keyCode);
         let disabled_char_text =
           props.custom_symbols !== undefined
             ? props.custom_symbols
             : props.allow_symbols
-              ? all_characters
-              : numbers_letters;
+            ? all_characters
+            : numbers_letters;
 
         if (disabled_char_text.test(char_text)) {
           return true;
@@ -427,8 +444,8 @@ function onKeyPress(e: KeyboardEvent) {
             props.custom_symbols !== undefined
               ? props.custom_symbols
               : props.allow_symbols
-                ? numbers_characters
-                : numbers_positive_negative;
+              ? numbers_characters
+              : numbers_positive_negative;
         } else {
           if (props.min !== "" && props.max === "") {
             if (parseInt(props.min.toString()) < 0) {
@@ -436,38 +453,38 @@ function onKeyPress(e: KeyboardEvent) {
                 props.custom_symbols !== undefined
                   ? props.custom_symbols
                   : props.allow_symbols
-                    ? numbers_characters
-                    : numbers_positive_negative;
+                  ? numbers_characters
+                  : numbers_positive_negative;
             } else {
               disabled_char_number =
                 props.custom_symbols !== undefined
                   ? props.custom_symbols
                   : props.allow_symbols
-                    ? numbers_characters
-                    : numbers_positive;
+                  ? numbers_characters
+                  : numbers_positive;
             }
           } else if (props.max !== "" && props.min === "") {
             disabled_char_number =
               props.custom_symbols !== undefined
                 ? props.custom_symbols
                 : props.allow_symbols
-                  ? numbers_characters
-                  : numbers_positive_negative;
+                ? numbers_characters
+                : numbers_positive_negative;
           } else {
             if (parseInt(props.min.toString()) < 0) {
               disabled_char_number =
                 props.custom_symbols !== undefined
                   ? props.custom_symbols
                   : props.allow_symbols
-                    ? numbers_characters
-                    : numbers_positive_negative;
+                  ? numbers_characters
+                  : numbers_positive_negative;
             } else {
               disabled_char_number =
                 props.custom_symbols !== undefined
                   ? props.custom_symbols
                   : props.allow_symbols
-                    ? numbers_characters
-                    : numbers_positive;
+                  ? numbers_characters
+                  : numbers_positive;
             }
           }
         }
@@ -488,8 +505,8 @@ function onKeyPress(e: KeyboardEvent) {
           props.custom_symbols !== undefined
             ? props.custom_symbols
             : props.allow_symbols
-              ? numbers_characters
-              : numbers_positive;
+            ? numbers_characters
+            : numbers_positive;
         if (disabled_char_tel.test(char_tel)) {
           return true;
         } else {
@@ -506,8 +523,8 @@ function onKeyPress(e: KeyboardEvent) {
           props.custom_symbols !== undefined
             ? props.custom_symbols
             : props.allow_symbols
-              ? all_characters
-              : /[a-zA-Z0-9@.]/;
+            ? all_characters
+            : /[a-zA-Z0-9@.]/;
         if (disabled_char_email.test(char_email)) {
           return true;
         } else {
@@ -611,23 +628,27 @@ onMounted(() => {
     observer.disconnect();
   });
 });
-const isFirstTime = ref(true)
-watch(() => props.modelValue, (newVal) => {
-  if (props.is_currency && isFirstTime) {
-    isFirstTime.value = false
-    const value = newVal
-      .replace(/[^0-9 .]*/g, "")
-      .split(".")
-      .join("");
-    if (value === "") {
-      emit("update:modelValue", "");
-      emit("input", "");
-    } else {
-      emit("update:modelValue", numberFormat(parseInt(value), false));
-      emit("input", numberFormat(parseInt(value), false));
+const isFirstTime = ref(true);
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (props.is_currency && isFirstTime) {
+      isFirstTime.value = false;
+      const value = newVal
+        .replace(/[^0-9 .]*/g, "")
+        .split(".")
+        .join("");
+      if (value === "") {
+        emit("update:modelValue", "");
+        emit("input", "");
+      } else {
+        emit("update:modelValue", numberFormat(parseInt(value), false));
+        emit("input", numberFormat(parseInt(value), false));
+      }
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -645,21 +666,59 @@ watch(() => props.modelValue, (newVal) => {
     </div>
     <div class="pln-input--container">
       <div class="pln-input--wrapper">
-        <input class="pln-input--input" :id="id" :name="id" :type="input_type" :class="classes" :style="styles"
-          :placeholder="placeholder" :disabled="disabled" v-model="model" :required="required" :min="min" :max="max"
-          :minlength="minlength" :maxlength="maxlength" :readonly="readonly"
-          @input="(e: any) => onInput(e?.target?.value)" @keypress="onKeyPress" @paste="disablePaste"
-          @copy="disableCopy" :autocomplete="autocomplete" v-bind="$attrs" />
-        <div class="pln-input--icon--before" v-if="showPrefix || prefix_icon !== ''" ref="element_before">
-          <icon v-if="prefix_icon !== '' && !showPrefix" :name="prefix_icon" :class="classIcon" />
+        <input
+          class="pln-input--input"
+          :id="id"
+          :name="id"
+          :type="input_type"
+          :class="classes"
+          :style="styles"
+          :placeholder="placeholder"
+          :disabled="disabled"
+          v-model="model"
+          :required="required"
+          :min="min"
+          :max="max"
+          :minlength="minlength"
+          :maxlength="maxlength"
+          :readonly="readonly"
+          @input="(e: any) => onInput(e?.target?.value)"
+          @keypress="onKeyPress"
+          @paste="disablePaste"
+          @copy="disableCopy"
+          :autocomplete="autocomplete"
+          v-bind="$attrs"
+        />
+        <div
+          class="pln-input--icon--before"
+          v-if="showPrefix || prefix_icon !== ''"
+          ref="element_before"
+        >
+          <icon
+            v-if="prefix_icon !== '' && !showPrefix"
+            :name="prefix_icon"
+            :class="classIcon"
+          />
           <slot v-if="showPrefix" name="prefix" />
         </div>
-        <div class="pln-input--icon--after" v-if="showSuffix || suffix_icon !== ''" ref="element_after">
-          <icon v-if="suffix_icon !== '' && !showSuffix" :name="suffix_icon" :class="classIcon" />
+        <div
+          class="pln-input--icon--after"
+          v-if="showSuffix || suffix_icon !== ''"
+          ref="element_after"
+        >
+          <icon
+            v-if="suffix_icon !== '' && !showSuffix"
+            :name="suffix_icon"
+            :class="classIcon"
+          />
           <slot v-if="showSuffix" name="suffix" />
         </div>
         <template v-if="is_password">
-          <div class="pln-input--icon--password" @click="handlerVisibility" :class="classIcon">
+          <div
+            class="pln-input--icon--password"
+            @click="handlerVisibility"
+            :class="classIcon"
+          >
             <icon v-if="input_type === 'password'" name="eye-slash" />
             <icon v-else name="eye" />
           </div>
@@ -670,8 +729,11 @@ watch(() => props.modelValue, (newVal) => {
           <span class="pln-input-notes">{{ notes }}</span>
         </slot>
       </div>
-      <span v-if="status !== 'default' || checkErrorInput()" :class="classTextStatus">{{ status_message ||
-        checkErrorMessageInput() }}</span>
+      <span
+        v-if="status !== 'default' || checkErrorInput()"
+        :class="classTextStatus"
+        >{{ status_message || checkErrorMessageInput() }}</span
+      >
     </div>
   </div>
 </template>

@@ -63,7 +63,7 @@ const model = ref<ToolStdCreateModelInterface>({
   scope_standart_uuid: "",
   equipment_uuid: "",
   activity_uuid: "",
-  tools_uuid: "",
+  tool_uuid: "",
   qty: "",
 });
 const v$_form = reactive(useVuelidate());
@@ -352,7 +352,7 @@ const setValue = () => {
       props.selectedValue?.activity?.equipment?.scope_standart_uuid || "",
     equipment_uuid: props.selectedValue?.activity?.equipment_uuid || "",
     activity_uuid: props.selectedValue?.activity_uuid || "",
-    tools_uuid: props.selectedValue?.tools_uuid || "",
+    tool_uuid: props.selectedValue?.tools_uuid || "",
     qty: String(props.selectedValue?.qty) || "",
   };
 };
@@ -368,7 +368,7 @@ const resetValue = () => {
     scope_standart_uuid: "",
     equipment_uuid: "",
     activity_uuid: "",
-    tools_uuid: "",
+    tool_uuid: "",
     qty: "",
   };
   refetchBidang();
